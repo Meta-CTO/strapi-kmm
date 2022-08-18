@@ -118,49 +118,49 @@ class StrapiQueryBuilder {
     }
 
     fun includedIn(field: String, value: List<String>) = apply {
-        field.split(".").map { "[$it]" }.forEach {
+        field.split(".").map { "[$it]" }.forEach { mappedField ->
             value.forEach {
-                put("filters${it}[\$in]", it)
+                put("filters${mappedField}[\$in]", it)
             }
         }
     }
 
     fun noIncludedIn(field: String, value: List<String>) = apply {
-        field.split(".").map { "[$it]" }.forEach {
+        field.split(".").map { "[$it]" }.forEach { mappedField ->
             value.forEach {
-                put("filters${it}[\$nin]", it)
+                put("filters${mappedField}[\$nin]", it)
             }
         }
     }
 
     fun contains(field: String, value: List<String>) = apply {
-        field.split(".").map { "[$it]" }.forEach {
+        field.split(".").map { "[$it]" }.forEach { mappedField ->
             value.forEach {
-                put("filters${it}[\$contains]", it)
+                put("filters${mappedField}[\$contains]", it)
             }
         }
     }
 
     fun notContains(field: String, value: List<String>) = apply {
-        field.split(".").map { "[$it]" }.forEach {
+        field.split(".").map { "[$it]" }.forEach { mappedField ->
             value.forEach {
-                put("filters${it}[\$ncontain]", it)
+                put("filters${mappedField}[\$ncontain]", it)
             }
         }
     }
 
     fun containsCaseSensitive(field: String, value: List<String>) = apply {
-        field.split(".").map { "[$it]" }.forEach {
+        field.split(".").map { "[$it]" }.forEach { mappedField ->
             value.forEach {
-                put("filters${it}[\$containss]", it)
+                put("filters${mappedField}[\$containss]", it)
             }
         }
     }
 
     fun notContainsCaseSensitive(field: String, value: List<String>) = apply {
-        field.split(".").map { "[$it]" }.forEach {
+        field.split(".").map { "[$it]" }.forEach { mappedField ->
             value.forEach {
-                put("filters${it}[\$ncontainss]", it)
+                put("filters${mappedField}[\$ncontainss]", it)
             }
         }
     }
