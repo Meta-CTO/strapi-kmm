@@ -2,65 +2,65 @@ package com.swensonhe.strapikmm.sharedpreference
 
 import com.liftric.kvault.KVault
 
-class KmmPreference(private val kVault: KVault) {
+expect class KmmPreference(kVault: KVault) {
 
-    fun putInt(key: String, value: Int) {
-        kVault.set(key, value)
-    }
+    fun putInt(key: String, value: Int)
 
-    fun getInt(key: String, default: Int): Int {
-        return kVault.int(key) ?: default
-    }
+    fun getInt(key: String, default: Int): Int
 
-    fun putString(key: String, value: String) {
-        kVault.set(key,value)
-    }
+    fun putSecureInt(key: String, value: Int)
 
-    fun getString(key: String): String? {
-        return kVault.string(key)
-    }
+    fun getSecureInt(key: String, default: Int): Int
 
-    fun putDouble(key: String, value: Double) {
-        kVault.set(key,value)
-    }
+    fun putString(key: String, value: String)
 
-    fun getDouble(key: String, default: Double): Double {
-        return kVault.double(key) ?: default
-    }
+    fun getString(key: String): String?
 
-    fun putFloat(key: String, value: Float) {
-        kVault.set(key,value)
-    }
+    fun putSecureString(key: String, value: String)
 
-    fun getFloat(key: String, default: Float): Float {
-        return kVault.float(key) ?: default
-    }
+    fun getSecureString(key: String): String?
 
-    fun putLong(key: String, value: Long) {
-        kVault.set(key,value)
-    }
+    fun putDouble(key: String, value: Double)
 
-    fun getLong(key: String, default: Long): Long {
-        return kVault.long(key) ?: default
-    }
+    fun getDouble(key: String, default: Double): Double
 
-    fun putBool(key: String, value: Boolean) {
-        kVault.set(key, value)
-    }
+    fun putSecureDouble(key: String, value: Double)
 
-    fun getBool(key: String, default: Boolean): Boolean {
-        return kVault.bool(key) ?: default
-    }
+    fun getSecureDouble(key: String, default: Double): Double
 
-    fun contains(key: String): Boolean {
-        return kVault.existsObject(key)
-    }
+    fun putFloat(key: String, value: Float)
 
-    fun clear() {
-        kVault.clear()
-    }
+    fun getFloat(key: String, default: Float): Float
 
-    fun clearValue(key: String) {
-        kVault.deleteObject(key)
-    }
+    fun putSecureFloat(key: String, value: Float)
+
+    fun getSecureFloat(key: String, default: Float): Float
+
+    fun putLong(key: String, value: Long)
+
+    fun getLong(key: String, default: Long): Long
+
+    fun putSecureLong(key: String, value: Long)
+
+    fun getSecureLong(key: String, default: Long): Long
+
+    fun putBool(key: String, value: Boolean)
+
+    fun getBool(key: String, default: Boolean): Boolean
+
+    fun putSecureBool(key: String, value: Boolean)
+
+    fun getSecureBool(key: String, default: Boolean): Boolean
+
+    fun clearValue(key: String)
+
+    fun clearSecureValue(key: String)
+
+    fun clearAll()
+
+    fun clearSecuredValues()
+
+    fun clearAllUserValues()
+
+    fun contains(key: String, isSecure: Boolean): Boolean
 }

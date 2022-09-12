@@ -40,7 +40,7 @@ actual class KtorClientFactory actual constructor(context: Any, networkLogLevel:
             }
 
             install(DefaultRequest) {
-                val token = preference.getString(SharedConstants.ACCESS_TOKEN)
+                val token = preference.getSecureString(SharedConstants.ACCESS_TOKEN)
                 if (token.isNullOrEmpty().not()) {
                     headers.append(
                         SharedConstants.AUTHORIZATION_HEADER,

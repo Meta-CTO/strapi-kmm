@@ -17,7 +17,7 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
 
-actual class KtorClientFactory actual constructor(context: Any, val networkLogLevel: NetworkLogLevel) {
+actual class KtorClientFactory actual constructor(context: Any, networkLogLevel: NetworkLogLevel) {
     private val preference = KmmPreference(KVault())
 
     init {
@@ -39,7 +39,7 @@ actual class KtorClientFactory actual constructor(context: Any, val networkLogLe
             }
 
             install(DefaultRequest) {
-                val token = preference.getString(SharedConstants.ACCESS_TOKEN)
+                val token = preference.getSecureString(SharedConstants.ACCESS_TOKEN)
                 if (token.isNullOrEmpty().not()) {
                     headers.append(
                         SharedConstants.AUTHORIZATION_HEADER,

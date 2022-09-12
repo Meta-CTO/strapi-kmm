@@ -38,7 +38,7 @@ fun HttpRequestBuilder.printCURLDescription(
         }
     }
 
-    val token = kmmPreference.getString(SharedConstants.ACCESS_TOKEN)
+    val token = kmmPreference.getSecureString(SharedConstants.ACCESS_TOKEN)
     if (token.isNullOrEmpty().not()) {
         components.add("-H \"Authorization: Bearer ${token!!.replace("\"", "\\\"")}\"")
     }
