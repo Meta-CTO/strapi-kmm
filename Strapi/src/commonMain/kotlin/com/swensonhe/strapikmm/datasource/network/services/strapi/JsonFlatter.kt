@@ -4,6 +4,7 @@ import com.swensonhe.strapikmm.datasource.network.NetworkLogLevel
 import com.swensonhe.strapikmm.util.Logger
 import com.swensonhe.strapikmm.util.strapiNetworkLogLevel
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.elementNames
 import kotlinx.serialization.json.*
@@ -25,7 +26,31 @@ object JsonFlatter {
                 val map = mutableMapOf<String, JsonElement>()
                 elementNames.forEachIndexed { index, elementName ->
                     val childDescriptor = descriptor.getElementDescriptor(index)
-                    map[elementName] = parse(elementName, jsonElement, childDescriptor)
+                    val jsonNames = mutableListOf<String>()
+                    val annotations = descriptor.getElementAnnotations(index)
+                        .filter { it is JsonNames || it is SerialName }
+
+                    annotations.forEach { annotation ->
+                        if (annotation is SerialName) {
+                            jsonNames.add(annotation.value)
+                        } else if (annotation is JsonNames) {
+                            jsonNames.addAll(annotation.names)
+                        }
+                    }
+
+                    if(jsonNames.isEmpty()) {
+                        jsonNames.add(elementName)
+                    }
+
+                    // Default value if the item not presented in the json
+                    map[elementName] = JsonNull
+
+                    jsonNames.sortedBy { it.contains(".") }.forEach { element ->
+                        val value = parse(element, jsonElement, childDescriptor)
+                        if(value != JsonNull) {
+                            map[elementName] = value
+                        }
+                    }
                 }
 
                 JsonObject(map)
@@ -50,7 +75,31 @@ object JsonFlatter {
         val elementNames = descriptor.elementNames
         elementNames.forEachIndexed { index, elementName ->
             val childDescriptor = descriptor.getElementDescriptor(index)
-            map[elementName] = parse(elementName, json, childDescriptor)
+            val jsonNames = mutableListOf<String>()
+            val annotations = descriptor.getElementAnnotations(index)
+                .filter { it is JsonNames || it is SerialName }
+
+            annotations.forEach { annotation ->
+                if (annotation is SerialName) {
+                    jsonNames.add(annotation.value)
+                } else if (annotation is JsonNames) {
+                    jsonNames.addAll(annotation.names)
+                }
+            }
+
+            if(jsonNames.isEmpty()) {
+                jsonNames.add(elementName)
+            }
+
+            // Default value if the item not presented in the json
+            map[elementName] = JsonNull
+
+            jsonNames.sortedBy { it.contains(".") }.forEach { element ->
+                val value = parse(element, json, childDescriptor)
+                if(value != JsonNull) {
+                    map[elementName] = value
+                }
+            }
         }
         return JsonObject(map)
     }

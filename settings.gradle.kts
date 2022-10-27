@@ -8,3 +8,4 @@ pluginManagement {
 
 rootProject.name = "StrapiKMM"
 include(":Strapi")
+include(":mylibrary")
