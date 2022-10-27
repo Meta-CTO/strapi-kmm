@@ -3,6 +3,7 @@ package com.swensonhe.strapikmm.datasource.network
 import com.liftric.kvault.KVault
 import com.swensonhe.strapikmm.constants.SharedConstants
 import com.swensonhe.strapikmm.datasource.network.services.strapi.JsonFlatter
+import com.swensonhe.strapikmm.datasource.network.services.strapi.JsonWithIgnoredUnknownKeys
 import com.swensonhe.strapikmm.errorhandling.NetworkError
 import com.swensonhe.strapikmm.errorhandling.NetworkErrorMapper
 import com.swensonhe.strapikmm.sharedpreference.KmmPreference
@@ -25,12 +26,6 @@ actual class KtorClientFactory actual constructor(context: Any, networkLogLevel:
     }
 
     actual fun build(): HttpClient {
-        val jsonSerializer = kotlinx.serialization.json.Json {
-            ignoreUnknownKeys = true
-            encodeDefaults = false
-            explicitNulls = false
-            useAlternativeNames = false
-        }
 
         return HttpClient(Ios) {
             expectSuccess = true
@@ -69,9 +64,9 @@ actual class KtorClientFactory actual constructor(context: Any, networkLogLevel:
                     val response = responseException.response
                     val bytes = response.body<JsonElement>()
                     val errorData =
-                        JsonFlatter.flat<NetworkError>(jsonSerializer.decodeFromJsonElement(bytes))
+                        JsonFlatter.flat<NetworkError>(JsonWithIgnoredUnknownKeys.decodeFromJsonElement(bytes))
                     val errorResponse =
-                        jsonSerializer.decodeFromJsonElement<NetworkError>(errorData)
+                        JsonWithIgnoredUnknownKeys.decodeFromJsonElement<NetworkError>(errorData)
                     val error = NetworkErrorMapper().mapServerError(
                         errorCode = errorResponse.code,
                         errorMessage = errorResponse.message,

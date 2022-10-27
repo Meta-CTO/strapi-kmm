@@ -86,12 +86,13 @@ class StrapiService(
     }
 }
 
-val jsonWithIgnoredUnknownKeys = Json {
+val JsonWithIgnoredUnknownKeys = Json {
     ignoreUnknownKeys = true
-    useAlternativeNames = false
+    useAlternativeNames = true
     encodeDefaults = false
+    explicitNulls = false
 }
 
 inline fun <reified T> JsonElement.convert(): T {
-    return jsonWithIgnoredUnknownKeys.decodeFromString(this.toString())
+    return JsonWithIgnoredUnknownKeys.decodeFromString(this.toString())
 }

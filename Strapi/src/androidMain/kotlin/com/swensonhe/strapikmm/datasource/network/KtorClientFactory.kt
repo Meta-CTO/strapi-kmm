@@ -4,6 +4,7 @@ import android.content.Context
 import com.liftric.kvault.KVault
 import com.swensonhe.strapikmm.constants.SharedConstants
 import com.swensonhe.strapikmm.datasource.network.services.strapi.JsonFlatter
+import com.swensonhe.strapikmm.datasource.network.services.strapi.JsonWithIgnoredUnknownKeys
 import com.swensonhe.strapikmm.errorhandling.NetworkError
 import com.swensonhe.strapikmm.errorhandling.NetworkErrorMapper
 import com.swensonhe.strapikmm.sharedpreference.KmmPreference
@@ -15,7 +16,6 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.statement.*
 import io.ktor.serialization.kotlinx.json.*
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
 
@@ -27,12 +27,6 @@ actual class KtorClientFactory actual constructor(context: Any, networkLogLevel:
     }
 
     actual fun build(): HttpClient {
-        val jsonSerializer = Json {
-            ignoreUnknownKeys = true
-            encodeDefaults = true
-            useAlternativeNames = false
-        }
-
         return HttpClient(Android) {
             expectSuccess = true
             install(ContentNegotiation) {
@@ -71,9 +65,9 @@ actual class KtorClientFactory actual constructor(context: Any, networkLogLevel:
                     val response = responseException.response
                     val bytes = response.body<JsonElement>()
                     val errorData =
-                        JsonFlatter.flat<NetworkError>(jsonSerializer.decodeFromJsonElement(bytes))
+                        JsonFlatter.flat<NetworkError>(JsonWithIgnoredUnknownKeys.decodeFromJsonElement(bytes))
                     val errorResponse =
-                        jsonSerializer.decodeFromJsonElement<NetworkError>(errorData)
+                        JsonWithIgnoredUnknownKeys.decodeFromJsonElement<NetworkError>(errorData)
                     val error = NetworkErrorMapper().mapServerError(
                         errorCode = errorResponse.code,
                         errorMessage = errorResponse.message,
