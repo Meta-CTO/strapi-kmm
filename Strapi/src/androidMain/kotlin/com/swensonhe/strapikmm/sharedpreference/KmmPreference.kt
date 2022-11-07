@@ -2,7 +2,7 @@ package com.swensonhe.strapikmm.sharedpreference
 
 import com.liftric.kvault.KVault
 
-actual class KmmPreference actual constructor(private val kVault: KVault) {
+actual class KmmPreference actual constructor(private val encryptedPreferences: KVault) {
     actual fun putInt(key: String, value: Int) {
         putSecureInt(key, value)
     }
@@ -12,11 +12,11 @@ actual class KmmPreference actual constructor(private val kVault: KVault) {
     }
 
     actual fun putSecureInt(key: String, value: Int) {
-        kVault.set(key, value)
+        encryptedPreferences.set(key, value)
     }
 
     actual fun getSecureInt(key: String, default: Int): Int {
-        return kVault.int(key) ?: default
+        return encryptedPreferences.int(key) ?: default
     }
 
     actual fun putString(key: String, value: String) {
@@ -28,11 +28,11 @@ actual class KmmPreference actual constructor(private val kVault: KVault) {
     }
 
     actual fun putSecureString(key: String, value: String) {
-        kVault.set(key, value)
+        encryptedPreferences.set(key, value)
     }
 
     actual fun getSecureString(key: String): String? {
-        return kVault.string(key)
+        return encryptedPreferences.string(key)
     }
 
     actual fun putDouble(key: String, value: Double) {
@@ -44,11 +44,11 @@ actual class KmmPreference actual constructor(private val kVault: KVault) {
     }
 
     actual fun putSecureDouble(key: String, value: Double) {
-        kVault.set(key, value)
+        encryptedPreferences.set(key, value)
     }
 
     actual fun getSecureDouble(key: String, default: Double): Double {
-        return kVault.double(key) ?: default
+        return encryptedPreferences.double(key) ?: default
     }
 
     actual fun putFloat(key: String, value: Float) {
@@ -60,11 +60,11 @@ actual class KmmPreference actual constructor(private val kVault: KVault) {
     }
 
     actual fun putSecureFloat(key: String, value: Float) {
-        kVault.set(key, value)
+        encryptedPreferences.set(key, value)
     }
 
     actual fun getSecureFloat(key: String, default: Float): Float {
-        return kVault.float(key) ?: default
+        return encryptedPreferences.float(key) ?: default
     }
 
     actual fun putLong(key: String, value: Long) {
@@ -76,11 +76,11 @@ actual class KmmPreference actual constructor(private val kVault: KVault) {
     }
 
     actual fun putSecureLong(key: String, value: Long) {
-        kVault.set(key, value)
+        encryptedPreferences.set(key, value)
     }
 
     actual fun getSecureLong(key: String, default: Long): Long {
-        return kVault.long(key) ?: default
+        return encryptedPreferences.long(key) ?: default
     }
 
     actual fun putBool(key: String, value: Boolean) {
@@ -92,15 +92,15 @@ actual class KmmPreference actual constructor(private val kVault: KVault) {
     }
 
     actual fun putSecureBool(key: String, value: Boolean) {
-        kVault.set(key, value)
+        encryptedPreferences.set(key, value)
     }
 
     actual fun getSecureBool(key: String, default: Boolean): Boolean {
-        return kVault.bool(key) ?: default
+        return encryptedPreferences.bool(key) ?: default
     }
 
     actual fun contains(key: String, isSecure: Boolean): Boolean {
-        return kVault.existsObject(key)
+        return encryptedPreferences.existsObject(key)
     }
 
     actual fun clearAll() {
@@ -109,7 +109,7 @@ actual class KmmPreference actual constructor(private val kVault: KVault) {
     }
 
     actual fun clearSecuredValues() {
-        kVault.clear()
+        encryptedPreferences.clear()
     }
 
     actual fun clearAllUserValues() {
@@ -121,6 +121,6 @@ actual class KmmPreference actual constructor(private val kVault: KVault) {
     }
 
     actual fun clearSecureValue(key: String) {
-        kVault.deleteObject(key)
+        encryptedPreferences.deleteObject(key)
     }
 }

@@ -2,7 +2,7 @@ package com.swensonhe.strapikmm.sharedpreference
 
 import com.liftric.kvault.KVault
 
-expect class KmmPreference(kVault: KVault) {
+expect class KmmPreference(encryptedPreferences: KVault) {
 
     fun putInt(key: String, value: Int)
 

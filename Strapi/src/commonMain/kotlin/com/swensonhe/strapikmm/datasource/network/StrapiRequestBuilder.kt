@@ -87,6 +87,13 @@ class StrapiQueryBuilder {
         put("filters${updatedField}[\$eq]", value)
     }
 
+    fun orEqualTo(field: String, values: List<String>) = apply {
+        val updatedField = field.split(".").joinToString("") { "[$it]" }
+        values.forEachIndexed { index, value ->
+            put("filters[\$or][$index]${updatedField}[\$eq]", value)
+        }
+    }
+
     fun notEqualTo(field: String, value: String) = apply {
         val updatedField = field.split(".").joinToString("") { "[$it]" }
         put("filters${updatedField}[\$ne]", value)
