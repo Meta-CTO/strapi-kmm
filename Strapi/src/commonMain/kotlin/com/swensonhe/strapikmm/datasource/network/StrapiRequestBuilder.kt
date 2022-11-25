@@ -140,6 +140,13 @@ class StrapiQueryBuilder {
         }
     }
 
+    fun containsCaseInsensitive(field: String, value: List<String>) = apply {
+        val updatedField = field.split(".").joinToString("") { "[$it]" }
+        value.forEach {
+            put("filters${updatedField}[\$containsi]", it)
+        }
+    }
+
     fun notContains(field: String, value: List<String>) = apply {
         val updatedField = field.split(".").joinToString("") { "[$it]" }
         value.forEach {
@@ -158,6 +165,14 @@ class StrapiQueryBuilder {
         val updatedField = field.split(".").joinToString("") { "[$it]" }
         value.forEach {
             put("filters${updatedField}[\$ncontainss]", it)
+        }
+
+    }
+
+    fun notContainsCaseInsensitive(field: String, value: List<String>) = apply {
+        val updatedField = field.split(".").joinToString("") { "[$it]" }
+        value.forEach {
+            put("filters${updatedField}[\$notContainsi]", it)
         }
 
     }
