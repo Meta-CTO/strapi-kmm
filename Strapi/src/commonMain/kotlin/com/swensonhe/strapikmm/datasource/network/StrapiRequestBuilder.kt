@@ -82,11 +82,19 @@ class StrapiQueryBuilder {
         put("groupBy", key)
     }
 
-    fun equalTo(field: String, value: String) = apply {
+    fun equalTo(field: String, values: List<String>, filterType: StrapiFilterType = StrapiFilterType.NONE) = apply {
+        val updatedField = field.split(".").joinToString("") { "[$it]" }
+        values.forEachIndexed { index, value ->
+            put("filters${filterType.type}[$index]${updatedField}[\$eq]", value)
+        }
+    }
+
+    fun equalTo(field: String, value: String, filterType: StrapiFilterType = StrapiFilterType.NONE) = apply {
         val updatedField = field.split(".").joinToString("") { "[$it]" }
         put("filters${updatedField}[\$eq]", value)
     }
 
+    @Deprecated("Use equalTo with StrapiFilterType OR")
     fun orEqualTo(field: String, values: List<String>) = apply {
         val updatedField = field.split(".").joinToString("") { "[$it]" }
         values.forEachIndexed { index, value ->
@@ -99,14 +107,35 @@ class StrapiQueryBuilder {
         put("filters${updatedField}[\$ne]", value)
     }
 
+    fun notEqualTo(field: String, values: List<String>, filterType: StrapiFilterType = StrapiFilterType.NONE) = apply {
+        val updatedField = field.split(".").joinToString("") { "[$it]" }
+        values.forEachIndexed { index, value ->
+            put("filters${filterType.type}[$index]${updatedField}[\$ne]", value)
+        }
+    }
+
     fun lessThan(field: String, value: String) = apply {
         val updatedField = field.split(".").joinToString("") { "[$it]" }
         put("filters${updatedField}[\$lt]", value)
     }
 
+    fun lessThan(field: String, values: List<String>, filterType: StrapiFilterType = StrapiFilterType.NONE) = apply {
+        val updatedField = field.split(".").joinToString("") { "[$it]" }
+        values.forEachIndexed { index, value ->
+            put("filters${filterType.type}[$index]${updatedField}[\$lt]", value)
+        }
+    }
+
     fun greaterThan(field: String, value: String) = apply {
             val updatedField = field.split(".").joinToString("") { "[$it]" }
             put("filters${updatedField}[\$gt]", value)
+    }
+
+    fun greaterThan(field: String, values: List<String>, filterType: StrapiFilterType = StrapiFilterType.NONE) = apply {
+        val updatedField = field.split(".").joinToString("") { "[$it]" }
+        values.forEachIndexed { index, value ->
+            put("filters${filterType.type}[$index]${updatedField}[\$gt]", value)
+        }
     }
 
     fun lessThanOrEqual(field: String, value: String) = apply {
@@ -140,10 +169,24 @@ class StrapiQueryBuilder {
         }
     }
 
+    fun contains(field: String, values: List<String>, filterType: StrapiFilterType = StrapiFilterType.NONE) = apply {
+        val updatedField = field.split(".").joinToString("") { "[$it]" }
+        values.forEachIndexed { index, value ->
+            put("filters${filterType.type}[$index]${updatedField}[\$contains]", value)
+        }
+    }
+
     fun containsCaseInsensitive(field: String, value: List<String>) = apply {
         val updatedField = field.split(".").joinToString("") { "[$it]" }
         value.forEach {
             put("filters${updatedField}[\$containsi]", it)
+        }
+    }
+
+    fun containsCaseInsensitive(field: String, values: List<String>, filterType: StrapiFilterType = StrapiFilterType.NONE) = apply {
+        val updatedField = field.split(".").joinToString("") { "[$it]" }
+        values.forEachIndexed { index, value ->
+            put("filters${filterType.type}[$index]${updatedField}[\$containsi]", value)
         }
     }
 
@@ -154,10 +197,24 @@ class StrapiQueryBuilder {
         }
     }
 
+    fun notContains(field: String, values: List<String>, filterType: StrapiFilterType = StrapiFilterType.NONE) = apply {
+        val updatedField = field.split(".").joinToString("") { "[$it]" }
+        values.forEachIndexed { index, value ->
+            put("filters${filterType.type}[$index]${updatedField}[\$ncontain]", value)
+        }
+    }
+
     fun containsCaseSensitive(field: String, value: List<String>) = apply {
         val updatedField = field.split(".").joinToString("") { "[$it]" }
         value.forEach {
             put("filters${updatedField}[\$containss]", it)
+        }
+    }
+
+    fun containsCaseSensitive(field: String, values: List<String>, filterType: StrapiFilterType = StrapiFilterType.NONE) = apply {
+        val updatedField = field.split(".").joinToString("") { "[$it]" }
+        values.forEachIndexed { index, value ->
+            put("filters${filterType.type}[$index]${updatedField}[\$containss]", value)
         }
     }
 
@@ -166,7 +223,13 @@ class StrapiQueryBuilder {
         value.forEach {
             put("filters${updatedField}[\$ncontainss]", it)
         }
+    }
 
+    fun notContainsCaseSensitive(field: String, values: List<String>, filterType: StrapiFilterType = StrapiFilterType.NONE) = apply {
+        val updatedField = field.split(".").joinToString("") { "[$it]" }
+        values.forEachIndexed { index, value ->
+            put("filters${filterType.type}[$index]${updatedField}[\$ncontainss]", value)
+        }
     }
 
     fun notContainsCaseInsensitive(field: String, value: List<String>) = apply {
@@ -174,7 +237,13 @@ class StrapiQueryBuilder {
         value.forEach {
             put("filters${updatedField}[\$notContainsi]", it)
         }
+    }
 
+    fun notContainsCaseInsensitive(field: String, values: List<String>, filterType: StrapiFilterType = StrapiFilterType.NONE) = apply {
+        val updatedField = field.split(".").joinToString("") { "[$it]" }
+        values.forEachIndexed { index, value ->
+            put("filters${filterType.type}[$index]${updatedField}[\$notContainsi]", value)
+        }
     }
 
     fun sortBy(field: String, type: StrapiSortType) {
@@ -206,6 +275,12 @@ class StrapiQueryBuilder {
 enum class StrapiSortType(val type: String) {
     ASC(":asc"),
     DESC(":desc"),
+}
+
+enum class StrapiFilterType(val type: String) {
+    OR("[\$or]"),
+    AND("[\$and]"),
+    NONE("");
 }
 
 sealed class RequestContent {
