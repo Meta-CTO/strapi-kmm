@@ -19,7 +19,7 @@ val publishEmail: String = gradleLocalProperties(rootDir).getProperty("publishEm
 val publishRepository: String = gradleLocalProperties(rootDir).getProperty("publishRepository")
 val publishDeveloper: String = gradleLocalProperties(rootDir).getProperty("publishDeveloper")
 
-val currentVersion = "3.0.10"
+val currentVersion = "4.0.0"
 val libName = "strapiKMM"
 
 version = currentVersion
@@ -28,7 +28,6 @@ kotlin {
 
     android {
         publishLibraryVariants("debug", "release")
-//        publishLibraryVariantsGroupedByFlavor = true
     }
 
     val xcf = XCFramework(libName)
