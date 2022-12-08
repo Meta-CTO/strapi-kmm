@@ -19,7 +19,7 @@ val publishEmail: String = gradleLocalProperties(rootDir).getProperty("publishEm
 val publishRepository: String = gradleLocalProperties(rootDir).getProperty("publishRepository")
 val publishDeveloper: String = gradleLocalProperties(rootDir).getProperty("publishDeveloper")
 
-val currentVersion = "4.0.0"
+val currentVersion = "4.0.8"
 val libName = "strapiKMM"
 
 version = currentVersion

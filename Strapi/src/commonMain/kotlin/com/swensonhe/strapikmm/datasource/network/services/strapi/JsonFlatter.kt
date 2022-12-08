@@ -45,9 +45,9 @@ object JsonFlatter {
                     // Default value if the item not presented in the json
                     map[elementName] = JsonNull
 
-                    jsonNames.sortedBy { it.contains(".") }.forEach { element ->
+                    jsonNames.forEach { element ->
                         val value = parse(element, jsonElement, childDescriptor)
-                        if(value != JsonNull) {
+                        if(value != null) {
                             map[elementName] = value
                         }
                     }
@@ -94,13 +94,14 @@ object JsonFlatter {
             // Default value if the item not presented in the json
             map[elementName] = JsonNull
 
-            jsonNames.sortedBy { it.contains(".") }.forEach { element ->
+            jsonNames.forEach { element ->
                 val value = parse(element, json, childDescriptor)
-                if(value != JsonNull) {
+                if(value != null) {
                     map[elementName] = value
                 }
             }
         }
+
         return JsonObject(map)
     }
 
@@ -109,7 +110,7 @@ object JsonFlatter {
         elementName: String,
         jsonObject: JsonObject,
         descriptor: SerialDescriptor
-    ): JsonElement {
+    ): JsonElement? {
         if (elementName.contains(".")) {
             val serializedNameComponents = elementName.split(".")
             var jsonElement: JsonElement? = null
@@ -132,8 +133,10 @@ object JsonFlatter {
                 }
             }
             return JsonNull
-        } else {
+        } else if(jsonObject.containsKey(elementName)){
             return parse(jsonObject[elementName], descriptor)
+        } else {
+            return null
         }
     }
 

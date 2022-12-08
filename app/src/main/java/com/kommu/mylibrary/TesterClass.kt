@@ -12,6 +12,8 @@ class TesterClass {
     companion object {
         @JvmStatic
         fun main(args : Array<String>) {
+
+            // Contractor
             val map = mutableMapOf<String, JsonElement>()
             val data = mutableMapOf<String, JsonElement>()
             data.put("id", JsonPrimitive(80))
@@ -37,13 +39,53 @@ class TesterClass {
 
             data.put("attributes", JsonObject(attributes))
             map.put("data", JsonObject(data))
+
             val json = JsonObject(map)
-            val flat = JsonFlatter.flat<DataWrapper<ContractorData>>(json).convert<DataWrapper<ContractorData>>()
+
+            val flatee = JsonFlatter.flat<DataWrapper<ContractorData>>(json)
+            println(flatee)
+            val flat = flatee.convert<DataWrapper<ContractorData>>()
+
             val title = flat.data.title
+            val services = flat.data.services
             val id = flat.data.id
             val description = flat.data.description
 
             println(description)
+            println(services)
+
+            println(description)
+
+
+
+            // User
+
+//            val map = mutableMapOf<String, JsonElement>()
+//            val data = mutableMapOf<String, JsonElement>()
+//            data.put("jwt", JsonPrimitive("jwt"))
+//
+//            val user = mutableMapOf<String, JsonElement>()
+//            user.put("id", JsonPrimitive(22))
+//            user.put("username", JsonPrimitive("username"))
+//            user.put("timeZone", JsonPrimitive("timeZone"))
+//            user.put("phoneNumber", JsonPrimitive("phoneNumber"))
+//            user.put("provider", JsonPrimitive("provider"))
+//
+//            data.put("user", JsonObject(user))
+//            map.put("data", JsonObject(data))
+//            val json = JsonObject(map)
+//
+//            val flatee = JsonFlatter.flat<DataWrapper<AuthResponse>>(json)
+//            println(flatee)
+//                val flat = flatee.convert<DataWrapper<AuthResponse>>()
+//            val jwt = flat.data.jwt
+//            val username = flat.data.user.username
+//            val id = flat.data.user.id
+//
+//            println(id)
+//            println(username)
+
+//            println(jwt)
 
         }
     }
@@ -73,7 +115,7 @@ data class ContractorData(
     val id: Int? = null,
     @JsonNames("attributes.serviceAreas.data", "serviceAreas")
     val serviceAreas: List<ServiceArea>? = null,
-    @JsonNames("attributes.services.data", "services")
+    @JsonNames("attributes.services", "attributes.services.data", "services")
     val services: List<Service>? = null,
     @JsonNames("attributes.address", "address")
     val address: Address? = null,
@@ -120,3 +162,26 @@ data class Address(
 ) {
     fun getFullAddress() = listOfNotNull(street1, street2, city, state).joinToString(", ")
 }
+
+
+@Serializable
+data class AuthResponse(
+    @SerialName("user")
+    val user: User,
+    @SerialName("jwt")
+    val jwt: String?,
+)
+
+@Serializable
+data class User(
+    @SerialName("id")
+    val id: Int,
+    @JsonNames("attributes.username", "username")
+    val username: String? = null,
+    @JsonNames("attributes.timeZone", "timeZone")
+    val timeZone: String? = null,
+    @JsonNames("attributes.phoneNumber", "phoneNumber")
+    val phoneNumber: String? = null,
+    @JsonNames("attributes.provider", "provider")
+    val provider: String? = null,
+)
