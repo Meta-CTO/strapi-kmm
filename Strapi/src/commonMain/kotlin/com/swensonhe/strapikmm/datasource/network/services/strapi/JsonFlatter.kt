@@ -13,6 +13,7 @@ import kotlin.reflect.typeOf
 
 object JsonFlatter {
 
+    @OptIn(ExperimentalSerializationApi::class)
     inline fun <reified T> flat(jsonElement: JsonElement): JsonElement {
         if (strapiNetworkLogLevel == NetworkLogLevel.ALL) {
             Logger("").log(jsonElement.toString())
@@ -47,7 +48,7 @@ object JsonFlatter {
 
                     jsonNames.forEach { element ->
                         val value = parse(element, jsonElement, childDescriptor)
-                        if(value != null) {
+                        if(value != DummyObject && value != null) {
                             map[elementName] = value
                         }
                     }
@@ -96,7 +97,7 @@ object JsonFlatter {
 
             jsonNames.forEach { element ->
                 val value = parse(element, json, childDescriptor)
-                if(value != null) {
+                if(value != DummyObject && value != null) {
                     map[elementName] = value
                 }
             }
@@ -111,7 +112,9 @@ object JsonFlatter {
         jsonObject: JsonObject,
         descriptor: SerialDescriptor
     ): JsonElement? {
-        if (elementName.contains(".")) {
+        if(jsonObject.containsKey(elementName.split(".").firstOrNull()).not()){
+            return DummyObject
+        } else if (elementName.contains(".")) {
             val serializedNameComponents = elementName.split(".")
             var jsonElement: JsonElement? = null
             serializedNameComponents.forEachIndexed { index, serializedNameComponent ->
@@ -136,7 +139,7 @@ object JsonFlatter {
         } else if(jsonObject.containsKey(elementName)){
             return parse(jsonObject[elementName], descriptor)
         } else {
-            return null
+            return JsonNull
         }
     }
 
@@ -175,3 +178,5 @@ object JsonFlatter {
         return JsonArray(data)
     }
 }
+
+val DummyObject = JsonObject(mapOf("key" to JsonPrimitive("value")))

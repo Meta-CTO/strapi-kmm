@@ -40,8 +40,10 @@ class TesterClass {
             data.put("attributes", JsonObject(attributes))
             map.put("data", JsonObject(data))
 
-            val json = JsonObject(map)
 
+//            val json = JsonObject(map)
+
+            val json = Json.parseToJsonElement("{\"data\":{\"id\":43,\"attributes\":{\"title\":\"3b3al Contractor\",\"description\":\"jkkjjklkj\",\"websiteURL\":null,\"rating\":null,\"createdAt\":\"2022-10-13T09:48:54.536Z\",\"updatedAt\":\"2022-11-04T19:33:03.767Z\",\"email\":\"shamyyoun+cont1@gmail.com\",\"phoneNumber\":\"2125458525\",\"proposedFirstName\":null,\"proposedLastName\":null,\"logo\":{\"data\":{\"id\":1132,\"attributes\":{\"name\":\"null\",\"alternativeText\":\"null\",\"caption\":\"null\",\"width\":0,\"height\":0,\"formats\":null,\"hash\":\"null\",\"ext\":\"jpg\",\"mime\":\"image/*\",\"size\":0.01,\"url\":\"https://dev-cozo-uploads.s3.us-west-2.amazonaws.com/6cc24461-1470-4487-a782-d3ef3269b2d2.jpg\",\"previewUrl\":null,\"provider\":\"aws-s3\",\"provider_metadata\":null,\"createdAt\":\"2022-11-03T19:49:40.259Z\",\"updatedAt\":\"2022-11-03T19:49:40.259Z\"}}},\"address\":{\"id\":490,\"street1\":\"asdas\",\"street2\":null,\"city\":\"asdasd\",\"state\":\"CO\",\"zip\":\"88888\",\"googleId\":null,\"lat\":null,\"lon\":null},\"serviceAreas\":[{\"id\":316,\"title\":\"55555\"}],\"services\":{\"data\":[{\"id\":15,\"attributes\":{\"title\":\"Bathrooms\",\"priority\":100,\"createdAt\":\"2022-10-25T17:13:11.621Z\",\"updatedAt\":\"2022-10-25T17:13:11.621Z\"}},{\"id\":18,\"attributes\":{\"title\":\"Painting\",\"priority\":100,\"createdAt\":\"2022-10-25T17:13:36.008Z\",\"updatedAt\":\"2022-10-25T17:13:36.008Z\"}},{\"id\":20,\"attributes\":{\"title\":\"Finished Carpentry\",\"priority\":100,\"createdAt\":\"2022-10-25T17:13:56.974Z\",\"updatedAt\":\"2022-10-25T17:13:56.974Z\"}},{\"id\":21,\"attributes\":{\"title\":\"Concrete\",\"priority\":100,\"createdAt\":\"2022-10-25T17:14:10.300Z\",\"updatedAt\":\"2022-10-25T17:14:10.300Z\"}}]}}},\"meta\":{}}")
             val flatee = JsonFlatter.flat<DataWrapper<ContractorData>>(json)
             println(flatee)
             val flat = flatee.convert<DataWrapper<ContractorData>>()
