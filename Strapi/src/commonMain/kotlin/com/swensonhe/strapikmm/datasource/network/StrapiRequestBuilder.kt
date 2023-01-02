@@ -399,6 +399,92 @@ class StrapiQueryBuilder {
         }
     }
 
+    fun nullable(
+        field: String,
+        value: Boolean,
+        filterType: StrapiFilterType = StrapiFilterType.NONE
+    ) = apply {
+        val updatedField = field.split(".").joinToString("") { "[$it]" }
+        val filterIndex = if (filterType == StrapiFilterType.NONE) {
+            ""
+        } else {
+            val filter = "[$currentFilterIndex]"
+            currentFilterIndex++
+            filter
+        }
+        put("filters${filterType.type}$filterIndex${updatedField}[\$null]", value.toString())
+    }
+
+    fun notNullable(
+        field: String,
+        value: Boolean,
+        filterType: StrapiFilterType = StrapiFilterType.NONE
+    ) = apply {
+        val updatedField = field.split(".").joinToString("") { "[$it]" }
+        val filterIndex = if (filterType == StrapiFilterType.NONE) {
+            ""
+        } else {
+            val filter = "[$currentFilterIndex]"
+            currentFilterIndex++
+            filter
+        }
+        put("filters${filterType.type}$filterIndex${updatedField}[\$notNull]", value.toString())
+    }
+
+    fun between(
+        field: String,
+        values: List<String>,
+        filterType: StrapiFilterType = StrapiFilterType.NONE
+    ) = apply {
+        val updatedField = field.split(".").joinToString("") { "[$it]" }
+        values.forEach {
+            val filterIndex = if (filterType == StrapiFilterType.NONE) {
+                ""
+            } else {
+                val filter = "[$currentFilterIndex]"
+                currentFilterIndex++
+                filter
+            }
+            put("filters${filterType.type}$filterIndex${updatedField}[\$between]", it)
+        }
+    }
+
+    fun startsWith(
+        field: String,
+        values: List<String>,
+        filterType: StrapiFilterType = StrapiFilterType.NONE
+    ) = apply {
+        val updatedField = field.split(".").joinToString("") { "[$it]" }
+        values.forEach {
+            val filterIndex = if (filterType == StrapiFilterType.NONE) {
+                ""
+            } else {
+                val filter = "[$currentFilterIndex]"
+                currentFilterIndex++
+                filter
+            }
+            put("filters${filterType.type}$filterIndex${updatedField}[\$startsWith]", it)
+        }
+    }
+
+    fun endsWith(
+        field: String,
+        values: List<String>,
+        filterType: StrapiFilterType = StrapiFilterType.NONE
+    ) = apply {
+        val updatedField = field.split(".").joinToString("") { "[$it]" }
+        values.forEach {
+            val filterIndex = if (filterType == StrapiFilterType.NONE) {
+                ""
+            } else {
+                val filter = "[$currentFilterIndex]"
+                currentFilterIndex++
+                filter
+            }
+            put("filters${filterType.type}$filterIndex${updatedField}[\$endsWith]", it)
+        }
+    }
+
     fun sortBy(field: String, type: StrapiSortType) {
         val updatedField = field.split(".").joinToString("") { "[$it]" }
         put("sort", "$updatedField${type.type}")

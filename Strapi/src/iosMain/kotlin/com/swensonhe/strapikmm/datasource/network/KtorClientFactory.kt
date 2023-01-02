@@ -10,6 +10,7 @@ import com.swensonhe.strapikmm.sharedpreference.KmmPreference
 import com.swensonhe.strapikmm.util.strapiNetworkLogLevel
 import io.ktor.client.*
 import io.ktor.client.call.*
+import io.ktor.client.engine.darwin.*
 import io.ktor.client.engine.ios.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -27,7 +28,7 @@ actual class KtorClientFactory actual constructor(context: Any, networkLogLevel:
 
     actual fun build(): HttpClient {
 
-        return HttpClient(Ios) {
+        return HttpClient(Darwin) {
             expectSuccess = true
             install(ContentNegotiation) {
                 json()
