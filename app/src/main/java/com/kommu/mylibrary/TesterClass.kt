@@ -332,8 +332,8 @@ class InventoryQuestion(
 //    val isOnBoardingQuestion: Boolean? = null,
 //    @JsonNames("attributes.weight", "weight")
 //    val weight: Double? = null,
-//    @JsonNames("attributes.personality_relationship", "personality_relationship")
-//    val personalityRelationship: String? = null,
+    @JsonNames("attributes.personality_relationship","attributes.per.sonality.relation.ship", "attributes.personality.relationship", "attributes.persona.lity.relationship", "personality_relationship")
+    val personalityRelationship: String? = null,
 //    @JsonNames("attributes.type", "type")
 //    val type: InventoryQuestionType? = null,
 //    @JsonNames("attributes.choices", "choices")

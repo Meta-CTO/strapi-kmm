@@ -35,11 +35,13 @@ object JsonFlatter {
                         if (annotation is SerialName) {
                             jsonNames.add(annotation.value)
                         } else if (annotation is JsonNames) {
-                            jsonNames.addAll(annotation.names)
+                            jsonNames.addAll(
+                                annotation.names.sortedByDescending { it.split(".").size }
+                            )
                         }
                     }
 
-                    if(jsonNames.isEmpty()) {
+                    if (jsonNames.isEmpty()) {
                         jsonNames.add(elementName)
                     }
 
@@ -48,7 +50,7 @@ object JsonFlatter {
 
                     jsonNames.forEach { element ->
                         val value = parse(element, jsonElement, childDescriptor)
-                        if(value != DummyObject && value != null) {
+                        if (value != DummyObject && value != null) {
                             map[elementName] = value
                         }
                     }
@@ -84,11 +86,13 @@ object JsonFlatter {
                 if (annotation is SerialName) {
                     jsonNames.add(annotation.value)
                 } else if (annotation is JsonNames) {
-                    jsonNames.addAll(annotation.names)
+                    jsonNames.addAll(
+                        annotation.names.sortedByDescending { it.split(".").size }
+                    )
                 }
             }
 
-            if(jsonNames.isEmpty()) {
+            if (jsonNames.isEmpty()) {
                 jsonNames.add(elementName)
             }
 
@@ -97,7 +101,7 @@ object JsonFlatter {
 
             jsonNames.forEach { element ->
                 val value = parse(element, json, childDescriptor)
-                if(value != DummyObject && value != null) {
+                if (value != DummyObject && value != null) {
                     map[elementName] = value
                 }
             }
@@ -112,7 +116,7 @@ object JsonFlatter {
         jsonObject: JsonObject,
         descriptor: SerialDescriptor
     ): JsonElement? {
-        if(jsonObject.keyExists(elementName).not()){
+        if (jsonObject.keyExists(elementName).not()) {
             return DummyObject
         } else if (elementName.contains(".")) {
             val serializedNameComponents = elementName.split(".")
@@ -136,7 +140,7 @@ object JsonFlatter {
                 }
             }
             return JsonNull
-        } else if(jsonObject.containsKey(elementName)){
+        } else if (jsonObject.containsKey(elementName)) {
             return parse(jsonObject[elementName], descriptor)
         } else {
             return JsonNull
@@ -189,7 +193,7 @@ fun JsonObject.keyExists(elementName: String): Boolean {
     var currentObject = this
 
     searchMap.forEachIndexed loop@{ index, item ->
-        if(!breakLoop) {
+        if (!breakLoop) {
             if (index == searchMap.lastIndex && currentObject.containsKey(item)) {
                 exists = true
                 breakLoop = true
