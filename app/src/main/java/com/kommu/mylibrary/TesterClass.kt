@@ -6,6 +6,7 @@ import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
+import java.time.LocalDate
 import kotlin.jvm.JvmStatic
 
 class TesterClass {
@@ -14,119 +15,189 @@ class TesterClass {
         fun main(args : Array<String>) {
             // Questions
             val json = Json.parseToJsonElement("{\n" +
-                    "    \"data\": [\n" +
-                    "        {\n" +
-                    "            \"id\": 122,\n" +
+                    "            \"id\": 581,\n" +
                     "            \"attributes\": {\n" +
-                    "                \"priority\": 3,\n" +
-                    "                \"title\": \"Building that Represents You\",\n" +
-                    "                \"high_value_title\": null,\n" +
-                    "                \"low_value_title\": null,\n" +
-                    "                \"enabled\": true,\n" +
-                    "                \"skippable\": true,\n" +
-                    "                \"description\": null,\n" +
-                    "                \"is_onboarding_question\": true,\n" +
-                    "                \"personality_relationship\": \"inverted\",\n" +
-                    "                \"weight\": 1,\n" +
-                    "                \"createdAt\": \"2022-12-12T16:52:40.301Z\",\n" +
-                    "                \"updatedAt\": \"2022-12-12T17:06:21.068Z\",\n" +
-                    "                \"type\": \"image\",\n" +
-                    "                \"choices\": [\n" +
-                    "                    {\n" +
-                    "                        \"id\": 8,\n" +
-                    "                        \"choice\": null,\n" +
-                    "                        \"title\": null,\n" +
-                    "                        \"description\": null,\n" +
-                    "                        \"branchID\": {\n" +
-                    "                            \"data\": null\n" +
-                    "                        }\n" +
-                    "                    }\n" +
-                    "                ],\n" +
-                    "                \"images\": [\n" +
-                    "                    {\n" +
-                    "                        \"id\": 6,\n" +
-                    "                        \"title\": null,\n" +
-                    "                        \"description\": null,\n" +
-                    "                        \"image\": {\n" +
-                    "                            \"data\": {\n" +
-                    "                                \"id\": 102,\n" +
-                    "                                \"attributes\": {\n" +
-                    "                                    \"name\": \"Cairo_opera_house.jpg\",\n" +
-                    "                                    \"alternativeText\": \"Cairo_opera_house.jpg\",\n" +
-                    "                                    \"caption\": \"Cairo_opera_house.jpg\",\n" +
-                    "                                    \"width\": 800,\n" +
-                    "                                    \"height\": 600,\n" +
-                    "                                    \"formats\": {\n" +
-                    "                                        \"small\": {\n" +
-                    "                                            \"ext\": \".jpg\",\n" +
-                    "                                            \"url\": \"https://fore-dev-upload.s3.us-west-2.amazonaws.com/small_Cairo_opera_house_94b83262cc.jpg\",\n" +
-                    "                                            \"hash\": \"small_Cairo_opera_house_94b83262cc\",\n" +
-                    "                                            \"mime\": \"image/jpeg\",\n" +
-                    "                                            \"name\": \"small_Cairo_opera_house.jpg\",\n" +
-                    "                                            \"path\": null,\n" +
-                    "                                            \"size\": 25.48,\n" +
-                    "                                            \"width\": 500,\n" +
-                    "                                            \"height\": 375\n" +
-                    "                                        },\n" +
-                    "                                        \"medium\": {\n" +
-                    "                                            \"ext\": \".jpg\",\n" +
-                    "                                            \"url\": \"https://fore-dev-upload.s3.us-west-2.amazonaws.com/medium_Cairo_opera_house_94b83262cc.jpg\",\n" +
-                    "                                            \"hash\": \"medium_Cairo_opera_house_94b83262cc\",\n" +
-                    "                                            \"mime\": \"image/jpeg\",\n" +
-                    "                                            \"name\": \"medium_Cairo_opera_house.jpg\",\n" +
-                    "                                            \"path\": null,\n" +
-                    "                                            \"size\": 48.65,\n" +
-                    "                                            \"width\": 750,\n" +
-                    "                                            \"height\": 563\n" +
-                    "                                        },\n" +
-                    "                                        \"thumbnail\": {\n" +
-                    "                                            \"ext\": \".jpg\",\n" +
-                    "                                            \"url\": \"https://fore-dev-upload.s3.us-west-2.amazonaws.com/thumbnail_Cairo_opera_house_94b83262cc.jpg\",\n" +
-                    "                                            \"hash\": \"thumbnail_Cairo_opera_house_94b83262cc\",\n" +
-                    "                                            \"mime\": \"image/jpeg\",\n" +
-                    "                                            \"name\": \"thumbnail_Cairo_opera_house.jpg\",\n" +
-                    "                                            \"path\": null,\n" +
-                    "                                            \"size\": 6.21,\n" +
-                    "                                            \"width\": 208,\n" +
-                    "                                            \"height\": 156\n" +
+                    "                \"receivedAt\": null,\n" +
+                    "                \"createdAt\": \"2022-12-27T02:52:25.995Z\",\n" +
+                    "                \"updatedAt\": \"2022-12-27T02:52:25.995Z\",\n" +
+                    "                \"unreadCount\": null,\n" +
+                    "                \"channelURL\": null,\n" +
+                    "                \"destination\": {\n" +
+                    "                    \"data\": {\n" +
+                    "                        \"id\": 152,\n" +
+                    "                        \"attributes\": {\n" +
+                    "                            \"username\": \"alissajoseymoure\",\n" +
+                    "                            \"email\": \"alissajoseymoure@gmail.com\",\n" +
+                    "                            \"provider\": null,\n" +
+                    "                            \"confirmed\": true,\n" +
+                    "                            \"blocked\": false,\n" +
+                    "                            \"phoneNumber\": \"+15176733128\",\n" +
+                    "                            \"timeZone\": null,\n" +
+                    "                            \"firstName\": \"Alissa\",\n" +
+                    "                            \"lastName\": \"Seymoure\",\n" +
+                    "                            \"age\": null,\n" +
+                    "                            \"gender\": null,\n" +
+                    "                            \"firebaseUserID\": \"jZqPIU4ot6OuwLqcHn21javGk3m2\",\n" +
+                    "                            \"appleEmail\": null,\n" +
+                    "                            \"alternateEmail\": null,\n" +
+                    "                            \"enableNotifications\": null,\n" +
+                    "                            \"createdAt\": \"2022-12-27T02:48:23.117Z\",\n" +
+                    "                            \"updatedAt\": \"2023-01-20T02:32:03.678Z\",\n" +
+                    "                            \"instagram\": \"Alissajosey\",\n" +
+                    "                            \"linkedIn\": \"\",\n" +
+                    "                            \"referralCode\": \"3UAAQXXP\",\n" +
+                    "                            \"properties\": {\n" +
+                    "                                \"data\": [\n" +
+                    "                                    {\n" +
+                    "                                        \"id\": 63,\n" +
+                    "                                        \"attributes\": {\n" +
+                    "                                            \"title\": null,\n" +
+                    "                                            \"nightlyCost\": 150,\n" +
+                    "                                            \"cleaningCost\": 200,\n" +
+                    "                                            \"description\": \"Super cute luxury convertible studio apartment on the border of Old Town and Gold Coast. All the high end amenities you can dream of (gym, peloton, steam room, sauna, work + entertainment spaces) and lots of good vibes in my unit. \",\n" +
+                    "                                            \"isPrimaryResidence\": true,\n" +
+                    "                                            \"createdAt\": \"2023-01-11T23:21:52.805Z\",\n" +
+                    "                                            \"updatedAt\": \"2023-01-11T23:26:10.087Z\",\n" +
+                    "                                            \"photos\": {\n" +
+                    "                                                \"data\": [\n" +
+                    "                                                    {\n" +
+                    "                                                        \"id\": 350,\n" +
+                    "                                                        \"attributes\": {\n" +
+                    "                                                            \"name\": \"D16B6670-05DD-42C3-B8FA-36447E049790\",\n" +
+                    "                                                            \"alternativeText\": \"D16B6670-05DD-42C3-B8FA-36447E049790\",\n" +
+                    "                                                            \"caption\": \"D16B6670-05DD-42C3-B8FA-36447E049790\",\n" +
+                    "                                                            \"width\": 0,\n" +
+                    "                                                            \"height\": 0,\n" +
+                    "                                                            \"formats\": null,\n" +
+                    "                                                            \"hash\": \"D16B6670-05DD-42C3-B8FA-36447E049790\",\n" +
+                    "                                                            \"ext\": \"jpeg\",\n" +
+                    "                                                            \"mime\": \"image/jpeg\",\n" +
+                    "                                                            \"size\": 143.38,\n" +
+                    "                                                            \"url\": \"https://kommu-prod-upload.s3.us-west-2.amazonaws.com/D16B6670-05DD-42C3-B8FA-36447E049790_1DCF72E7-127E-411B-A25C-E5BC5464318D.jpeg\",\n" +
+                    "                                                            \"previewUrl\": null,\n" +
+                    "                                                            \"provider\": \"aws-s3\",\n" +
+                    "                                                            \"provider_metadata\": null,\n" +
+                    "                                                            \"createdAt\": \"2023-01-11T23:21:52.154Z\",\n" +
+                    "                                                            \"updatedAt\": \"2023-01-11T23:21:52.154Z\"\n" +
+                    "                                                        }\n" +
+                    "                                                    },\n" +
+                    "                                                    {\n" +
+                    "                                                        \"id\": 351,\n" +
+                    "                                                        \"attributes\": {\n" +
+                    "                                                            \"name\": \"8921C868-1B0E-4D55-8CD2-D7F4729B3AA9\",\n" +
+                    "                                                            \"alternativeText\": \"8921C868-1B0E-4D55-8CD2-D7F4729B3AA9\",\n" +
+                    "                                                            \"caption\": \"8921C868-1B0E-4D55-8CD2-D7F4729B3AA9\",\n" +
+                    "                                                            \"width\": 0,\n" +
+                    "                                                            \"height\": 0,\n" +
+                    "                                                            \"formats\": null,\n" +
+                    "                                                            \"hash\": \"8921C868-1B0E-4D55-8CD2-D7F4729B3AA9\",\n" +
+                    "                                                            \"ext\": \"jpeg\",\n" +
+                    "                                                            \"mime\": \"image/jpeg\",\n" +
+                    "                                                            \"size\": 193.54,\n" +
+                    "                                                            \"url\": \"https://kommu-prod-upload.s3.us-west-2.amazonaws.com/8921C868-1B0E-4D55-8CD2-D7F4729B3AA9_5793AFD7-66D4-4322-80C6-2A23AEBE018E.jpeg\",\n" +
+                    "                                                            \"previewUrl\": null,\n" +
+                    "                                                            \"provider\": \"aws-s3\",\n" +
+                    "                                                            \"provider_metadata\": null,\n" +
+                    "                                                            \"createdAt\": \"2023-01-11T23:21:52.154Z\",\n" +
+                    "                                                            \"updatedAt\": \"2023-01-11T23:21:52.154Z\"\n" +
+                    "                                                        }\n" +
+                    "                                                    }\n" +
+                    "                                                ]\n" +
+                    "                                            },\n" +
+                    "                                            \"location\": {\n" +
+                    "                                                \"id\": 506,\n" +
+                    "                                                \"address1\": \"228 West Hill Street\",\n" +
+                    "                                                \"address2\": \"\",\n" +
+                    "                                                \"city\": \"Chicago\",\n" +
+                    "                                                \"state\": \"IL\",\n" +
+                    "                                                \"zip\": \"60610\",\n" +
+                    "                                                \"placeId\": \"ChIJLf-PTq_TD4gRjJTWIsyuqQ4\",\n" +
+                    "                                                \"lat\": 41.9,\n" +
+                    "                                                \"long\": -87.64\n" +
+                    "                                            },\n" +
+                    "                                            \"propertyType\": {\n" +
+                    "                                                \"data\": {\n" +
+                    "                                                    \"id\": 1,\n" +
+                    "                                                    \"attributes\": {\n" +
+                    "                                                        \"title\": \"Entire Home\",\n" +
+                    "                                                        \"createdAt\": \"2022-11-04T00:40:51.628Z\",\n" +
+                    "                                                        \"updatedAt\": \"2022-11-04T00:40:51.628Z\"\n" +
+                    "                                                    }\n" +
+                    "                                                }\n" +
+                    "                                            },\n" +
+                    "                                            \"availabilities\": {\n" +
+                    "                                                \"data\": [\n" +
+                    "                                                    {\n" +
+                    "                                                        \"id\": 93,\n" +
+                    "                                                        \"attributes\": {\n" +
+                    "                                                            \"startDate\": \"2023-01-08\",\n" +
+                    "                                                            \"endDate\": \"2023-02-09\",\n" +
+                    "                                                            \"isFlexible\": false,\n" +
+                    "                                                            \"createdAt\": \"2023-01-11T23:25:31.287Z\",\n" +
+                    "                                                            \"updatedAt\": \"2023-01-11T23:25:31.287Z\"\n" +
+                    "                                                        }\n" +
+                    "                                                    },\n" +
+                    "                                                    {\n" +
+                    "                                                        \"id\": 94,\n" +
+                    "                                                        \"attributes\": {\n" +
+                    "                                                            \"startDate\": \"2023-03-14\",\n" +
+                    "                                                            \"endDate\": \"2023-03-23\",\n" +
+                    "                                                            \"isFlexible\": false,\n" +
+                    "                                                            \"createdAt\": \"2023-01-11T23:27:25.261Z\",\n" +
+                    "                                                            \"updatedAt\": \"2023-01-11T23:27:25.261Z\"\n" +
+                    "                                                        }\n" +
+                    "                                                    }\n" +
+                    "                                                ]\n" +
+                    "                                            }\n" +
                     "                                        }\n" +
-                    "                                    },\n" +
-                    "                                    \"hash\": \"Cairo_opera_house_94b83262cc\",\n" +
-                    "                                    \"ext\": \".jpg\",\n" +
-                    "                                    \"mime\": \"image/jpeg\",\n" +
-                    "                                    \"size\": 51.11,\n" +
-                    "                                    \"url\": \"https://fore-dev-upload.s3.us-west-2.amazonaws.com/Cairo_opera_house_94b83262cc.jpg\",\n" +
-                    "                                    \"previewUrl\": null,\n" +
-                    "                                    \"provider\": \"aws-s3\",\n" +
-                    "                                    \"provider_metadata\": null,\n" +
-                    "                                    \"createdAt\": \"2022-11-02T18:51:00.612Z\",\n" +
-                    "                                    \"updatedAt\": \"2022-11-02T18:51:18.461Z\"\n" +
+                    "                                    }\n" +
+                    "                                ]\n" +
+                    "                            },\n" +
+                    "                            \"image\": {\n" +
+                    "                                \"data\": {\n" +
+                    "                                    \"id\": 229,\n" +
+                    "                                    \"attributes\": {\n" +
+                    "                                        \"name\": \"AA36D8B8-F29C-4A00-97F5-4CCEFC3CC5EE\",\n" +
+                    "                                        \"alternativeText\": \"AA36D8B8-F29C-4A00-97F5-4CCEFC3CC5EE\",\n" +
+                    "                                        \"caption\": \"AA36D8B8-F29C-4A00-97F5-4CCEFC3CC5EE\",\n" +
+                    "                                        \"width\": 0,\n" +
+                    "                                        \"height\": 0,\n" +
+                    "                                        \"formats\": null,\n" +
+                    "                                        \"hash\": \"AA36D8B8-F29C-4A00-97F5-4CCEFC3CC5EE\",\n" +
+                    "                                        \"ext\": \"jpeg\",\n" +
+                    "                                        \"mime\": \"image/jpeg\",\n" +
+                    "                                        \"size\": 58.91,\n" +
+                    "                                        \"url\": \"https://kommu-prod-upload.s3.us-west-2.amazonaws.com/AA36D8B8-F29C-4A00-97F5-4CCEFC3CC5EE_F32ECEED-644B-4CB0-BA97-72C16F45DD54.jpeg\",\n" +
+                    "                                        \"previewUrl\": null,\n" +
+                    "                                        \"provider\": \"aws-s3\",\n" +
+                    "                                        \"provider_metadata\": null,\n" +
+                    "                                        \"createdAt\": \"2022-12-27T02:51:21.033Z\",\n" +
+                    "                                        \"updatedAt\": \"2022-12-27T02:51:21.033Z\"\n" +
+                    "                                    }\n" +
                     "                                }\n" +
+                    "                            },\n" +
+                    "                            \"location\": {\n" +
+                    "                                \"id\": 364,\n" +
+                    "                                \"address1\": \"\",\n" +
+                    "                                \"address2\": \"\",\n" +
+                    "                                \"city\": \"Chicago\",\n" +
+                    "                                \"state\": \"IL\",\n" +
+                    "                                \"zip\": \"\",\n" +
+                    "                                \"placeId\": \"ChIJ7cv00DwsDogRAMDACa2m4K8\",\n" +
+                    "                                \"lat\": 41.88,\n" +
+                    "                                \"long\": -87.63\n" +
                     "                            }\n" +
-                    "                        },\n" +
-                    "                        \"branchID\": {\n" +
-                    "                            \"data\": null\n" +
                     "                        }\n" +
                     "                    }\n" +
-                    "                ]\n" +
+                    "                }\n" +
                     "            }\n" +
-                    "        }\n" +
-                    "    ],\n" +
-                    "    \"meta\": {\n" +
-                    "        \"pagination\": {\n" +
-                    "            \"page\": 1,\n" +
-                    "            \"pageSize\": 25,\n" +
-                    "            \"pageCount\": 1,\n" +
-                    "            \"total\": 10\n" +
-                    "        }\n" +
-                    "    }\n" +
-                    "}")
-            val flatee = JsonFlatter.flat<PagingResponse<InventoryQuestion>>(json)
+                    "        }")
+            val flatee = JsonFlatter.flat<Friend>(json)
             println(flatee)
-            val flat = flatee.convert<PagingResponse<InventoryQuestion>>()
+            val flat = flatee.convert<Friend>()
 
-            val images = flat.data.get(0).images
-            val id = flat.data.get(0).id
+            val unreadCount = flat.unreadCount
+            val user = flat.user
 
 //            // Contractor
 //            val map = mutableMapOf<String, JsonElement>()
@@ -219,60 +290,135 @@ data class DataWrapper<T>(
     @SerialName("data")
     val data: T
 )
+@Serializable
+data class Friend(
+    @JsonNames("unreadCount")
+    val unreadCount: Int?,
+    @JsonNames( "attributes.destination", "attributes.destination.data", "destination")
+    val user: User
+)
 
 @Serializable
-data class ContractorData(
-    @JsonNames("attributes.description", "description")
-    val description: String? = null,
-    @JsonNames("attributes.rating", "rating")
-    val rating: Double? = null,
-    @JsonNames("attributes.email", "email")
-    val email: String? = null,
-    @JsonNames("attributes.title", "title")
-    val title: String,
-    @JsonNames("attributes.websiteURL", "websiteURL")
-    val websiteURL: String? = null,
-    @JsonNames("attributes.phoneNumber", "phoneNumber")
+data class User(
+    @SerialName("id")
+    val id: Int,
+    @JsonNames("firstName", "attributes.firstName")
+    val firstName: String? = null,
+    @JsonNames("lastName", "attributes.lastName")
+    val lastName: String? = null,
+    @JsonNames("phoneNumber", "attributes.phoneNumber")
     val phoneNumber: String? = null,
+    @JsonNames("email", "attributes.email")
+    val email: String? = null,
+    @JsonNames("location", "attributes.location")
+    val location: Address? = null,
+    @JsonNames("instagram", "attributes.instagram")
+    val instagram: String? = null,
+    @JsonNames("linkedIn", "attributes.linkedIn")
+    val linkedIn: String? = null,
+    @JsonNames("image", "attributes.image", "attributes.image.data")
+    val image: File? = null,
+    @JsonNames("properties", "attributes.properties", "attributes.properties.data")
+    val properties: List<Property>?,
+    @JsonNames("referralCode", "attributes.referralCode")
+    val referralCode: String? = null
+) {
+
+    val fullName: String
+        get() {
+            return buildString {
+                append(firstName ?: "")
+                if (lastName != null) {
+                    append(" $lastName")
+                }
+            }
+        }
+
+    val onboardingState: OnboardingState
+        get() {
+            if (phoneNumber == null) {
+                return OnboardingState.MISSING_PHONE_NUMBER
+            }
+
+            if (image == null) {
+                return OnboardingState.MISSING_PROFILE_PICTURE
+            }
+
+            return OnboardingState.COMPLETE
+        }
+
+    val propertyId: Int?
+        get() {
+            return properties?.firstOrNull()?.id
+        }
+}
+
+@Serializable
+data class Property(
     @SerialName("id")
-    val id: Int? = null,
-    @JsonNames("attributes.serviceAreas.data", "serviceAreas")
-    val serviceAreas: List<ServiceArea>? = null,
-    @JsonNames("attributes.services", "attributes.services.data", "services")
-    val services: List<Service>? = null,
-    @JsonNames("attributes.address", "address")
-    val address: Address? = null,
-    @JsonNames("attributes.logo.data.attributes.url", "logo.url")
-    val imageUrl: String? = null,
-    @JsonNames("attributes.logo.data.id", "logo.id")
-    val imageId: Int? = null,
+    val id: Int,
+    @JsonNames("nightlyCost", "attributes.nightlyCost")
+    val nightlyCost: Double?,
+    @JsonNames("cleaningCost", "attributes.cleaningCost")
+    val cleaningCost: Double?,
+    @JsonNames("description", "attributes.description")
+    val description: String?,
+    @JsonNames("propertyType", "attributes.propertyType", "attributes.propertyType.data")
+    val type: PropertyType?,
+    @JsonNames("photos", "attributes.photos", "attributes.photos.data")
+    val photos: List<File>?,
+    @JsonNames("location", "attributes.location", "attributes.location.data")
+    val location: Address?,
+    @JsonNames("availabilities", "attributes.availabilities", "attributes.availabilities.data")
+    val availabilities: List<Availability>?,
+    @JsonNames("user", "attributes.user", "attributes.user.data")
+    val user: User?
 )
 
 @Serializable
-data class ServiceArea(
-    @SerialName("title")
-    val title: String? = null,
-    @EncodeDefault(EncodeDefault.Mode.NEVER)
+data class Availability(
     @SerialName("id")
-    val id: Int? = null,
+    val id: Int,
+    @JsonNames("isFlexible", "attributes.isFlexible")
+    val isFlexible: Boolean?,
+    @JsonNames("guest.data", "attributes.guest.data")
+    val guest: User?
+) {
+
+    val updatingDueToScheduledGuest: Boolean
+        get() {
+            return guest != null
+        }
+}
+
+@Serializable
+data class PropertyType(
+    @SerialName("id")
+    val id: Int,
+    @JsonNames("title", "attributes.title")
+    val title: String?
 )
 
 @Serializable
-data class Service(
-    @SerialName("attributes.title")
-    val title: String? = null,
-    @SerialName("id")
+data class File(
+    @JsonNames("id")
     val id: Int? = null,
+    @JsonNames("attributes.url", "url")
+    val url: String? = null,
+    @JsonNames("attributes.name", "name")
+    val name: String? = null,
+    @JsonNames("attributes.mime", "mime")
+    val mime: String? = null
 )
 
 @Serializable
 data class Address(
     @EncodeDefault(EncodeDefault.Mode.NEVER)
-    @SerialName("street1")
-    val street1: String? = null,
+    @SerialName("address1")
+    val address1: String? = null,
     @EncodeDefault(EncodeDefault.Mode.NEVER)
-    @SerialName("street2")
-    val street2: String? = null,
+    @SerialName("address2")
+    val address2: String? = null,
     @EncodeDefault(EncodeDefault.Mode.NEVER)
     @SerialName("city")
     val city: String? = null,
@@ -281,93 +427,20 @@ data class Address(
     val state: String? = null,
     @EncodeDefault(EncodeDefault.Mode.NEVER)
     @SerialName("zip")
-    val zip: String? = null
-) {
-    fun getFullAddress() = listOfNotNull(street1, street2, city, state).joinToString(", ")
-}
-
-
-@Serializable
-data class AuthResponse(
-    @SerialName("user")
-    val user: User,
-    @SerialName("jwt")
-    val jwt: String?,
+    val zip: String? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER)
+    @SerialName("placeId")
+    val placeId: String? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER)
+    @SerialName("lat")
+    val lat: Double? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER)
+    @SerialName("long")
+    val long: Double? = null
 )
 
-@Serializable
-data class User(
-    @SerialName("id")
-    val id: Int,
-    @JsonNames("attributes.username", "username")
-    val username: String? = null,
-    @JsonNames("attributes.timeZone", "timeZone")
-    val timeZone: String? = null,
-    @JsonNames("attributes.phoneNumber", "phoneNumber")
-    val phoneNumber: String? = null,
-    @JsonNames("attributes.provider", "provider")
-    val provider: String? = null,
-)
-
-
-@Serializable
-class InventoryQuestion(
-    @SerialName("id")
-    val id: Int? = null,
-//    @JsonNames("attributes.title", "title")
-//    val title: String? = null,
-//    @JsonNames("attributes.description", "description")
-//    val description: String? = null,
-//    @JsonNames("attributes.high_value_title", "high_value_title")
-//    val highValueTitle: String? = null,
-//    @JsonNames("attributes.low_value_title", "low_value_title")
-//    val lowValueTitle: String? = null,
-//    @JsonNames("attributes.medium_value_title", "medium_value_title")
-//    val mediumValueTitle: String? = null,
-//    @JsonNames("attributes.enabled", "enabled")
-//    val enabled: Boolean? = null,
-//    @JsonNames("attributes.skippable", "skippable")
-//    val skippable: Boolean? = null,
-//    @JsonNames("attributes.is_onboarding_question", "is_onboarding_question")
-//    val isOnBoardingQuestion: Boolean? = null,
-//    @JsonNames("attributes.weight", "weight")
-//    val weight: Double? = null,
-    @JsonNames("attributes.personality_relationship","attributes.per.sonality.relation.ship", "attributes.personality.relationship", "attributes.persona.lity.relationship", "personality_relationship")
-    val personalityRelationship: String? = null,
-//    @JsonNames("attributes.type", "type")
-//    val type: InventoryQuestionType? = null,
-//    @JsonNames("attributes.choices", "choices")
-//    val choices: List<InventoryQuestionChoice>? = null,
-    @JsonNames("attributes.images", "images")
-    val images: List<InventoryQuestionImages>? = null,
-)
-
-//@Serializable
-//class InventoryQuestionChoice(
-//    @SerialName("id")
-//    val id: Int? = null,
-//    @SerialName("title")
-//    val title: String? = null,
-//    @SerialName("description")
-//    val description: String? = null,
-//    @SerialName("choice")
-//    val choice: String? = null,
-//    @JsonNames("branchID.data.id", "branchID.id")
-//    val branchID: Int? = null,
-//)
-
-@Serializable
-class InventoryQuestionImages(
-    @JsonNames("image.data.attributes.url", "image.attributes.url")
-    val image: String? = null,
-)
-
-@Serializable
-enum class InventoryQuestionType {
-    @SerialName("personality")
-    PERSONALITY,
-    @SerialName("choice")
-    CHOICE,
-    @SerialName("image")
-    IMAGE,
+enum class OnboardingState(val key: String) {
+    MISSING_PHONE_NUMBER("missingPhoneNumber"),
+    MISSING_PROFILE_PICTURE("missingProfilePicture"),
+    COMPLETE("complete")
 }

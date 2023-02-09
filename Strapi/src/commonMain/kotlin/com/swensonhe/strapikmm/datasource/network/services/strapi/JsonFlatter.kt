@@ -36,7 +36,7 @@ object JsonFlatter {
                             jsonNames.add(annotation.value)
                         } else if (annotation is JsonNames) {
                             jsonNames.addAll(
-                                annotation.names.sortedByDescending { it.split(".").size }
+                                annotation.names.sortedBy { it.split(".").size }
                             )
                         }
                     }
@@ -87,7 +87,7 @@ object JsonFlatter {
                     jsonNames.add(annotation.value)
                 } else if (annotation is JsonNames) {
                     jsonNames.addAll(
-                        annotation.names.sortedByDescending { it.split(".").size }
+                        annotation.names.sortedBy { it.split(".").size }
                     )
                 }
             }
