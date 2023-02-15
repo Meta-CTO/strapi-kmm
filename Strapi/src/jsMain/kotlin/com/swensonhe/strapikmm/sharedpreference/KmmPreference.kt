@@ -1,7 +1,10 @@
+@file:OptIn(ExperimentalJsExport::class)
+
 package com.swensonhe.strapikmm.sharedpreference
 
 import com.russhwolf.settings.Settings
 
+@JsExport
 actual class KmmPreference actual constructor(
     private val preferences: Settings,
     private val encryptedPreferences: Settings?

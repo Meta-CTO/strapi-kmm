@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalJsExport::class)
+
 package com.swensonhe.strapikmm.datasource.network
 
 import com.swensonhe.strapikmm.constants.SharedConstants
@@ -7,7 +9,10 @@ import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.util.*
+import kotlin.js.ExperimentalJsExport
+import kotlin.js.JsExport
 
+@JsExport
 enum class NetworkLogLevel {
     NONE,
     REQUEST,
