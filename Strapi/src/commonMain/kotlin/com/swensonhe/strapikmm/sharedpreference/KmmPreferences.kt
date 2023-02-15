@@ -1,8 +1,8 @@
 package com.swensonhe.strapikmm.sharedpreference
 
-import com.liftric.kvault.KVault
+import com.russhwolf.settings.Settings
 
-expect class KmmPreference(encryptedPreferences: KVault) {
+expect class KmmPreference(preferences: Settings, encryptedPreferences: Settings? = null) {
 
     fun putInt(key: String, value: Int)
 

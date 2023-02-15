@@ -19,7 +19,7 @@ val publishEmail: String = gradleLocalProperties(rootDir).getProperty("publishEm
 val publishRepository: String = gradleLocalProperties(rootDir).getProperty("publishRepository")
 val publishDeveloper: String = gradleLocalProperties(rootDir).getProperty("publishDeveloper")
 
-val currentVersion = "4.0.17"
+val currentVersion = "5.0.0"
 val libName = "strapiKMM"
 
 version = currentVersion
@@ -39,6 +39,13 @@ kotlin {
         it.binaries.framework(libName) {
             baseName = libName
             xcf.add(this)
+        }
+    }
+
+    js(IR) {
+        binaries.library()
+        nodejs {
+
         }
     }
 
@@ -63,12 +70,12 @@ kotlin {
                 api(Ktor.contentNegotiation)
                 api(Ktor.logback)
                 api(Ktor.logging)
-                api(ProjectDependencies.sharedPreferencesKVaultV)
-                api(ProjectDependencies.paging)
+                api(ProjectDependencies.sharedPreferencesMultiplatformSettings)
             }
         }
         val androidMain by getting {
             dependencies {
+                implementation("androidx.security:security-crypto:1.0.0")
                 api(Ktor.android)
             }
         }
@@ -85,6 +92,13 @@ kotlin {
             iosX64Main.dependsOn(this)
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)
+        }
+
+        val jsMain by getting {
+            dependsOn(commonMain)
+            dependencies {
+                api(Ktor.js)
+            }
         }
     }
 
@@ -117,7 +131,7 @@ kotlin {
 }
 
 android {
-    compileSdk = Application.compileSdk
+    compileSdkVersion(Application.compileSdk)
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
         minSdk = Application.minSdk

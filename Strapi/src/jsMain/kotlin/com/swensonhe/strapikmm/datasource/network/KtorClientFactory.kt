@@ -9,7 +9,7 @@ import com.swensonhe.strapikmm.sharedpreference.KmmPreference
 import com.swensonhe.strapikmm.util.strapiNetworkLogLevel
 import io.ktor.client.*
 import io.ktor.client.call.*
-import io.ktor.client.engine.darwin.*
+import io.ktor.client.engine.js.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.statement.*
@@ -25,14 +25,20 @@ actual class KtorClientFactory actual constructor(networkLogLevel: NetworkLogLev
 
     actual fun build(): HttpClient {
 
-        return HttpClient(Darwin) {
+        return HttpClient(Js) {
             expectSuccess = true
             install(ContentNegotiation) {
                 json()
             }
 
             install(DefaultRequest) {
-                handleAuthenticationHeader(preference)
+                val token = preference.getSecureString(SharedConstants.ACCESS_TOKEN)
+                if (token.isNullOrEmpty().not()) {
+                    headers.append(
+                        SharedConstants.AUTHORIZATION_HEADER,
+                        "${SharedConstants.BEARER} $token"
+                    )
+                }
             }
 
             HttpResponseValidator {

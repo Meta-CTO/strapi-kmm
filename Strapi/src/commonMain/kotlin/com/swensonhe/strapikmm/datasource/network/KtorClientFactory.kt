@@ -14,7 +14,7 @@ enum class NetworkLogLevel {
     ALL
 }
 
-expect class KtorClientFactory(context: Any, networkLogLevel: NetworkLogLevel) {
+expect class KtorClientFactory(networkLogLevel: NetworkLogLevel, preference: KmmPreference) {
 
     fun build(): HttpClient
 }

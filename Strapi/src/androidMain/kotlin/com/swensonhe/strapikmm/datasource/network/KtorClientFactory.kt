@@ -1,7 +1,5 @@
 package com.swensonhe.strapikmm.datasource.network
 
-import android.content.Context
-import com.liftric.kvault.KVault
 import com.swensonhe.strapikmm.constants.SharedConstants
 import com.swensonhe.strapikmm.datasource.network.services.strapi.JsonFlatter
 import com.swensonhe.strapikmm.datasource.network.services.strapi.JsonWithIgnoredUnknownKeys
@@ -19,8 +17,7 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
 
-actual class KtorClientFactory actual constructor(context: Any, networkLogLevel: NetworkLogLevel) {
-    private val preference = KmmPreference(KVault(context as Context))
+actual class KtorClientFactory actual constructor(networkLogLevel: NetworkLogLevel, private val preference: KmmPreference) {
 
     init {
         strapiNetworkLogLevel = networkLogLevel

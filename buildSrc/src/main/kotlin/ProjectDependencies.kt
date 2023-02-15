@@ -1,8 +1,8 @@
 object ProjectDependencies {
 
-    private const val sharedPreferencesKVaultVersion = "1.8.0"
-    private const val pagingVersion = "0.4.7"
+//    private const val sharedPreferencesKVaultVersion = "1.8.0"
+    private const val sharedPreferencesMultiplatformSettingsVersion = "1.0.0"
 
-    const val sharedPreferencesKVaultV = "com.liftric:kvault:${sharedPreferencesKVaultVersion}"
-    const val paging = "io.github.kuuuurt:multiplatform-paging:${pagingVersion}"
+//    const val sharedPreferencesKVaultV = "com.liftric:kvault:${sharedPreferencesKVaultVersion}"
+    const val sharedPreferencesMultiplatformSettings = "com.russhwolf:multiplatform-settings:${sharedPreferencesMultiplatformSettingsVersion}"
 }
