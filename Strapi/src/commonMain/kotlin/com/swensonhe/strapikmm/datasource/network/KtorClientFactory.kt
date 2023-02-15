@@ -11,6 +11,7 @@ import io.ktor.client.request.*
 import io.ktor.util.*
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
+import io.ktor.util.*
 
 @JsExport
 enum class NetworkLogLevel {
