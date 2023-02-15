@@ -34,13 +34,7 @@ actual class KtorClientFactory actual constructor(context: Any, networkLogLevel:
             }
 
             install(DefaultRequest) {
-                val token = preference.getSecureString(SharedConstants.ACCESS_TOKEN)
-                if (token.isNullOrEmpty().not()) {
-                    headers.append(
-                        SharedConstants.AUTHORIZATION_HEADER,
-                        "${SharedConstants.BEARER} $token"
-                    )
-                }
+                handleAuthenticationHeader(preference)
             }
 
             HttpResponseValidator {

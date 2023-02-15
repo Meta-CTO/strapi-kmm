@@ -4,7 +4,9 @@ import com.swensonhe.strapikmm.constants.SharedConstants
 import com.swensonhe.strapikmm.sharedpreference.KmmPreference
 import com.swensonhe.strapikmm.util.Logger
 import io.ktor.client.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
+import io.ktor.util.*
 
 enum class NetworkLogLevel {
     NONE,
@@ -30,17 +32,18 @@ fun HttpRequestBuilder.printCURLDescription(
     components.add("$ curl -v")
     components.add("-X $method")
 
-    val headers = headers.entries()
 
-    headers.forEach { entry ->
+    val token = kmmPreference.getSecureString(SharedConstants.ACCESS_TOKEN)
+    if (token.isNullOrEmpty().not() && (headers[KmmBaseService.IS_AUTHENTICATED] ?: true.toString()).toBooleanStrict()) {
+        components.add("-H \"Authorization: Bearer ${token!!.replace("\"", "\\\"")}\"")
+    }
+
+    val headersEntries = headers.entries().filter { it.key != KmmBaseService.IS_AUTHENTICATED }
+
+    headersEntries.forEach { entry ->
         entry.value.forEach { value ->
             components.add("-H \"${entry.key}: ${value.replace("\"", "\\\"")}\"")
         }
-    }
-
-    val token = kmmPreference.getSecureString(SharedConstants.ACCESS_TOKEN)
-    if (token.isNullOrEmpty().not()) {
-        components.add("-H \"Authorization: Bearer ${token!!.replace("\"", "\\\"")}\"")
     }
 
     if (bodyString != null) {
@@ -51,4 +54,18 @@ fun HttpRequestBuilder.printCURLDescription(
     val message = components.joinToString(" \\\n\t")
     Logger("").log(message)
     Logger("").log("================================================")
+}
+
+fun DefaultRequest.DefaultRequestBuilder.handleAuthenticationHeader(preference: KmmPreference) {
+    val token = preference.getSecureString(SharedConstants.ACCESS_TOKEN)
+    if (token.isNullOrEmpty()
+            .not() && (headers[KmmBaseService.IS_AUTHENTICATED] ?: true.toString()).toBooleanStrict()
+    ) {
+        headers.append(
+            SharedConstants.AUTHORIZATION_HEADER,
+            "${SharedConstants.BEARER} $token"
+        )
+    }
+
+    headers.remove(KmmBaseService.IS_AUTHENTICATED)
 }

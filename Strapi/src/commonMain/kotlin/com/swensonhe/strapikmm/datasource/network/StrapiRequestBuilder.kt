@@ -13,6 +13,14 @@ class StrapiRequestBuilder {
         this.requestEndpoint = endpoint
     }
 
+    fun authenticated(isAuthenticated: Boolean){
+        if (this.contents.any { it is RequestContent.Authentication }) {
+            throw IllegalStateException("You can configure the authentication onetime only inside the request")
+        }
+
+        contents.add(RequestContent.Authentication(isAuthenticated))
+    }
+
     fun query(key: String, value: String) = apply {
         contents.add(RequestContent.Query(key, value))
     }
@@ -524,6 +532,7 @@ enum class StrapiFilterType(val type: String) {
 
 sealed class RequestContent {
     class Query(val key: String, val value: String) : RequestContent()
+    class Authentication(val isAuthenticated: Boolean) : RequestContent()
     class Path(val key: String, val value: String) : RequestContent()
     class Header(val key: String, val value: String) : RequestContent()
     class Body<T>(val value: T, val jsonString: String) : RequestContent()
