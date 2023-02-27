@@ -1,6 +1,5 @@
 package com.swensonhe.strapikmm.util
 
-import io.ktor.utils.io.core.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -10,17 +9,12 @@ import kotlinx.coroutines.flow.onEach
 
 fun <T> Flow<T>.asCommonFlow(): CommonFlow<T> = CommonFlow(this)
 class CommonFlow<T>(private val origin: Flow<T>) : Flow<T> by origin {
-    fun watch(block: (T) -> Unit): Closeable {
-        val job = Job()
-
+    fun collectCommon(
+        coroutineScope: CoroutineScope? = null, // 'viewModelScope' on Android and 'nil' on iOS
+        callback: (T) -> Unit, // callback on each emission
+    ) {
         onEach {
-            block(it)
-        }.launchIn(CoroutineScope(Dispatchers.Main + job))
-
-        return object : Closeable {
-            override fun close() {
-                job.cancel()
-            }
-        }
+            callback(it)
+        }.launchIn(coroutineScope ?: CoroutineScope(Dispatchers.Main + Job()))
     }
 }
