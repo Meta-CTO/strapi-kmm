@@ -3,12 +3,16 @@
 package com.swensonhe.strapikmm.sharedpreference
 
 import com.russhwolf.settings.Settings
+import com.swensonhe.strapikmm.cookies.Cookies
+import com.swensonhe.strapikmm.cookies.CookiesManager
 
 @JsExport
 actual class KmmPreference actual constructor(
-    private val preferences: Settings,
-    private val encryptedPreferences: Settings?
+    private val preferences: Settings?,
+    private val encryptedPreferences: Settings?,
+    private val useCookies: Boolean
 ) {
+    private val cookiesManager = CookiesManager()
     actual fun putInt(key: String, value: Int) {
         putSecureInt(key, value)
     }
@@ -18,11 +22,19 @@ actual class KmmPreference actual constructor(
     }
 
     actual fun putSecureInt(key: String, value: Int) {
-        preferences.putInt(key, value)
+        if (useCookies) {
+            cookiesManager.set(key, value)
+        } else {
+            preferences?.putInt(key, value)
+        }
     }
 
     actual fun getSecureInt(key: String, default: Int): Int {
-        return preferences.getIntOrNull(key) ?: default
+        return if (useCookies) {
+            (cookiesManager.get(key) ?: default) as Int
+        } else {
+            preferences?.getIntOrNull(key) ?: default
+        }
     }
 
     actual fun putString(key: String, value: String) {
@@ -34,11 +46,19 @@ actual class KmmPreference actual constructor(
     }
 
     actual fun putSecureString(key: String, value: String) {
-        preferences.putString(key, value)
+        if (useCookies) {
+            cookiesManager.set(key, value)
+        } else {
+            preferences?.putString(key, value)
+        }
     }
 
     actual fun getSecureString(key: String): String? {
-        return preferences.getStringOrNull(key)
+        return if (useCookies) {
+            cookiesManager.get(key) as String?
+        } else {
+            preferences?.getStringOrNull(key)
+        }
     }
 
     actual fun putDouble(key: String, value: Double) {
@@ -50,11 +70,19 @@ actual class KmmPreference actual constructor(
     }
 
     actual fun putSecureDouble(key: String, value: Double) {
-        preferences.putDouble(key, value)
+        if (useCookies) {
+            cookiesManager.set(key, value)
+        } else {
+            preferences?.putDouble(key, value)
+        }
     }
 
     actual fun getSecureDouble(key: String, default: Double): Double {
-        return preferences.getDoubleOrNull(key) ?: default
+        return if (useCookies) {
+            (cookiesManager.get(key) ?: default) as Double
+        } else {
+            preferences?.getDoubleOrNull(key) ?: default
+        }
     }
 
     actual fun putFloat(key: String, value: Float) {
@@ -66,11 +94,19 @@ actual class KmmPreference actual constructor(
     }
 
     actual fun putSecureFloat(key: String, value: Float) {
-        preferences.putFloat(key, value)
+        if (useCookies) {
+            cookiesManager.set(key, value)
+        } else {
+            preferences?.putFloat(key, value)
+        }
     }
 
     actual fun getSecureFloat(key: String, default: Float): Float {
-        return preferences.getFloatOrNull(key) ?: default
+        return if (useCookies) {
+            (cookiesManager.get(key) ?: default) as Float
+        } else {
+            preferences?.getFloatOrNull(key) ?: default
+        }
     }
 
     actual fun putLong(key: String, value: Long) {
@@ -82,11 +118,19 @@ actual class KmmPreference actual constructor(
     }
 
     actual fun putSecureLong(key: String, value: Long) {
-        preferences.putLong(key, value)
+        if (useCookies) {
+            cookiesManager.set(key, value)
+        } else {
+            preferences?.putLong(key, value)
+        }
     }
 
     actual fun getSecureLong(key: String, default: Long): Long {
-        return preferences.getLongOrNull(key) ?: default
+        return if (useCookies) {
+            (cookiesManager.get(key) ?: default) as Long
+        } else {
+            preferences?.getLongOrNull(key) ?: default
+        }
     }
 
     actual fun putBool(key: String, value: Boolean) {
@@ -98,15 +142,27 @@ actual class KmmPreference actual constructor(
     }
 
     actual fun putSecureBool(key: String, value: Boolean) {
-        preferences.putBoolean(key, value)
+        if (useCookies) {
+            cookiesManager.set(key, value)
+        } else {
+            preferences?.putBoolean(key, value)
+        }
     }
 
     actual fun getSecureBool(key: String, default: Boolean): Boolean {
-        return preferences.getBooleanOrNull(key) ?: default
+        return if (useCookies) {
+            (cookiesManager.get(key) ?: default) as Boolean
+        } else {
+            preferences?.getBooleanOrNull(key) ?: default
+        }
     }
 
     actual fun contains(key: String, isSecure: Boolean): Boolean {
-        return preferences.hasKey(key) ?: false
+        return if (useCookies) {
+            cookiesManager.hasValue(key)
+        } else {
+            preferences?.hasKey(key) ?: false
+        }
     }
 
     actual fun clearAll() {
@@ -115,7 +171,11 @@ actual class KmmPreference actual constructor(
     }
 
     actual fun clearSecuredValues() {
-        preferences.clear()
+        if (useCookies) {
+            cookiesManager.removeAll()
+        } else {
+            preferences?.clear()
+        }
     }
 
     actual fun clearAllUserValues() {
@@ -127,6 +187,10 @@ actual class KmmPreference actual constructor(
     }
 
     actual fun clearSecureValue(key: String) {
-        preferences.remove(key)
+        if (useCookies) {
+            cookiesManager.remove(key)
+        } else {
+            preferences?.remove(key)
+        }
     }
 }

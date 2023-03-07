@@ -3,8 +3,9 @@ package com.swensonhe.strapikmm.sharedpreference
 import com.russhwolf.settings.Settings
 
 actual class KmmPreference actual constructor(
-    private val preferences: Settings,
-    private val encryptedPreferences: Settings?
+    private val preferences: Settings?,
+    private val encryptedPreferences: Settings?,
+    private val useCookies: Boolean
 ) {
     actual fun putInt(key: String, value: Int) {
         putSecureInt(key, value)

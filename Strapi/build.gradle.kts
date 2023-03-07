@@ -19,7 +19,7 @@ val publishEmail: String = gradleLocalProperties(rootDir).getProperty("publishEm
 val publishRepository: String = gradleLocalProperties(rootDir).getProperty("publishRepository")
 val publishDeveloper: String = gradleLocalProperties(rootDir).getProperty("publishDeveloper")
 
-val currentVersion = "5.0.3"
+val currentVersion = "5.0.5"
 val libName = "strapiKMM"
 
 version = currentVersion
@@ -46,12 +46,6 @@ kotlin {
         binaries.library()
         nodejs {
 
-        }
-    }
-
-    cocoapods {
-        framework {
-            export("io.github.kuuuurt:multiplatform-paging:0.4.7")
         }
     }
 
@@ -98,6 +92,7 @@ kotlin {
             dependsOn(commonMain)
             dependencies {
                 api(Ktor.js)
+                api(npm("js-cookie", "3.0.1"))
             }
         }
     }

@@ -3,15 +3,16 @@ package com.swensonhe.strapikmm.sharedpreference
 import com.russhwolf.settings.Settings
 
 actual class KmmPreference actual constructor(
-    private val preferences: Settings,
-    private val encryptedPreferences: Settings?
+    private val preferences: Settings?,
+    private val encryptedPreferences: Settings?,
+    private val useCookies: Boolean
 ) {
     actual fun putInt(key: String, value: Int) {
-        preferences.putInt(key, value)
+        preferences?.putInt(key, value)
     }
 
     actual fun getInt(key: String, default: Int): Int {
-        return preferences.getIntOrNull(key) ?: default
+        return preferences?.getIntOrNull(key) ?: default
     }
 
     actual fun putSecureInt(key: String, value: Int) {
@@ -23,11 +24,11 @@ actual class KmmPreference actual constructor(
     }
 
     actual fun putString(key: String, value: String) {
-        preferences.putString(key, value)
+        preferences?.putString(key, value)
     }
 
     actual fun getString(key: String): String? {
-        return preferences.getStringOrNull(key)
+        return preferences?.getStringOrNull(key)
     }
 
     actual fun putSecureString(key: String, value: String) {
@@ -39,11 +40,11 @@ actual class KmmPreference actual constructor(
     }
 
     actual fun putDouble(key: String, value: Double) {
-        preferences.putDouble(key, value)
+        preferences?.putDouble(key, value)
     }
 
     actual fun getDouble(key: String, default: Double): Double {
-        return preferences.getDoubleOrNull(key) ?: default
+        return preferences?.getDoubleOrNull(key) ?: default
     }
 
     actual fun putSecureDouble(key: String, value: Double) {
@@ -55,11 +56,11 @@ actual class KmmPreference actual constructor(
     }
 
     actual fun putFloat(key: String, value: Float) {
-        preferences.putFloat(key, value)
+        preferences?.putFloat(key, value)
     }
 
     actual fun getFloat(key: String, default: Float): Float {
-        return preferences.getFloatOrNull(key) ?: default
+        return preferences?.getFloatOrNull(key) ?: default
     }
 
     actual fun putSecureFloat(key: String, value: Float) {
@@ -71,11 +72,11 @@ actual class KmmPreference actual constructor(
     }
 
     actual fun putLong(key: String, value: Long) {
-        preferences.putLong(key, value)
+        preferences?.putLong(key, value)
     }
 
     actual fun getLong(key: String, default: Long): Long {
-        return preferences.getLongOrNull(key) ?: default
+        return preferences?.getLongOrNull(key) ?: default
     }
 
     actual fun putSecureLong(key: String, value: Long) {
@@ -87,11 +88,11 @@ actual class KmmPreference actual constructor(
     }
 
     actual fun putBool(key: String, value: Boolean) {
-        preferences.putBoolean(key, value)
+        preferences?.putBoolean(key, value)
     }
 
     actual fun getBool(key: String, default: Boolean): Boolean {
-        return preferences.getBooleanOrNull(key) ?: default
+        return preferences?.getBooleanOrNull(key) ?: default
     }
 
     actual fun putSecureBool(key: String, value: Boolean) {
@@ -106,7 +107,7 @@ actual class KmmPreference actual constructor(
         return if (isSecure) {
             encryptedPreferences?.hasKey(key) ?: false
         } else {
-            preferences.hasKey(key)
+            preferences?.hasKey(key) ?: false
         }
     }
 
@@ -120,11 +121,11 @@ actual class KmmPreference actual constructor(
     }
 
     actual fun clearAllUserValues() {
-        preferences.clear()
+        preferences?.clear()
     }
 
     actual fun clearValue(key: String) {
-        preferences.remove(key)
+        preferences?.remove(key)
     }
 
     actual fun clearSecureValue(key: String) {
