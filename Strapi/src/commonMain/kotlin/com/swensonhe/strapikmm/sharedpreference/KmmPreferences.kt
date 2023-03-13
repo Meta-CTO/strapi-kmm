@@ -2,7 +2,10 @@ package com.swensonhe.strapikmm.sharedpreference
 
 import com.russhwolf.settings.Settings
 
-expect class KmmPreference(preferences: Settings? = null, encryptedPreferences: Settings? = null, useCookies: Boolean = false) {
+expect class KmmPreference(
+    preferences: Settings? = null,
+    encryptedPreferences: Settings? = null
+) {
 
     fun putInt(key: String, value: Int)
 

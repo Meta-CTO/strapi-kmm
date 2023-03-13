@@ -1,5 +1,5 @@
 object Ktor {
-    private const val ktorVersion = "2.2.2"
+    private const val ktorVersion = "2.2.3"
     private const val logBackVersion = "1.2.10"
     private const val kotlinXSerializationVersion = "1.3.2"
     const val core = "io.ktor:ktor-client-core:${ktorVersion}"
@@ -11,5 +11,6 @@ object Ktor {
     const val logback = "ch.qos.logback:logback-classic:${logBackVersion}"
     const val android = "io.ktor:ktor-client-android:${ktorVersion}"
     const val js = "io.ktor:ktor-client-js:${ktorVersion}"
+    const val jsSeralization = "io.ktor:ktor-client-serialization-js:${ktorVersion}"
     const val ios = "io.ktor:ktor-client-ios:${ktorVersion}"
 }

@@ -6,6 +6,7 @@ import com.swensonhe.strapikmm.datasource.network.services.strapi.JsonWithIgnore
 import com.swensonhe.strapikmm.errorhandling.NetworkError
 import com.swensonhe.strapikmm.errorhandling.NetworkErrorMapper
 import com.swensonhe.strapikmm.sharedpreference.KmmPreference
+import com.swensonhe.strapikmm.sharedpreference.TokenHandler
 import com.swensonhe.strapikmm.util.strapiNetworkLogLevel
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -32,7 +33,7 @@ actual class KtorClientFactory actual constructor(networkLogLevel: NetworkLogLev
             }
 
             install(DefaultRequest) {
-                val token = preference.getSecureString(SharedConstants.ACCESS_TOKEN)
+                val token = TokenHandler.token
                 if (token.isNullOrEmpty().not()) {
                     headers.append(
                         SharedConstants.AUTHORIZATION_HEADER,
