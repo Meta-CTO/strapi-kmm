@@ -3,6 +3,7 @@ package com.swensonhe.strapikmm.datasource.network
 import io.ktor.http.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlin.reflect.KClass
 
 class StrapiRequestBuilder {
     private lateinit var requestEndpoint: String
@@ -101,6 +102,60 @@ class StrapiQueryBuilder {
     fun add(map: Map<String, MutableList<String>>) = apply {
         map.forEach { item ->
             put(item.key, item.value)
+        }
+    }
+
+    inline fun populateEntity(
+        queryBuilder: PopulationQueryBuilder
+    ) {
+        val populations = queryBuilder.build().keys
+        populations.forEach {
+            populate(it)
+        }
+    }
+
+    inline fun populateEntity(
+        entityPrefix: String,
+        populationType: PopulationType = PopulationType.DEFAULT,
+        queryBuilder: PopulationQueryBuilder
+    ) {
+
+        val populations = when (populationType) {
+            PopulationType.ALL -> queryBuilder.build().keys
+            PopulationType.DEFAULT -> queryBuilder.build().filter { !it.value }.keys
+        }
+
+        populations.forEach {
+            populate("$entityPrefix.$it")
+        }
+    }
+
+    inline fun populateEntity(
+        crossinline populationQueryBuilder: PopulationQueryBuilder.() -> Unit = {}
+    ) {
+        val builder = PopulationQueryBuilder()
+        builder.populationQueryBuilder()
+        val populations = builder.build().keys
+        populations.forEach {
+            populate(it)
+        }
+    }
+
+    inline fun populateEntity(
+        entityPrefix: String,
+        populationType: PopulationType = PopulationType.DEFAULT,
+        crossinline populationQueryBuilder: PopulationQueryBuilder.() -> Unit = {}
+    ) {
+        val builder = PopulationQueryBuilder()
+        builder.populationQueryBuilder()
+
+        val populations = when (populationType) {
+            PopulationType.ALL -> builder.build().keys
+            PopulationType.DEFAULT -> builder.build().filter { !it.value }.keys
+        }
+
+        populations.forEach {
+            populate("$entityPrefix.$it")
         }
     }
 

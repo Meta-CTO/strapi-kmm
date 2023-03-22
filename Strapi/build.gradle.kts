@@ -19,7 +19,7 @@ val publishEmail: String = gradleLocalProperties(rootDir).getProperty("publishEm
 val publishRepository: String = gradleLocalProperties(rootDir).getProperty("publishRepository")
 val publishDeveloper: String = gradleLocalProperties(rootDir).getProperty("publishDeveloper")
 
-val currentVersion = "5.0.8"
+val currentVersion = "5.0.14"
 val libName = "strapiKMM"
 
 version = currentVersion
@@ -44,9 +44,8 @@ kotlin {
 
     js(IR) {
         binaries.library()
-        nodejs {
-
-        }
+        nodejs {}
+        browser {  }
     }
 
     metadata {
@@ -93,7 +92,6 @@ kotlin {
             dependencies {
                 api(Ktor.js)
                 api(Ktor.jsSeralization)
-//                api(npm("js-cookie", "3.0.1"))
             }
         }
     }

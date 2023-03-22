@@ -29,6 +29,7 @@ class StrapiService(
         return JsonFlatter.flat<T>(json).convert<T>()
     }
 
+    @Throws(Throwable::class)
     suspend inline fun <reified T> post(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
     ): T {
@@ -43,6 +44,7 @@ class StrapiService(
         }
     }
 
+    @Throws(Throwable::class)
     suspend inline fun <reified T> patch(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
     ): T {
@@ -57,6 +59,7 @@ class StrapiService(
         }
     }
 
+    @Throws(Throwable::class)
     suspend inline fun <reified T> put(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
     ): T {
@@ -71,6 +74,7 @@ class StrapiService(
         }
     }
 
+    @Throws(Throwable::class)
     suspend inline fun <reified T> delete(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
     ): T {
@@ -83,6 +87,12 @@ class StrapiService(
         } else {
             JsonFlatter.flat<T>(json).convert()
         }
+    }
+
+    @Throws(Throwable::class)
+    suspend fun getBytesFromUrl(url: String): ByteArray {
+        val httpResponse = httpClient.get(url)
+        return httpResponse.body()
     }
 }
 
