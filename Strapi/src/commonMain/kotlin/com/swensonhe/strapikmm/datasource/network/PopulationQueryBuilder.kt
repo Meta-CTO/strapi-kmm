@@ -7,6 +7,40 @@ class PopulationQueryBuilder {
         populations[key] = excludeFromDefault
     }
 
+    inline fun populateEntity(
+        entityPrefix: String,
+        populationType: PopulationType = PopulationType.DEFAULT,
+        queryBuilder: PopulationQueryBuilder
+    ) {
+
+        val populations = when (populationType) {
+            PopulationType.ALL -> queryBuilder.build()
+            PopulationType.DEFAULT -> queryBuilder.build().filter { !it.value }
+        }
+
+        populations.forEach {
+            populate("$entityPrefix.${it.key}", it.value)
+        }
+    }
+
+    inline fun populateEntity(
+        entityPrefix: String,
+        populationType: PopulationType = PopulationType.DEFAULT,
+        crossinline populationQueryBuilder: PopulationQueryBuilder.() -> Unit = {}
+    ) {
+        val builder = PopulationQueryBuilder()
+        builder.populationQueryBuilder()
+
+        val populations = when (populationType) {
+            PopulationType.ALL -> builder.build()
+            PopulationType.DEFAULT -> builder.build().filter { !it.value }
+        }
+
+        populations.forEach {
+            populate("$entityPrefix.${it.key}", it.value)
+        }
+    }
+
     fun build() = populations
 }
 

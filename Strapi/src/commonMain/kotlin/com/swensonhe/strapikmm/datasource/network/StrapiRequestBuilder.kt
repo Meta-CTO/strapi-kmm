@@ -106,15 +106,6 @@ class StrapiQueryBuilder {
     }
 
     inline fun populateEntity(
-        queryBuilder: PopulationQueryBuilder
-    ) {
-        val populations = queryBuilder.build().keys
-        populations.forEach {
-            populate(it)
-        }
-    }
-
-    inline fun populateEntity(
         entityPrefix: String,
         populationType: PopulationType = PopulationType.DEFAULT,
         queryBuilder: PopulationQueryBuilder
@@ -127,17 +118,6 @@ class StrapiQueryBuilder {
 
         populations.forEach {
             populate("$entityPrefix.$it")
-        }
-    }
-
-    inline fun populateEntity(
-        crossinline populationQueryBuilder: PopulationQueryBuilder.() -> Unit = {}
-    ) {
-        val builder = PopulationQueryBuilder()
-        builder.populationQueryBuilder()
-        val populations = builder.build().keys
-        populations.forEach {
-            populate(it)
         }
     }
 
