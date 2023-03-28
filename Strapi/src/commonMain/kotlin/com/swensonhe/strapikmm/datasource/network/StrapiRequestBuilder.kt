@@ -14,7 +14,7 @@ class StrapiRequestBuilder {
         this.requestEndpoint = endpoint
     }
 
-    fun authenticated(isAuthenticated: Boolean){
+    fun authenticated(isAuthenticated: Boolean) {
         if (this.contents.any { it is RequestContent.Authentication }) {
             throw IllegalStateException("You can configure the authentication onetime only inside the request")
         }
@@ -472,6 +472,26 @@ class StrapiQueryBuilder {
             filter
         }
         put("filters${filterType.type}$filterIndex${updatedField}[\$notNull]", value.toString())
+    }
+
+    inline fun populateEntity(
+        queryBuilder: PopulationQueryBuilder
+    ) {
+        val populations = queryBuilder.build().keys
+        populations.forEach {
+            populate(it)
+        }
+    }
+
+    inline fun populateEntity(
+        crossinline populationQueryBuilder: PopulationQueryBuilder.() -> Unit = {}
+    ) {
+        val builder = PopulationQueryBuilder()
+        builder.populationQueryBuilder()
+        val populations = builder.build()
+        populations.forEach {
+            populate(it.key)
+        }
     }
 
     fun between(
