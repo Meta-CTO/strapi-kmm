@@ -1,8 +1,10 @@
 package com.swensonhe.strapikmm.datasource.network.services.strapi
 
 import com.swensonhe.strapikmm.datasource.network.KmmBaseService
+import com.swensonhe.strapikmm.datasource.network.NetworkLogLevel
 import com.swensonhe.strapikmm.datasource.network.StrapiRequestBuilder
 import com.swensonhe.strapikmm.sharedpreference.KmmPreference
+import com.swensonhe.strapikmm.util.strapiNetworkLogLevel
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -103,6 +105,15 @@ val JsonWithIgnoredUnknownKeys = Json {
     explicitNulls = false
 }
 
+@Throws(Throwable::class)
 inline fun <reified T> JsonElement.convert(): T {
-    return JsonWithIgnoredUnknownKeys.decodeFromString(this.toString())
+    try {
+        return JsonWithIgnoredUnknownKeys.decodeFromString(this.toString())
+    } catch (throwable: Throwable) {
+        if (throwable is kotlinx.serialization.SerializationException && strapiNetworkLogLevel == NetworkLogLevel.NONE) {
+            throw Throwable("Something went wrong, please try again later")
+        } else {
+            throw throwable
+        }
+    }
 }
