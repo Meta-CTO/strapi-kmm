@@ -153,7 +153,7 @@ class StrapiQueryBuilder {
         filterType: StrapiFilterType = StrapiFilterType.NONE
     ) = apply {
         val splitted = field.split(".")
-        val updatedField = if (splitted.size == 1) field else splitted.joinToString("") { "[$it]" }
+        val updatedField = splitted.joinToString("") { "[$it]" }
         values.forEach { value ->
             val filterIndex = if (filterType == StrapiFilterType.NONE) {
                 ""
@@ -172,7 +172,7 @@ class StrapiQueryBuilder {
         filterType: StrapiFilterType = StrapiFilterType.NONE
     ) = apply {
         val splitted = field.split(".")
-        val updatedField = if (splitted.size == 1) field else splitted.joinToString("") { "[$it]" }
+        val updatedField = splitted.joinToString("") { "[$it]" }
         val filterIndex = if (filterType == StrapiFilterType.NONE) {
             ""
         } else {
@@ -188,7 +188,7 @@ class StrapiQueryBuilder {
         filterType: StrapiFilterType = StrapiFilterType.NONE
     ) = apply {
         val splitted = field.split(".")
-        val updatedField = if (splitted.size == 1) field else splitted.joinToString("") { "[$it]" }
+        val updatedField = splitted.joinToString("") { "[$it]" }
         val filterIndex = if (filterType == StrapiFilterType.NONE) {
             ""
         } else {
@@ -205,7 +205,7 @@ class StrapiQueryBuilder {
         filterType: StrapiFilterType = StrapiFilterType.NONE
     ) = apply {
         val splitted = field.split(".")
-        val updatedField = if (splitted.size == 1) field else splitted.joinToString("") { "[$it]" }
+        val updatedField = splitted.joinToString("") { "[$it]" }
         values.forEach { value ->
             val filterIndex = if (filterType == StrapiFilterType.NONE) {
                 ""
@@ -222,7 +222,7 @@ class StrapiQueryBuilder {
         field: String, value: String, filterType: StrapiFilterType = StrapiFilterType.NONE
     ) = apply {
         val splitted = field.split(".")
-        val updatedField = if (splitted.size == 1) field else splitted.joinToString("") { "[$it]" }
+        val updatedField = splitted.joinToString("") { "[$it]" }
         val filterIndex = if (filterType == StrapiFilterType.NONE) {
             ""
         } else {
@@ -239,7 +239,7 @@ class StrapiQueryBuilder {
         filterType: StrapiFilterType = StrapiFilterType.NONE
     ) = apply {
         val splitted = field.split(".")
-        val updatedField = if (splitted.size == 1) field else splitted.joinToString("") { "[$it]" }
+        val updatedField = splitted.joinToString("") { "[$it]" }
         values.forEach { value ->
             val filterIndex = if (filterType == StrapiFilterType.NONE) {
                 ""
@@ -256,7 +256,7 @@ class StrapiQueryBuilder {
         field: String, value: String, filterType: StrapiFilterType = StrapiFilterType.NONE
     ) = apply {
         val splitted = field.split(".")
-        val updatedField = if (splitted.size == 1) field else splitted.joinToString("") { "[$it]" }
+        val updatedField = splitted.joinToString("") { "[$it]" }
         val filterIndex = if (filterType == StrapiFilterType.NONE) {
             ""
         } else {
@@ -273,7 +273,7 @@ class StrapiQueryBuilder {
         filterType: StrapiFilterType = StrapiFilterType.NONE
     ) = apply {
         val splitted = field.split(".")
-        val updatedField = if (splitted.size == 1) field else splitted.joinToString("") { "[$it]" }
+        val updatedField = splitted.joinToString("") { "[$it]" }
         values.forEach { value ->
             val filterIndex = if (filterType == StrapiFilterType.NONE) {
                 ""
@@ -290,7 +290,7 @@ class StrapiQueryBuilder {
         field: String, value: String, filterType: StrapiFilterType = StrapiFilterType.NONE
     ) = apply {
         val splitted = field.split(".")
-        val updatedField = if (splitted.size == 1) field else splitted.joinToString("") { "[$it]" }
+        val updatedField = splitted.joinToString("") { "[$it]" }
         val filterIndex = if (filterType == StrapiFilterType.NONE) {
             ""
         } else {
@@ -305,7 +305,7 @@ class StrapiQueryBuilder {
         field: String, value: String, filterType: StrapiFilterType = StrapiFilterType.NONE
     ) = apply {
         val splitted = field.split(".")
-        val updatedField = if (splitted.size == 1) field else splitted.joinToString("") { "[$it]" }
+        val updatedField = splitted.joinToString("") { "[$it]" }
         val filterIndex = if (filterType == StrapiFilterType.NONE) {
             ""
         } else {
@@ -320,7 +320,7 @@ class StrapiQueryBuilder {
         field: String, value: List<String>, filterType: StrapiFilterType = StrapiFilterType.NONE
     ) = apply {
         val splitted = field.split(".")
-        val updatedField = if (splitted.size == 1) field else splitted.joinToString("") { "[$it]" }
+        val updatedField = splitted.joinToString("") { "[$it]" }
         value.forEach {
             val filterIndex = if (filterType == StrapiFilterType.NONE) {
                 ""
@@ -337,7 +337,7 @@ class StrapiQueryBuilder {
         field: String, value: List<String>, filterType: StrapiFilterType = StrapiFilterType.NONE
     ) = apply {
         val splitted = field.split(".")
-        val updatedField = if (splitted.size == 1) field else splitted.joinToString("") { "[$it]" }
+        val updatedField = splitted.joinToString("") { "[$it]" }
         value.forEach {
             val filterIndex = if (filterType == StrapiFilterType.NONE) {
                 ""
@@ -356,7 +356,7 @@ class StrapiQueryBuilder {
         filterType: StrapiFilterType = StrapiFilterType.NONE
     ) = apply {
         val splitted = field.split(".")
-        val updatedField = if (splitted.size == 1) field else splitted.joinToString("") { "[$it]" }
+        val updatedField = splitted.joinToString("") { "[$it]" }
         values.forEach { value ->
             val filterIndex = if (filterType == StrapiFilterType.NONE) {
                 ""
@@ -373,7 +373,7 @@ class StrapiQueryBuilder {
         field: String, values: List<String>, filterType: StrapiFilterType = StrapiFilterType.NONE
     ) = apply {
         val splitted = field.split(".")
-        val updatedField = if (splitted.size == 1) field else splitted.joinToString("") { "[$it]" }
+        val updatedField = splitted.joinToString("") { "[$it]" }
         values.forEach {
             val filterIndex = if (filterType == StrapiFilterType.NONE) {
                 ""
@@ -391,7 +391,7 @@ class StrapiQueryBuilder {
         filterType: StrapiFilterType = StrapiFilterType.NONE
     ) = apply {
         val splitted = field.split(".")
-        val updatedField = if (splitted.size == 1) field else splitted.joinToString("") { "[$it]" }
+        val updatedField = splitted.joinToString("") { "[$it]" }
         values.forEach {
             val filterIndex = if (filterType == StrapiFilterType.NONE) {
                 ""
@@ -409,7 +409,7 @@ class StrapiQueryBuilder {
         filterType: StrapiFilterType = StrapiFilterType.NONE
     ) = apply {
         val splitted = field.split(".")
-        val updatedField = if (splitted.size == 1) field else splitted.joinToString("") { "[$it]" }
+        val updatedField = splitted.joinToString("") { "[$it]" }
         value.forEach {
             val filterIndex = if (filterType == StrapiFilterType.NONE) {
                 ""
@@ -428,7 +428,7 @@ class StrapiQueryBuilder {
         filterType: StrapiFilterType = StrapiFilterType.NONE
     ) = apply {
         val splitted = field.split(".")
-        val updatedField = if (splitted.size == 1) field else splitted.joinToString("") { "[$it]" }
+        val updatedField = splitted.joinToString("") { "[$it]" }
         values.forEach { value ->
             val filterIndex = if (filterType == StrapiFilterType.NONE) {
                 ""
@@ -447,7 +447,7 @@ class StrapiQueryBuilder {
         filterType: StrapiFilterType = StrapiFilterType.NONE
     ) = apply {
         val splitted = field.split(".")
-        val updatedField = if (splitted.size == 1) field else splitted.joinToString("") { "[$it]" }
+        val updatedField = splitted.joinToString("") { "[$it]" }
         values.forEach {
             val filterIndex = if (filterType == StrapiFilterType.NONE) {
                 ""
@@ -466,7 +466,7 @@ class StrapiQueryBuilder {
         filterType: StrapiFilterType = StrapiFilterType.NONE
     ) = apply {
         val splitted = field.split(".")
-        val updatedField = if (splitted.size == 1) field else splitted.joinToString("") { "[$it]" }
+        val updatedField = splitted.joinToString("") { "[$it]" }
         val filterIndex = if (filterType == StrapiFilterType.NONE) {
             ""
         } else {
@@ -483,7 +483,7 @@ class StrapiQueryBuilder {
         filterType: StrapiFilterType = StrapiFilterType.NONE
     ) = apply {
         val splitted = field.split(".")
-        val updatedField = if (splitted.size == 1) field else splitted.joinToString("") { "[$it]" }
+        val updatedField = splitted.joinToString("") { "[$it]" }
         val filterIndex = if (filterType == StrapiFilterType.NONE) {
             ""
         } else {
@@ -495,22 +495,33 @@ class StrapiQueryBuilder {
     }
 
     inline fun populateEntity(
-        queryBuilder: PopulationQueryBuilder
+        populationType: PopulationType = PopulationType.ALL,
+        queryBuilder: PopulationQueryBuilder,
     ) {
-        val populations = queryBuilder.build().keys
+        val populations = when (populationType) {
+            PopulationType.ALL -> queryBuilder.build().keys
+            PopulationType.DEFAULT -> queryBuilder.build().filter { !it.value }.keys
+        }
+
         populations.forEach {
             populate(it)
         }
+
     }
 
     inline fun populateEntity(
+        populationType: PopulationType = PopulationType.ALL,
         crossinline populationQueryBuilder: PopulationQueryBuilder.() -> Unit = {}
     ) {
-        val builder = PopulationQueryBuilder()
-        builder.populationQueryBuilder()
-        val populations = builder.build()
+        val queryBuilder = PopulationQueryBuilder()
+        queryBuilder.populationQueryBuilder()
+        val populations = when (populationType) {
+            PopulationType.ALL -> queryBuilder.build().keys
+            PopulationType.DEFAULT -> queryBuilder.build().filter { !it.value }.keys
+        }
+
         populations.forEach {
-            populate(it.key)
+            populate(it)
         }
     }
 
@@ -520,7 +531,7 @@ class StrapiQueryBuilder {
         filterType: StrapiFilterType = StrapiFilterType.NONE
     ) = apply {
         val splitted = field.split(".")
-        val updatedField = if (splitted.size == 1) field else splitted.joinToString("") { "[$it]" }
+        val updatedField = splitted.joinToString("") { "[$it]" }
         values.forEach {
             val filterIndex = if (filterType == StrapiFilterType.NONE) {
                 ""
@@ -539,7 +550,7 @@ class StrapiQueryBuilder {
         filterType: StrapiFilterType = StrapiFilterType.NONE
     ) = apply {
         val splitted = field.split(".")
-        val updatedField = if (splitted.size == 1) field else splitted.joinToString("") { "[$it]" }
+        val updatedField = splitted.joinToString("") { "[$it]" }
         values.forEach {
             val filterIndex = if (filterType == StrapiFilterType.NONE) {
                 ""
@@ -558,7 +569,7 @@ class StrapiQueryBuilder {
         filterType: StrapiFilterType = StrapiFilterType.NONE
     ) = apply {
         val splitted = field.split(".")
-        val updatedField = if (splitted.size == 1) field else splitted.joinToString("") { "[$it]" }
+        val updatedField = splitted.joinToString("") { "[$it]" }
         values.forEach {
             val filterIndex = if (filterType == StrapiFilterType.NONE) {
                 ""

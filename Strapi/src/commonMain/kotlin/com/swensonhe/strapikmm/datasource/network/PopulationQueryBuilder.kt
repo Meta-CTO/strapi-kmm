@@ -10,6 +10,7 @@ class PopulationQueryBuilder {
     inline fun populateEntity(
         entityPrefix: String,
         populationType: PopulationType = PopulationType.DEFAULT,
+        excludeFromDefault: Boolean = false,
         queryBuilder: PopulationQueryBuilder
     ) {
 
@@ -19,13 +20,15 @@ class PopulationQueryBuilder {
         }
 
         populations.forEach {
-            populate("$entityPrefix.${it.key}", it.value)
+            populate("$entityPrefix.${it.key}", it.value || excludeFromDefault)
         }
+
     }
 
     inline fun populateEntity(
         entityPrefix: String,
         populationType: PopulationType = PopulationType.DEFAULT,
+        excludeFromDefault: Boolean = false,
         crossinline populationQueryBuilder: PopulationQueryBuilder.() -> Unit = {}
     ) {
         val builder = PopulationQueryBuilder()
@@ -37,7 +40,7 @@ class PopulationQueryBuilder {
         }
 
         populations.forEach {
-            populate("$entityPrefix.${it.key}", it.value)
+            populate("$entityPrefix.${it.key}", it.value || excludeFromDefault)
         }
     }
 
