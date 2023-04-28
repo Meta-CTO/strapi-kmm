@@ -5,7 +5,9 @@ import com.swensonhe.strapikmm.util.Logger
 import com.swensonhe.strapikmm.util.strapiNetworkLogLevel
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.descriptors.elementNames
 import kotlinx.serialization.json.*
 import kotlinx.serialization.serializer
@@ -74,6 +76,9 @@ object JsonFlatter {
 
     @ExperimentalSerializationApi
     fun parse(json: JsonObject, descriptor: SerialDescriptor): JsonObject {
+        if (descriptor.kind == PolymorphicKind.SEALED) {
+            return json
+        }
         val map = mutableMapOf<String, JsonElement>()
         val elementNames = descriptor.elementNames
         elementNames.forEachIndexed { index, elementName ->
@@ -91,6 +96,10 @@ object JsonFlatter {
                     )
                 }
             }
+
+//            if(annotations.isEmpty() && jsonNames.isEmpty()){
+//                return json
+//            }
 
             if (jsonNames.isEmpty()) {
                 jsonNames.add(elementName)
@@ -174,12 +183,24 @@ object JsonFlatter {
         jsonArray: JsonArray,
         descriptor: SerialDescriptor
     ): JsonElement {
-        val data = jsonArray.mapIndexed { index, jsonElement ->
-            val childDescriptor = descriptor.getElementDescriptor(index)
-            parse(jsonElement, childDescriptor)
-        }
+        if (descriptor.kind == StructureKind.LIST) {
+            // The descriptor represents a List of data classes
+            // Implement parsing logic for List of data classes
 
-        return JsonArray(data)
+            val data = jsonArray.mapIndexed { index, jsonElement ->
+                val childDescriptor = descriptor.getElementDescriptor(index)
+                parse(jsonElement, childDescriptor)
+            }
+
+            return JsonArray(data)
+
+        } else if (descriptor.kind == StructureKind.CLASS && descriptor.elementsCount == 0) {
+            // The descriptor represents a Pure JsonArray
+            // Implement parsing logic for Pure JsonArray
+            return jsonArray
+        } else {
+            throw IllegalArgumentException("Unsupported SerialDescriptor kind: ${descriptor.kind}")
+        }
     }
 }
 

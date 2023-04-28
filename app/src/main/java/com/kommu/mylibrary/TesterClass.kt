@@ -1,11 +1,13 @@
 package com.kommu.mylibrary
 
+import android.util.Log
 import com.swensonhe.strapikmm.datasource.network.services.strapi.JsonFlatter
 import com.swensonhe.strapikmm.datasource.network.services.strapi.convert
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
+import java.time.Instant
 import java.time.LocalDate
 import kotlin.jvm.JvmStatic
 
@@ -14,266 +16,259 @@ class TesterClass {
         @JvmStatic
         fun main(args : Array<String>) {
             // Questions
-            val json = Json.parseToJsonElement("{\n" +
-                    "            \"id\": 581,\n" +
-                    "            \"attributes\": {\n" +
-                    "                \"receivedAt\": null,\n" +
-                    "                \"createdAt\": \"2022-12-27T02:52:25.995Z\",\n" +
-                    "                \"updatedAt\": \"2022-12-27T02:52:25.995Z\",\n" +
-                    "                \"unreadCount\": null,\n" +
-                    "                \"channelURL\": null,\n" +
-                    "                \"destination\": {\n" +
-                    "                    \"data\": {\n" +
-                    "                        \"id\": 152,\n" +
-                    "                        \"attributes\": {\n" +
-                    "                            \"username\": \"alissajoseymoure\",\n" +
-                    "                            \"email\": \"alissajoseymoure@gmail.com\",\n" +
-                    "                            \"provider\": null,\n" +
-                    "                            \"confirmed\": true,\n" +
-                    "                            \"blocked\": false,\n" +
-                    "                            \"phoneNumber\": \"+15176733128\",\n" +
-                    "                            \"timeZone\": null,\n" +
-                    "                            \"firstName\": \"Alissa\",\n" +
-                    "                            \"lastName\": \"Seymoure\",\n" +
-                    "                            \"age\": null,\n" +
-                    "                            \"gender\": null,\n" +
-                    "                            \"firebaseUserID\": \"jZqPIU4ot6OuwLqcHn21javGk3m2\",\n" +
-                    "                            \"appleEmail\": null,\n" +
-                    "                            \"alternateEmail\": null,\n" +
-                    "                            \"enableNotifications\": null,\n" +
-                    "                            \"createdAt\": \"2022-12-27T02:48:23.117Z\",\n" +
-                    "                            \"updatedAt\": \"2023-01-20T02:32:03.678Z\",\n" +
-                    "                            \"instagram\": \"Alissajosey\",\n" +
-                    "                            \"linkedIn\": \"\",\n" +
-                    "                            \"referralCode\": \"3UAAQXXP\",\n" +
-                    "                            \"properties\": {\n" +
-                    "                                \"data\": [\n" +
-                    "                                    {\n" +
-                    "                                        \"id\": 63,\n" +
-                    "                                        \"attributes\": {\n" +
-                    "                                            \"title\": null,\n" +
-                    "                                            \"nightlyCost\": 150,\n" +
-                    "                                            \"cleaningCost\": 200,\n" +
-                    "                                            \"description\": \"Super cute luxury convertible studio apartment on the border of Old Town and Gold Coast. All the high end amenities you can dream of (gym, peloton, steam room, sauna, work + entertainment spaces) and lots of good vibes in my unit. \",\n" +
-                    "                                            \"isPrimaryResidence\": true,\n" +
-                    "                                            \"createdAt\": \"2023-01-11T23:21:52.805Z\",\n" +
-                    "                                            \"updatedAt\": \"2023-01-11T23:26:10.087Z\",\n" +
-                    "                                            \"photos\": {\n" +
-                    "                                                \"data\": [\n" +
-                    "                                                    {\n" +
-                    "                                                        \"id\": 350,\n" +
-                    "                                                        \"attributes\": {\n" +
-                    "                                                            \"name\": \"D16B6670-05DD-42C3-B8FA-36447E049790\",\n" +
-                    "                                                            \"alternativeText\": \"D16B6670-05DD-42C3-B8FA-36447E049790\",\n" +
-                    "                                                            \"caption\": \"D16B6670-05DD-42C3-B8FA-36447E049790\",\n" +
-                    "                                                            \"width\": 0,\n" +
-                    "                                                            \"height\": 0,\n" +
-                    "                                                            \"formats\": null,\n" +
-                    "                                                            \"hash\": \"D16B6670-05DD-42C3-B8FA-36447E049790\",\n" +
-                    "                                                            \"ext\": \"jpeg\",\n" +
-                    "                                                            \"mime\": \"image/jpeg\",\n" +
-                    "                                                            \"size\": 143.38,\n" +
-                    "                                                            \"url\": \"https://kommu-prod-upload.s3.us-west-2.amazonaws.com/D16B6670-05DD-42C3-B8FA-36447E049790_1DCF72E7-127E-411B-A25C-E5BC5464318D.jpeg\",\n" +
-                    "                                                            \"previewUrl\": null,\n" +
-                    "                                                            \"provider\": \"aws-s3\",\n" +
-                    "                                                            \"provider_metadata\": null,\n" +
-                    "                                                            \"createdAt\": \"2023-01-11T23:21:52.154Z\",\n" +
-                    "                                                            \"updatedAt\": \"2023-01-11T23:21:52.154Z\"\n" +
-                    "                                                        }\n" +
-                    "                                                    },\n" +
-                    "                                                    {\n" +
-                    "                                                        \"id\": 351,\n" +
-                    "                                                        \"attributes\": {\n" +
-                    "                                                            \"name\": \"8921C868-1B0E-4D55-8CD2-D7F4729B3AA9\",\n" +
-                    "                                                            \"alternativeText\": \"8921C868-1B0E-4D55-8CD2-D7F4729B3AA9\",\n" +
-                    "                                                            \"caption\": \"8921C868-1B0E-4D55-8CD2-D7F4729B3AA9\",\n" +
-                    "                                                            \"width\": 0,\n" +
-                    "                                                            \"height\": 0,\n" +
-                    "                                                            \"formats\": null,\n" +
-                    "                                                            \"hash\": \"8921C868-1B0E-4D55-8CD2-D7F4729B3AA9\",\n" +
-                    "                                                            \"ext\": \"jpeg\",\n" +
-                    "                                                            \"mime\": \"image/jpeg\",\n" +
-                    "                                                            \"size\": 193.54,\n" +
-                    "                                                            \"url\": \"https://kommu-prod-upload.s3.us-west-2.amazonaws.com/8921C868-1B0E-4D55-8CD2-D7F4729B3AA9_5793AFD7-66D4-4322-80C6-2A23AEBE018E.jpeg\",\n" +
-                    "                                                            \"previewUrl\": null,\n" +
-                    "                                                            \"provider\": \"aws-s3\",\n" +
-                    "                                                            \"provider_metadata\": null,\n" +
-                    "                                                            \"createdAt\": \"2023-01-11T23:21:52.154Z\",\n" +
-                    "                                                            \"updatedAt\": \"2023-01-11T23:21:52.154Z\"\n" +
-                    "                                                        }\n" +
-                    "                                                    }\n" +
-                    "                                                ]\n" +
-                    "                                            },\n" +
-                    "                                            \"location\": {\n" +
-                    "                                                \"id\": 506,\n" +
-                    "                                                \"address1\": \"228 West Hill Street\",\n" +
-                    "                                                \"address2\": \"\",\n" +
-                    "                                                \"city\": \"Chicago\",\n" +
-                    "                                                \"state\": \"IL\",\n" +
-                    "                                                \"zip\": \"60610\",\n" +
-                    "                                                \"placeId\": \"ChIJLf-PTq_TD4gRjJTWIsyuqQ4\",\n" +
-                    "                                                \"lat\": 41.9,\n" +
-                    "                                                \"long\": -87.64\n" +
-                    "                                            },\n" +
-                    "                                            \"propertyType\": {\n" +
-                    "                                                \"data\": {\n" +
-                    "                                                    \"id\": 1,\n" +
-                    "                                                    \"attributes\": {\n" +
-                    "                                                        \"title\": \"Entire Home\",\n" +
-                    "                                                        \"createdAt\": \"2022-11-04T00:40:51.628Z\",\n" +
-                    "                                                        \"updatedAt\": \"2022-11-04T00:40:51.628Z\"\n" +
-                    "                                                    }\n" +
-                    "                                                }\n" +
-                    "                                            },\n" +
-                    "                                            \"availabilities\": {\n" +
-                    "                                                \"data\": [\n" +
-                    "                                                    {\n" +
-                    "                                                        \"id\": 93,\n" +
-                    "                                                        \"attributes\": {\n" +
-                    "                                                            \"startDate\": \"2023-01-08\",\n" +
-                    "                                                            \"endDate\": \"2023-02-09\",\n" +
-                    "                                                            \"isFlexible\": false,\n" +
-                    "                                                            \"createdAt\": \"2023-01-11T23:25:31.287Z\",\n" +
-                    "                                                            \"updatedAt\": \"2023-01-11T23:25:31.287Z\"\n" +
-                    "                                                        }\n" +
-                    "                                                    },\n" +
-                    "                                                    {\n" +
-                    "                                                        \"id\": 94,\n" +
-                    "                                                        \"attributes\": {\n" +
-                    "                                                            \"startDate\": \"2023-03-14\",\n" +
-                    "                                                            \"endDate\": \"2023-03-23\",\n" +
-                    "                                                            \"isFlexible\": false,\n" +
-                    "                                                            \"createdAt\": \"2023-01-11T23:27:25.261Z\",\n" +
-                    "                                                            \"updatedAt\": \"2023-01-11T23:27:25.261Z\"\n" +
-                    "                                                        }\n" +
-                    "                                                    }\n" +
-                    "                                                ]\n" +
-                    "                                            }\n" +
-                    "                                        }\n" +
-                    "                                    }\n" +
-                    "                                ]\n" +
-                    "                            },\n" +
-                    "                            \"image\": {\n" +
-                    "                                \"data\": {\n" +
-                    "                                    \"id\": 229,\n" +
-                    "                                    \"attributes\": {\n" +
-                    "                                        \"name\": \"AA36D8B8-F29C-4A00-97F5-4CCEFC3CC5EE\",\n" +
-                    "                                        \"alternativeText\": \"AA36D8B8-F29C-4A00-97F5-4CCEFC3CC5EE\",\n" +
-                    "                                        \"caption\": \"AA36D8B8-F29C-4A00-97F5-4CCEFC3CC5EE\",\n" +
-                    "                                        \"width\": 0,\n" +
-                    "                                        \"height\": 0,\n" +
-                    "                                        \"formats\": null,\n" +
-                    "                                        \"hash\": \"AA36D8B8-F29C-4A00-97F5-4CCEFC3CC5EE\",\n" +
-                    "                                        \"ext\": \"jpeg\",\n" +
-                    "                                        \"mime\": \"image/jpeg\",\n" +
-                    "                                        \"size\": 58.91,\n" +
-                    "                                        \"url\": \"https://kommu-prod-upload.s3.us-west-2.amazonaws.com/AA36D8B8-F29C-4A00-97F5-4CCEFC3CC5EE_F32ECEED-644B-4CB0-BA97-72C16F45DD54.jpeg\",\n" +
-                    "                                        \"previewUrl\": null,\n" +
-                    "                                        \"provider\": \"aws-s3\",\n" +
-                    "                                        \"provider_metadata\": null,\n" +
-                    "                                        \"createdAt\": \"2022-12-27T02:51:21.033Z\",\n" +
-                    "                                        \"updatedAt\": \"2022-12-27T02:51:21.033Z\"\n" +
-                    "                                    }\n" +
-                    "                                }\n" +
-                    "                            },\n" +
-                    "                            \"location\": {\n" +
-                    "                                \"id\": 364,\n" +
-                    "                                \"address1\": \"\",\n" +
-                    "                                \"address2\": \"\",\n" +
-                    "                                \"city\": \"Chicago\",\n" +
-                    "                                \"state\": \"IL\",\n" +
-                    "                                \"zip\": \"\",\n" +
-                    "                                \"placeId\": \"ChIJ7cv00DwsDogRAMDACa2m4K8\",\n" +
-                    "                                \"lat\": 41.88,\n" +
-                    "                                \"long\": -87.63\n" +
-                    "                            }\n" +
-                    "                        }\n" +
-                    "                    }\n" +
-                    "                }\n" +
-                    "            }\n" +
-                    "        }")
-            val flatee = JsonFlatter.flat<Friend>(json)
-            println(flatee)
-            val flat = flatee.convert<Friend>()
+            try {
+                val json = Json.parseToJsonElement("{\n" +
+                        "    \"data\": {\n" +
+                        "        \"id\": 1,\n" +
+                        "        \"attributes\": {\n" +
+                        "            \"createdAt\": \"2022-06-14T17:46:48.114Z\",\n" +
+                        "            \"updatedAt\": \"2023-04-28T07:30:01.542Z\",\n" +
+                        "            \"waitlistSignUpRedirectURL\": \"https://www.thevellaapp.com/tester-confirmation/\",\n" +
+                        "            \"privacyPolicy\": \"https://www.thevellaapp.com/privacy/\",\n" +
+                        "            \"termsOfService\": \"https://www.thevellaapp.com/privacy/\",\n" +
+                        "            \"defaultExperienceRangeInMiles\": null,\n" +
+                        "            \"onboarding_personality\": {\n" +
+                        "                \"data\": {\n" +
+                        "                    \"id\": 2,\n" +
+                        "                    \"attributes\": {\n" +
+                        "                        \"title\": \"Extraversion\",\n" +
+                        "                        \"description\": \"The age old question of \\\"Are you an Extrovert or Introvert\\\" is one that gets volleyed around rather frequently. We all have an idea of what the two labels mean, but we never really give the concept credit for being so complex and multilayered. \\n\\nExtraversion isn't just about how social you are. Think about it. Being social involves a whole host of layers: how motivated you are to be social, your specialized way of being social, how often you're social... you get the picture.\\n\\nExtraversion as a trait describes how often and with what quality you interact with external activities. Extraversion isn't meant to be a measure of how \\\"prosocial\\\" you are, or a way to describe whether or not you like people, so people who score lower on this trait shouldn't be seen as being \\\"asocial\\\" or \\\"antisocial\\\" at all. \\n\\nLow scorers of the extraversion trait may be called \\\"introverts\\\" and all that means is that they need less external stimulation, value the time they're able to have on their own, and may choose more inward-facing activities for self-care. \\n\\nHigh scorers in the extraversion trait may be seen as being more easily excitable, adventurous, pleasure-seeking and will likely prefer activities that provide high stimulation. \\n\\nPeople who fall in the middle will likely enjoy times that provide them with sufficient stimulation but know where their boundaries are, as well as when and how \\\"recharging\\\" is needed. \",\n" +
+                        "                        \"high_value_title\": \"Extravert\",\n" +
+                        "                        \"low_value_title\": \"Introvert\",\n" +
+                        "                        \"createdAt\": \"2022-06-13T19:51:15.763Z\",\n" +
+                        "                        \"updatedAt\": \"2022-12-13T16:11:50.097Z\",\n" +
+                        "                        \"color_aarrggbb\": \"FFEC875E\",\n" +
+                        "                        \"medium_value_title\": \"Ambivert\",\n" +
+                        "                        \"test\": null,\n" +
+                        "                        \"low_value_description\": null,\n" +
+                        "                        \"medium_value_description\": null,\n" +
+                        "                        \"high_value_description\": null,\n" +
+                        "                        \"order\": 3\n" +
+                        "                    }\n" +
+                        "                }\n" +
+                        "            },\n" +
+                        "            \"permissions\": [\n" +
+                        "                {\n" +
+                        "                    \"id\": 1,\n" +
+                        "                    \"title\": \"Bluetooth\",\n" +
+                        "                    \"justification\": \"Please Grant Bluetooth Permission.\",\n" +
+                        "                    \"type\": \"bluetooth\"\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 2,\n" +
+                        "                    \"title\": \"Calendar\",\n" +
+                        "                    \"justification\": \"The way you manage your calendar can tell us a lot about who you are. \\n\\nThat is why we will only look at things like:\\n\\n- How many events you have on your calendar\\n- How many events you have responded to\\n- The date and time of events\\n\\nWe do not look at or save your event details, attendee information etc.\",\n" +
+                        "                    \"type\": \"calendar\"\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 3,\n" +
+                        "                    \"title\": \"Contacts\",\n" +
+                        "                    \"justification\": \"The way you organize your contact list can tell us a lot about who you are. \\n\\nThat is why we will only look at things like:\\n\\n- How you enter their information (first and last name filled in, first name only etc.)\\n- If you have profile pictures\\n- If you have addresses entered\\n\\nWe do not look at or save your contacts actual information.\",\n" +
+                        "                    \"type\": \"contacts\"\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 4,\n" +
+                        "                    \"title\": \"Spotify\",\n" +
+                        "                    \"justification\": \"Music has very strong links to personality and mood. What we listen to, when and how often we listen to it are strong indicators.\\n\\nWe will look at things like\\n\\n- How long you listen to music\\n- When you listen (time of day)\\n- What kind of music (genre, artist, etc.)\\n\\nWe do not look at or save any Spotify account information.\",\n" +
+                        "                    \"type\": \"spotify\"\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 5,\n" +
+                        "                    \"title\": \"Gmail\",\n" +
+                        "                    \"justification\": \"The way you manage your inbox can tell us a lot about who you are. \\n\\nThat is why we will only look at things like:\\n\\n- How many email you receive/send\\n- How long email are (character count)\\n- How many unread emails you have\\n- When you check your emails\\n\\nWe do not look at or save any of the email/senders information.\",\n" +
+                        "                    \"type\": \"gmail\"\n" +
+                        "                }\n" +
+                        "            ],\n" +
+                        "            \"personality_ranges\": [\n" +
+                        "                {\n" +
+                        "                    \"id\": 1,\n" +
+                        "                    \"key\": \"low\",\n" +
+                        "                    \"min_value\": 0.1,\n" +
+                        "                    \"max_value\": 2.2\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 2,\n" +
+                        "                    \"key\": \"medium\",\n" +
+                        "                    \"min_value\": 2.2,\n" +
+                        "                    \"max_value\": 3.2\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 3,\n" +
+                        "                    \"key\": \"high\",\n" +
+                        "                    \"min_value\": 3.2,\n" +
+                        "                    \"max_value\": 5\n" +
+                        "                }\n" +
+                        "            ],\n" +
+                        "            \"educational_levels\": [\n" +
+                        "                {\n" +
+                        "                    \"id\": 1,\n" +
+                        "                    \"title\": \"Middle school\\t\",\n" +
+                        "                    \"key\": \"middle_school\"\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 3,\n" +
+                        "                    \"title\": \"High school diploma or GED\",\n" +
+                        "                    \"key\": \"high_school\"\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 4,\n" +
+                        "                    \"title\": \"Some college or 2-year degree\",\n" +
+                        "                    \"key\": \"associates_degree\"\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 6,\n" +
+                        "                    \"title\": \"4-year college graduate\",\n" +
+                        "                    \"key\": \"bachelors_degree\"\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 5,\n" +
+                        "                    \"title\": \"Graduate or professional degree\",\n" +
+                        "                    \"key\": \"masters_degree\"\n" +
+                        "                }\n" +
+                        "            ],\n" +
+                        "            \"activityPercentiles\": [\n" +
+                        "                {\n" +
+                        "                    \"id\": 64912,\n" +
+                        "                    \"numberOfActivities\": 1,\n" +
+                        "                    \"percentage\": 0\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 64914,\n" +
+                        "                    \"numberOfActivities\": 1,\n" +
+                        "                    \"percentage\": 5\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 64913,\n" +
+                        "                    \"numberOfActivities\": 1,\n" +
+                        "                    \"percentage\": 10\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 64915,\n" +
+                        "                    \"numberOfActivities\": 1,\n" +
+                        "                    \"percentage\": 15\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 64916,\n" +
+                        "                    \"numberOfActivities\": 2,\n" +
+                        "                    \"percentage\": 20\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 64917,\n" +
+                        "                    \"numberOfActivities\": 2,\n" +
+                        "                    \"percentage\": 25\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 64918,\n" +
+                        "                    \"numberOfActivities\": 2,\n" +
+                        "                    \"percentage\": 30\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 64919,\n" +
+                        "                    \"numberOfActivities\": 2,\n" +
+                        "                    \"percentage\": 35\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 64921,\n" +
+                        "                    \"numberOfActivities\": 3,\n" +
+                        "                    \"percentage\": 40\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 64920,\n" +
+                        "                    \"numberOfActivities\": 3,\n" +
+                        "                    \"percentage\": 45\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 64922,\n" +
+                        "                    \"numberOfActivities\": 4,\n" +
+                        "                    \"percentage\": 50\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 64923,\n" +
+                        "                    \"numberOfActivities\": 5,\n" +
+                        "                    \"percentage\": 55\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 64924,\n" +
+                        "                    \"numberOfActivities\": 5,\n" +
+                        "                    \"percentage\": 60\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 64925,\n" +
+                        "                    \"numberOfActivities\": 6,\n" +
+                        "                    \"percentage\": 65\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 64926,\n" +
+                        "                    \"numberOfActivities\": 6,\n" +
+                        "                    \"percentage\": 70\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 64927,\n" +
+                        "                    \"numberOfActivities\": 9,\n" +
+                        "                    \"percentage\": 75\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 64928,\n" +
+                        "                    \"numberOfActivities\": 11,\n" +
+                        "                    \"percentage\": 80\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 64929,\n" +
+                        "                    \"numberOfActivities\": 12,\n" +
+                        "                    \"percentage\": 85\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 64930,\n" +
+                        "                    \"numberOfActivities\": 14,\n" +
+                        "                    \"percentage\": 90\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 64931,\n" +
+                        "                    \"numberOfActivities\": 19,\n" +
+                        "                    \"percentage\": 95\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 64932,\n" +
+                        "                    \"numberOfActivities\": 98,\n" +
+                        "                    \"percentage\": 100\n" +
+                        "                }\n" +
+                        "            ],\n" +
+                        "            \"personalityQuestionsMinimumCount\": [\n" +
+                        "                {\n" +
+                        "                    \"id\": 1,\n" +
+                        "                    \"count\": 10\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 2,\n" +
+                        "                    \"count\": 10\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 3,\n" +
+                        "                    \"count\": 10\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 4,\n" +
+                        "                    \"count\": 10\n" +
+                        "                },\n" +
+                        "                {\n" +
+                        "                    \"id\": 5,\n" +
+                        "                    \"count\": 10\n" +
+                        "                }\n" +
+                        "            ],\n" +
+                        "            \"journeyAssets\": []\n" +
+                        "        }\n" +
+                        "    },\n" +
+                        "    \"meta\": {}\n" +
+                        "}")
+                val flatee = JsonFlatter.flat<AppConfiguration>(json)
+                println(flatee)
+                val flat = flatee.convert<AppConfiguration>()
 
-            val unreadCount = flat.unreadCount
-            val user = flat.user
-
-//            // Contractor
-//            val map = mutableMapOf<String, JsonElement>()
-//            val data = mutableMapOf<String, JsonElement>()
-//            data.put("id", JsonPrimitive(80))
-//
-//            val attributes = mutableMapOf<String, JsonElement>()
-//            attributes.put("title", JsonPrimitive("ww"))
-//            attributes.put("description", JsonPrimitive("contractor description"))
-//            attributes.put("websiteURL", JsonPrimitive("google.com"))
-//
-//            val service = mutableMapOf<String, JsonElement>()
-//            service.put("id", JsonPrimitive(32))
-//            val serviceAttributes = mutableMapOf<String, JsonElement>()
-//            serviceAttributes.put("title", JsonPrimitive("sadfsfds"))
-//
-//            service.put("attributes", JsonObject(serviceAttributes))
-//
-//
-//            val servicesData = JsonArray(JsonArray(listOf(JsonObject(service))))
-//            val servicesObject = mutableMapOf<String, JsonElement>()
-//            servicesObject.put("data", servicesData)
-//
-//            attributes.put("services", JsonObject(servicesObject))
-//
-//            data.put("attributes", JsonObject(attributes))
-//            map.put("data", JsonObject(data))
-//
-//
-////            val json = JsonObject(map)
-//
-//            val json = Json.parseToJsonElement("{\"data\":{\"id\":43,\"attributes\":{\"title\":\"3b3al Contractor\",\"description\":\"jkkjjklkj\",\"websiteURL\":null,\"rating\":null,\"createdAt\":\"2022-10-13T09:48:54.536Z\",\"updatedAt\":\"2022-11-04T19:33:03.767Z\",\"email\":\"shamyyoun+cont1@gmail.com\",\"phoneNumber\":\"2125458525\",\"proposedFirstName\":null,\"proposedLastName\":null,\"logo\":{\"data\":{\"id\":1132,\"attributes\":{\"name\":\"null\",\"alternativeText\":\"null\",\"caption\":\"null\",\"width\":0,\"height\":0,\"formats\":null,\"hash\":\"null\",\"ext\":\"jpg\",\"mime\":\"image/*\",\"size\":0.01,\"url\":\"https://dev-cozo-uploads.s3.us-west-2.amazonaws.com/6cc24461-1470-4487-a782-d3ef3269b2d2.jpg\",\"previewUrl\":null,\"provider\":\"aws-s3\",\"provider_metadata\":null,\"createdAt\":\"2022-11-03T19:49:40.259Z\",\"updatedAt\":\"2022-11-03T19:49:40.259Z\"}}},\"address\":{\"id\":490,\"street1\":\"asdas\",\"street2\":null,\"city\":\"asdasd\",\"state\":\"CO\",\"zip\":\"88888\",\"googleId\":null,\"lat\":null,\"lon\":null},\"serviceAreas\":[{\"id\":316,\"title\":\"55555\"}],\"services\":{\"data\":[{\"id\":15,\"attributes\":{\"title\":\"Bathrooms\",\"priority\":100,\"createdAt\":\"2022-10-25T17:13:11.621Z\",\"updatedAt\":\"2022-10-25T17:13:11.621Z\"}},{\"id\":18,\"attributes\":{\"title\":\"Painting\",\"priority\":100,\"createdAt\":\"2022-10-25T17:13:36.008Z\",\"updatedAt\":\"2022-10-25T17:13:36.008Z\"}},{\"id\":20,\"attributes\":{\"title\":\"Finished Carpentry\",\"priority\":100,\"createdAt\":\"2022-10-25T17:13:56.974Z\",\"updatedAt\":\"2022-10-25T17:13:56.974Z\"}},{\"id\":21,\"attributes\":{\"title\":\"Concrete\",\"priority\":100,\"createdAt\":\"2022-10-25T17:14:10.300Z\",\"updatedAt\":\"2022-10-25T17:14:10.300Z\"}}]}}},\"meta\":{}}")
-//            val flatee = JsonFlatter.flat<DataWrapper<ContractorData>>(json)
-//            println(flatee)
-//            val flat = flatee.convert<DataWrapper<ContractorData>>()
-//
-//            val title = flat.data.title
-//            val services = flat.data.services
-//            val id = flat.data.id
-//            val description = flat.data.description
-//
-//            println(description)
-//            println(services)
-//
-//            println(description)
-
-
-
-            // User
-
-//            val map = mutableMapOf<String, JsonElement>()
-//            val data = mutableMapOf<String, JsonElement>()
-//            data.put("jwt", JsonPrimitive("jwt"))
-//
-//            val user = mutableMapOf<String, JsonElement>()
-//            user.put("id", JsonPrimitive(22))
-//            user.put("username", JsonPrimitive("username"))
-//            user.put("timeZone", JsonPrimitive("timeZone"))
-//            user.put("phoneNumber", JsonPrimitive("phoneNumber"))
-//            user.put("provider", JsonPrimitive("provider"))
-//
-//            data.put("user", JsonObject(user))
-//            map.put("data", JsonObject(data))
-//            val json = JsonObject(map)
-//
-//            val flatee = JsonFlatter.flat<DataWrapper<AuthResponse>>(json)
-//            println(flatee)
-//                val flat = flatee.convert<DataWrapper<AuthResponse>>()
-//            val jwt = flat.data.jwt
-//            val username = flat.data.user.username
-//            val id = flat.data.user.id
-//
-//            println(id)
-//            println(username)
-
-//            println(jwt)
+                val first = flat.educationLevels.orEmpty().first()
+                val last = flat.educationLevels?.last()
+            } catch (throwable: Throwable) {
+                Log.e("Error", throwable.message.orEmpty())
+            }
 
         }
     }
@@ -290,157 +285,215 @@ data class DataWrapper<T>(
     @SerialName("data")
     val data: T
 )
+
 @Serializable
-data class Friend(
-    @JsonNames("unreadCount")
-    val unreadCount: Int?,
-    @JsonNames( "attributes.destination", "attributes.destination.data", "destination")
-    val user: User
+open class StepStoneType(
+    @SerialName("component")
+    open val type: StepStoneComponent? = null,
 )
 
 @Serializable
-data class User(
-    @SerialName("id")
-    val id: Int,
-    @JsonNames("firstName", "attributes.firstName")
-    val firstName: String? = null,
-    @JsonNames("lastName", "attributes.lastName")
-    val lastName: String? = null,
-    @JsonNames("phoneNumber", "attributes.phoneNumber")
-    val phoneNumber: String? = null,
-    @JsonNames("email", "attributes.email")
-    val email: String? = null,
-    @JsonNames("location", "attributes.location")
-    val location: Address? = null,
-    @JsonNames("instagram", "attributes.instagram")
-    val instagram: String? = null,
-    @JsonNames("linkedIn", "attributes.linkedIn")
-    val linkedIn: String? = null,
-    @JsonNames("image", "attributes.image", "attributes.image.data")
-    val image: File? = null,
-    @JsonNames("properties", "attributes.properties", "attributes.properties.data")
-    val properties: List<Property>?,
-    @JsonNames("referralCode", "attributes.referralCode")
-    val referralCode: String? = null
-) {
+enum class StepStoneComponent(val type: String) {
+    @SerialName("journey.discover-personality")
+    DISCOVER_PERSONALITY("journey.discover-personality"),
 
-    val fullName: String
-        get() {
-            return buildString {
-                append(firstName ?: "")
-                if (lastName != null) {
-                    append(" $lastName")
-                }
-            }
+    @SerialName("journey.complete-goal")
+    COMPLETE_GOAL("journey.complete-goal"),
+
+    @SerialName("journey.discover-character")
+    DISCOVER_CHARACTER("journey.discover-character"),
+
+    @SerialName("journey.complete-activity")
+    COMPLETE_ACTIVITY("journey.complete-activity");
+
+    companion object {
+        fun from(type: String): StepStoneComponent? {
+            return values().firstOrNull { it.type == type }
         }
-
-    val onboardingState: OnboardingState
-        get() {
-            if (phoneNumber == null) {
-                return OnboardingState.MISSING_PHONE_NUMBER
-            }
-
-            if (image == null) {
-                return OnboardingState.MISSING_PROFILE_PICTURE
-            }
-
-            return OnboardingState.COMPLETE
-        }
-
-    val propertyId: Int?
-        get() {
-            return properties?.firstOrNull()?.id
-        }
+    }
 }
 
 @Serializable
-data class Property(
+data class StepStoneCompleteActivityType(
     @SerialName("id")
     val id: Int,
-    @JsonNames("nightlyCost", "attributes.nightlyCost")
-    val nightlyCost: Double?,
-    @JsonNames("cleaningCost", "attributes.cleaningCost")
-    val cleaningCost: Double?,
-    @JsonNames("description", "attributes.description")
-    val description: String?,
-    @JsonNames("propertyType", "attributes.propertyType", "attributes.propertyType.data")
-    val type: PropertyType?,
-    @JsonNames("photos", "attributes.photos", "attributes.photos.data")
-    val photos: List<File>?,
-    @JsonNames("location", "attributes.location", "attributes.location.data")
-    val location: Address?,
-    @JsonNames("availabilities", "attributes.availabilities", "attributes.availabilities.data")
-    val availabilities: List<Availability>?,
-    @JsonNames("user", "attributes.user", "attributes.user.data")
-    val user: User?
+    @SerialName("__component")
+    override val type: StepStoneComponent? = null,
+    @SerialName("quantity")
+    val quantity: Int? = null,
+    @SerialName("dayRange")
+    val dayRange: Int? = null
+): StepStoneType(type)
+
+@Serializable
+data class StepStoneCompleteGoalType(
+    @SerialName("id")
+    val id: Int,
+    @SerialName("__component")
+    override val type: StepStoneComponent? = null,
+    @SerialName("minDifficulty")
+    val minDifficulty: Int? = null,
+    @SerialName("minCompletionRate")
+    val minCompletionRate: Double? = null,
+    @SerialName("quantity")
+    val quantity: Int? = null,
+    @SerialName("dayRange")
+    val dayRange: Int? = null,
+): StepStoneType(type)
+
+@Serializable
+data class StepStoneDiscoverPersonalityType(
+    @SerialName("id")
+    val id: Int,
+    @SerialName("__component")
+    override val type: StepStoneComponent? = null,
+): StepStoneType(type)
+
+@Serializable
+data class StepStoneDiscoverCharacterType(
+    @SerialName("id")
+    val id: Int,
+    @SerialName("__component")
+    override val type: StepStoneComponent? = null,
+    @SerialName("requireAll")
+    val requireAll: Boolean? = null,
+): StepStoneType(type)
+
+@Serializable
+data class JourneyStepStone(
+    @SerialName("id")
+    val id: Int,
+    @SerialName("attributes.title")
+    val title: String? = null,
+    @SerialName("attributes.description")
+    val description: String? = null,
+    @SerialName("attributes.requiredStep.data.id")
+    val requiredStepId: Int?= null,
+    @SerialName("attributes.requiredStep.data.attributes.title")
+    val requiredStepTitle: String?= null,
+    @SerialName("attributes.type")
+    val type: JsonArray?= null
 )
 
 @Serializable
-data class Availability(
+data class JourneyLevel(
     @SerialName("id")
     val id: Int,
-    @JsonNames("isFlexible", "attributes.isFlexible")
-    val isFlexible: Boolean?,
-    @JsonNames("guest.data", "attributes.guest.data")
-    val guest: User?
-) {
-
-    val updatingDueToScheduledGuest: Boolean
-        get() {
-            return guest != null
-        }
-}
-
-@Serializable
-data class PropertyType(
-    @SerialName("id")
-    val id: Int,
-    @JsonNames("title", "attributes.title")
-    val title: String?
+    @SerialName("attributes.title")
+    val title: String? = null,
+    @SerialName("attributes.orderIndex")
+    val orderIndex: Int?= null,
+    @SerialName("attributes.color")
+    val color: String?= null,
+        @SerialName("attributes.previous.data.id")
+    val previousLevelId: Int?= null,
+    @SerialName("attributes.previous.data.attributes.title")
+    val previousLevelTitle: String?= null,
+    @SerialName("attributes.stepstones.data")
+    val stepstones: List<JourneyStepStone>?= null,
 )
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//////    ===== App config for vella
+
 @Serializable
-data class File(
-    @JsonNames("id")
+data class AppConfiguration(
+    @SerialName("data.id")
     val id: Int? = null,
-    @JsonNames("attributes.url", "url")
-    val url: String? = null,
-    @JsonNames("attributes.name", "name")
-    val name: String? = null,
-    @JsonNames("attributes.mime", "mime")
-    val mime: String? = null
+    @SerialName("data.attributes.educational_levels")
+    val educationLevels: List<EducationLevel>? = null,
+    @SerialName("data.attributes.permissions")
+    val permissions: List<AppConfigPermission>? = null,
+    @SerialName("data.attributes.privacyPolicy")
+    val privacyPolicy: String? = null,
+    @SerialName("data.attributes.termsOfService")
+    val termsOfService: String? = null,
+    @SerialName("data.attributes.activityPercentiles")
+    val activityPercentiles: List<ActivityPercentile>? = null,
+    @SerialName("data.attributes.journeyAssets")
+    val journeyAssets: JourneyAssets? = null
 )
 
 @Serializable
-data class Address(
-    @EncodeDefault(EncodeDefault.Mode.NEVER)
-    @SerialName("address1")
-    val address1: String? = null,
-    @EncodeDefault(EncodeDefault.Mode.NEVER)
-    @SerialName("address2")
-    val address2: String? = null,
-    @EncodeDefault(EncodeDefault.Mode.NEVER)
-    @SerialName("city")
-    val city: String? = null,
-    @EncodeDefault(EncodeDefault.Mode.NEVER)
-    @SerialName("state")
-    val state: String? = null,
-    @EncodeDefault(EncodeDefault.Mode.NEVER)
-    @SerialName("zip")
-    val zip: String? = null,
-    @EncodeDefault(EncodeDefault.Mode.NEVER)
-    @SerialName("placeId")
-    val placeId: String? = null,
-    @EncodeDefault(EncodeDefault.Mode.NEVER)
-    @SerialName("lat")
-    val lat: Double? = null,
-    @EncodeDefault(EncodeDefault.Mode.NEVER)
-    @SerialName("long")
-    val long: Double? = null
+data class JourneyAssets(
+    @SerialName("stoneIcons")
+    val stoneIcons: List<StoneIcon>?
 )
 
-enum class OnboardingState(val key: String) {
-    MISSING_PHONE_NUMBER("missingPhoneNumber"),
-    MISSING_PROFILE_PICTURE("missingProfilePicture"),
-    COMPLETE("complete")
+@Serializable
+data class StoneIcon(
+    @SerialName("componentName")
+    val componentName: String?,
+)
+
+@Serializable
+class ActivityPercentile(
+    @SerialName("id")
+    val id: Int,
+    @SerialName("numberOfActivities")
+    val numberOfActivities: Int,
+    @SerialName("percentage")
+    val percentage: Int
+)
+
+@Serializable
+class EducationLevel(
+    @SerialName("id")
+    val id: Int,
+    @SerialName("key")
+    val key: String,
+    @SerialName("title")
+    val title: String
+)
+
+@Serializable
+class AppConfigPermission(
+    @SerialName("id")
+    val id: Int,
+    @SerialName("justification")
+    val justification: String,
+    @SerialName("type")
+    val type: PermissionType,
+    @SerialName("title")
+    val title: String
+)
+
+@Serializable
+enum class PermissionType {
+    @SerialName("bluetooth")
+    Bluetooth,
+
+    @SerialName("calendar")
+    Calendar,
+
+    @SerialName("contacts")
+    Contacts,
+
+    @SerialName("spotify")
+    Spotify,
+
+    @SerialName("gmail")
+    Gmail,
+
+    @SerialName("wifi")
+    Wifi,
+
+    @SerialName("battery")
+    Battery,
+
+    @SerialName("location")
+    Location;
 }
