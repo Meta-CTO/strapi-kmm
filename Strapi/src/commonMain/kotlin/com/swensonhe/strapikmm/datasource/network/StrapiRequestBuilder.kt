@@ -333,7 +333,7 @@ class StrapiQueryBuilder {
         }
     }
 
-    fun noIncludedIn(
+    fun notIncludedIn(
         field: String, value: List<String>, filterType: StrapiFilterType = StrapiFilterType.NONE
     ) = apply {
         val splitted = field.split(".")
@@ -346,7 +346,7 @@ class StrapiQueryBuilder {
                 currentFilterIndex++
                 filter
             }
-            put("filters${filterType.type}$filterIndex${updatedField}[\$nin]", it)
+            put("filters${filterType.type}$filterIndex${updatedField}[\$notIn]", it)
         }
     }
 
