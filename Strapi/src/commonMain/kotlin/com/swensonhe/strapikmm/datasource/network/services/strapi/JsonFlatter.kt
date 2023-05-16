@@ -76,9 +76,14 @@ object JsonFlatter {
 
     @ExperimentalSerializationApi
     fun parse(json: JsonObject, descriptor: SerialDescriptor): JsonObject {
+        if(json.isEmpty()) {
+            return json
+        }
+
         if (descriptor.kind == PolymorphicKind.SEALED) {
             return json
         }
+
         val map = mutableMapOf<String, JsonElement>()
         val elementNames = descriptor.elementNames
         elementNames.forEachIndexed { index, elementName ->
@@ -96,10 +101,6 @@ object JsonFlatter {
                     )
                 }
             }
-
-//            if(annotations.isEmpty() && jsonNames.isEmpty()){
-//                return json
-//            }
 
             if (jsonNames.isEmpty()) {
                 jsonNames.add(elementName)
@@ -183,6 +184,7 @@ object JsonFlatter {
         jsonArray: JsonArray,
         descriptor: SerialDescriptor
     ): JsonElement {
+        if(jsonArray.isEmpty()) return jsonArray
         if (descriptor.kind == StructureKind.LIST) {
             // The descriptor represents a List of data classes
             // Implement parsing logic for List of data classes

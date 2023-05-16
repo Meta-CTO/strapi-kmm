@@ -424,7 +424,7 @@ data class AppConfiguration(
     @SerialName("data.attributes.activityPercentiles")
     val activityPercentiles: List<ActivityPercentile>? = null,
     @SerialName("data.attributes.journeyAssets")
-    val journeyAssets: JourneyAssets? = null
+    val journeyAssets: List<JourneyAssets>? = null
 )
 
 @Serializable

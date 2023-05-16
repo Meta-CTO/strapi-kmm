@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
     spec.name                     = 'Strapi'
-    spec.version                  = '5.0.26'
+    spec.version                  = '5.0.27'
     spec.homepage                 = ''
     spec.source                   = { :http=> ''}
     spec.authors                  = ''
