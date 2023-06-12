@@ -38,7 +38,6 @@ fun HttpRequestBuilder.printCURLDescription(
     components.add("$ curl -v")
     components.add("-X $method")
 
-
     val token = kmmPreference.getSecureString(SharedConstants.ACCESS_TOKEN)
     if (token.isNullOrEmpty().not() && (headers[KmmBaseService.IS_AUTHENTICATED] ?: true.toString()).toBooleanStrict()) {
         components.add("-H \"Authorization: Bearer ${token!!.replace("\"", "\\\"")}\"")

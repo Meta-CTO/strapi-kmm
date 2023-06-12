@@ -18,7 +18,10 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
 
-actual class KtorClientFactory actual constructor(networkLogLevel: NetworkLogLevel, private val preference: KmmPreference) {
+actual class KtorClientFactory actual constructor(
+    networkLogLevel: NetworkLogLevel,
+    private val preference: KmmPreference
+) {
 
     init {
         strapiNetworkLogLevel = networkLogLevel
@@ -33,11 +36,25 @@ actual class KtorClientFactory actual constructor(networkLogLevel: NetworkLogLev
             }
 
             install(DefaultRequest) {
+                val sharedToken = preference.getSecureString(SharedConstants.ACCESS_TOKEN)
                 val token = TokenHandler.token
-                if (token.isNullOrEmpty().not()) {
+
+                val finalToken = if (sharedToken.isNullOrEmpty().not()) {
+                    sharedToken
+                } else if (token.isNotEmpty()) {
+                    token
+                } else {
+                    null
+                }
+
+                if(strapiNetworkLogLevel != NetworkLogLevel.NONE) {
+                    console.log("finalToken: $finalToken")
+                }
+
+                if (finalToken.isNullOrEmpty().not()) {
                     headers.append(
                         SharedConstants.AUTHORIZATION_HEADER,
-                        "${SharedConstants.BEARER} $token"
+                        "${SharedConstants.BEARER} $finalToken"
                     )
                 }
             }
@@ -47,9 +64,15 @@ actual class KtorClientFactory actual constructor(networkLogLevel: NetworkLogLev
                 validateResponse { response: HttpResponse ->
                     val statusCode = response.status.value
                     when (statusCode) {
-                        in 300..399 -> throw RedirectResponseException(response, response.bodyAsText())
+                        in 300..399 -> throw RedirectResponseException(
+                            response,
+                            response.bodyAsText()
+                        )
                         in 400..499 -> throw ClientRequestException(response, response.bodyAsText())
-                        in 500..599 -> throw ServerResponseException(response, response.bodyAsText())
+                        in 500..599 -> throw ServerResponseException(
+                            response,
+                            response.bodyAsText()
+                        )
                     }
 
                     if (statusCode >= 600) {
@@ -63,7 +86,11 @@ actual class KtorClientFactory actual constructor(networkLogLevel: NetworkLogLev
                     val response = responseException.response
                     val bytes = response.body<JsonElement>()
                     val errorData =
-                        JsonFlatter.flat<NetworkError>(JsonWithIgnoredUnknownKeys.decodeFromJsonElement(bytes))
+                        JsonFlatter.flat<NetworkError>(
+                            JsonWithIgnoredUnknownKeys.decodeFromJsonElement(
+                                bytes
+                            )
+                        )
                     val errorResponse =
                         JsonWithIgnoredUnknownKeys.decodeFromJsonElement<NetworkError>(errorData)
                     val error = NetworkErrorMapper().mapServerError(
