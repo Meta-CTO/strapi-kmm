@@ -11,14 +11,18 @@ open class KmmBaseService(private val baseUrl: String, private val kmmPreference
         method: String,
     ): HttpRequestBuilder {
         val builderData = requestBuilder.build()
-        val urlSuffix = builderData.first
-        val headers = builderData.second.filterIsInstance<RequestContent.Header>()
-        val queries = builderData.second.filterIsInstance<RequestContent.Query>()
-        val body = builderData.second.filterIsInstance<RequestContent.Body<*>>()
-        val authentication = builderData.second.filterIsInstance<RequestContent.Authentication>()
+        val endpointUrl = builderData.filterIsInstance<RequestContent.Endpoint>().firstOrNull()
+        val headers = builderData.filterIsInstance<RequestContent.Header>()
+        val queries = builderData.filterIsInstance<RequestContent.Query>()
+        val body = builderData.filterIsInstance<RequestContent.Body<*>>()
+        val authentication = builderData.filterIsInstance<RequestContent.Authentication>()
         var bodyString: String? = null
         val builder = HttpRequestBuilder().apply {
-            url(baseUrl + urlSuffix)
+            if (endpointUrl?.isFullUrl == true) {
+                url(endpointUrl.url)
+            } else {
+                url(baseUrl + endpointUrl?.url.orEmpty())
+            }
 
             queries.forEach { param ->
                 parameter(param.key, param.value)
@@ -34,7 +38,7 @@ open class KmmBaseService(private val baseUrl: String, private val kmmPreference
 
             if (body.isNotEmpty()) {
                 bodyString = try {
-                     body.first().jsonString
+                    body.first().jsonString
                 } catch (throwable: Throwable) {
                     "unable to obtain body data"
                 }

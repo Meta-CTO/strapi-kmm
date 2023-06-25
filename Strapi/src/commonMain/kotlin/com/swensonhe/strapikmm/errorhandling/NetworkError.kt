@@ -6,7 +6,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class NetworkError(
     @SerialName("error.status")
-    val code: Int,
+    val httpStatusCode: Int? = null,
     @SerialName("error.message")
-    val message: String?
+    val message: String? = null,
+    @SerialName("error.details.code")
+    val errorCode: Int? = null
 )

@@ -60,7 +60,8 @@ actual class KtorClientFactory actual constructor(networkLogLevel: NetworkLogLev
                     val errorResponse =
                         JsonWithIgnoredUnknownKeys.decodeFromJsonElement<NetworkError>(errorData)
                     val error = NetworkErrorMapper().mapServerError(
-                        errorCode = errorResponse.code,
+                        httpErrorCode = errorResponse.httpStatusCode,
+                        errorCode = errorResponse.errorCode,
                         errorMessage = errorResponse.message,
                         throwable = responseException
                     )

@@ -7,11 +7,16 @@ import kotlin.reflect.KClass
 
 class StrapiRequestBuilder {
     private lateinit var requestEndpoint: String
+    private lateinit var requestFullUrlEndpoint: String
     val contents: MutableList<RequestContent> = mutableListOf()
     private var queryBuilder: StrapiQueryBuilder? = null
 
     fun endpoint(endpoint: String) {
         this.requestEndpoint = endpoint
+    }
+
+    fun endpointFullUrl(endpoint: String) {
+        requestFullUrlEndpoint = endpoint
     }
 
     fun authenticated(isAuthenticated: Boolean) {
@@ -50,17 +55,28 @@ class StrapiRequestBuilder {
         queryBuilder = builder
     }
 
-    fun build(): Pair<String, List<RequestContent>> {
+    fun build(): List<RequestContent> {
         contents.addAll(queryBuilder?.extractQueries().orEmpty())
 
         val pathContents = contents.filterIsInstance<RequestContent.Path>()
-        var updatedUrl = requestEndpoint
+
+        var updatedUrl = if(::requestEndpoint.isInitialized.not() || requestEndpoint.trim().isEmpty()) {
+            requestFullUrlEndpoint
+        } else {
+            requestEndpoint
+        }
+
+        val isFullUrl = ::requestEndpoint.isInitialized.not() || requestEndpoint.trim().isEmpty()
 
         pathContents.forEach {
             updatedUrl = updatedUrl.replace("{${it.key}}", it.value)
         }
 
-        return updatedUrl to contents.filter { it !is RequestContent.Path }
+        val updatedContents = contents.filter { it !is RequestContent.Path }.toMutableList()
+
+        updatedContents.add(RequestContent.Endpoint(updatedUrl, isFullUrl))
+
+        return updatedContents
     }
 
 }
@@ -626,6 +642,7 @@ sealed class RequestContent {
     class Path(val key: String, val value: String) : RequestContent()
     class Header(val key: String, val value: String) : RequestContent()
     class Body<T>(val value: T, val jsonString: String) : RequestContent()
+    class Endpoint(val url: String, val isFullUrl: Boolean) : RequestContent()
 }
 
 fun StrapiQueryBuilder.extractQueries(): List<RequestContent.Query> {
