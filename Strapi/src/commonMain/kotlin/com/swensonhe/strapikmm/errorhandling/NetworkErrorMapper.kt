@@ -27,16 +27,16 @@ class NetworkErrorMapper {
                 code = httpErrorCode,
                 errorMessage = createErrorJsonResponse(
                     errorMessage ?: "The application has encountered an unknown error",
-                    errorCode ?: -1
+                    httpErrorCode
                 ),
                 throwable = throwable
             )
 
             else -> AppException(
-                errorCode = httpErrorCode ?: UNEXPECTED,
+                errorCode = errorCode ?: httpErrorCode ?: -1,
                 errorMessage = createErrorJsonResponse(
                     errorMessage ?: "The application has encountered an unknown error",
-                    errorCode ?: -1
+                    errorCode ?: httpErrorCode ?: -1
                 ),
                 errorBody = errorBody,
                 throwable = throwable
