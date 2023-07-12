@@ -1,0 +1,43 @@
+CREATE TABLE apiDataTable (
+    apiName TEXT NOT NULL PRIMARY KEY,
+    modelVersion INTEGER NOT NULL,
+    content TEXT NOT NULL,
+    modelName TEXT NOT NULL,
+    isList INTEGER DEFAULT 0
+);
+
+-- Get data by model version and API name
+getDataByModelVersionAndApiName:
+SELECT * FROM apiDataTable WHERE modelVersion = ? AND apiName = ?;
+
+-- Get all list data by model version and API name
+getAllListDataByModelVersionAndModelName:
+SELECT * FROM apiDataTable WHERE modelVersion = ? AND modelName = ? AND isList = 1;
+
+-- Get data by API name
+getDataByApiName:
+SELECT * FROM apiDataTable WHERE apiName = ?;
+
+-- Get all data
+getAllData:
+SELECT * FROM apiDataTable;
+
+-- Get all data by model version and model name
+getAllDataByModelVersionAndModelName:
+SELECT * FROM apiDataTable WHERE modelVersion = ? AND modelName = ?;
+
+-- Delete data by model version and API name
+deleteDataByModelVersionAndApiName:
+DELETE FROM apiDataTable WHERE modelVersion = ? AND apiName = ?;
+
+-- Delete data by API name
+deleteDataByApiName:
+DELETE FROM apiDataTable WHERE apiName = ?;
+
+-- Delete all data
+deleteAllData:
+DELETE FROM apiDataTable;
+
+-- Insert or update data
+insertOrUpdateData:
+INSERT OR REPLACE INTO apiDataTable (apiName, modelVersion, content, modelName, isList) VALUES (?, ?, ?, ?, ?);

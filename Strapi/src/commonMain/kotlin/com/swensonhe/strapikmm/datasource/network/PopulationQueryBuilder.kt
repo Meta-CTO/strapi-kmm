@@ -7,7 +7,7 @@ class PopulationQueryBuilder {
         populations[key] = excludeFromDefault
     }
 
-    inline fun populateEntity(
+    fun populateEntity(
         entityPrefix: String,
         populationType: PopulationType = PopulationType.DEFAULT,
         excludeFromDefault: Boolean = false,

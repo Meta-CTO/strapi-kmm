@@ -1,15 +1,23 @@
 package com.swensonhe.strapikmm.datasource.network
 
+import com.swensonhe.strapikmm.datasource.network.services.strapi.FetchStrategy
+import com.swensonhe.strapikmm.datasource.network.services.strapi.PagingCacheStrategy
 import io.ktor.http.*
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.serializer
 import kotlin.reflect.KClass
+import kotlin.reflect.cast
 
 class StrapiRequestBuilder {
     private lateinit var requestEndpoint: String
     private lateinit var requestFullUrlEndpoint: String
     val contents: MutableList<RequestContent> = mutableListOf()
-    private var queryBuilder: StrapiQueryBuilder? = null
+    var queryBuilder: StrapiQueryBuilder? = null
+    var requestFetchStrategy: FetchStrategy = FetchStrategy.CACHE_THEN_REMOTE
+    var requestClassName: String? = null
+    var modelSerializer: KSerializer<*>? = null
 
     fun endpoint(endpoint: String) {
         this.requestEndpoint = endpoint
@@ -17,6 +25,15 @@ class StrapiRequestBuilder {
 
     fun endpointFullUrl(endpoint: String) {
         requestFullUrlEndpoint = endpoint
+    }
+
+    fun fetchStrategy(strategy: FetchStrategy) {
+        this.requestFetchStrategy = strategy
+    }
+
+    inline fun <reified T : Any> responseType() {
+        requestClassName = T::class.simpleName
+        modelSerializer = serializer<T>()
     }
 
     fun authenticated(isAuthenticated: Boolean) {
@@ -84,6 +101,7 @@ class StrapiRequestBuilder {
 class StrapiQueryBuilder {
 
     var filters: MutableMap<String, MutableList<String>> = mutableMapOf()
+    var pagingData: PagingData? = null
     private var currentFilterIndex = 0
 
     fun add(field: String, value: String, filterType: StrapiFilterType = StrapiFilterType.NONE) =
@@ -121,7 +139,7 @@ class StrapiQueryBuilder {
         }
     }
 
-    inline fun populateEntity(
+    fun populateEntity(
         entityPrefix: String,
         populationType: PopulationType = PopulationType.DEFAULT,
         queryBuilder: PopulationQueryBuilder
@@ -510,7 +528,7 @@ class StrapiQueryBuilder {
         put("filters${filterType.type}$filterIndex${updatedField}[\$notNull]", value.toString())
     }
 
-    inline fun populateEntity(
+    fun populateEntity(
         populationType: PopulationType = PopulationType.ALL,
         queryBuilder: PopulationQueryBuilder,
     ) {
@@ -604,7 +622,8 @@ class StrapiQueryBuilder {
         put("sort", "$updatedField${type.type}")
     }
 
-    fun paging(page: Int, pageSize: Int) {
+    fun paging(page: Int, pageSize: Int, pagingCacheStrategy: PagingCacheStrategy = PagingCacheStrategy.CACHE_FIRST) {
+        pagingData = PagingData(page, pageSize, pagingCacheStrategy)
         put("pagination[page]", page.toString())
         put("pagination[pageSize]", pageSize.toString())
         put("pagination[withCount]", true.toString())
@@ -635,6 +654,8 @@ enum class StrapiFilterType(val type: String) {
     AND("[\$and]"),
     NONE("");
 }
+
+data class PagingData(val page: Int, val pageSize: Int, val pagingCacheStrategy: PagingCacheStrategy)
 
 sealed class RequestContent {
     class Query(val key: String, val value: String) : RequestContent()

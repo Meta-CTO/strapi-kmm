@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id(Plugins.androidLibrary)
@@ -8,6 +9,7 @@ plugins {
     kotlin(Plugins.cocoapods)
     id(Plugins.mavenPublish)
     id(Plugins.signing)
+    id(Plugins.SQL_DELIGHT)
 }
 
 val publishKey: String = gradleLocalProperties(rootDir).getProperty("publishKey")
@@ -19,7 +21,7 @@ val publishEmail: String = gradleLocalProperties(rootDir).getProperty("publishEm
 val publishRepository: String = gradleLocalProperties(rootDir).getProperty("publishRepository")
 val publishDeveloper: String = gradleLocalProperties(rootDir).getProperty("publishDeveloper")
 
-val currentVersion = "6.1.2"
+val currentVersion = "7.1.4"
 val libName = "strapiKMM"
 
 version = currentVersion
@@ -68,6 +70,7 @@ kotlin {
             dependencies {
                 implementation("androidx.security:security-crypto:1.0.0")
                 api(Ktor.android)
+                implementation(ProjectDependencies.SqlDelight.ANDROID_DRIVER)
             }
         }
 
@@ -78,6 +81,7 @@ kotlin {
             dependsOn(commonMain)
             dependencies {
                 api(Ktor.ios)
+                implementation(ProjectDependencies.SqlDelight.NATIVE_DRIVER)
             }
 
             iosX64Main.dependsOn(this)
@@ -90,11 +94,13 @@ kotlin {
             dependencies {
                 api(Ktor.js)
                 api(Ktor.jsSeralization)
+                implementation(ProjectDependencies.SqlDelight.JS_DRIVER)
+                implementation(devNpm(ProjectDependencies.SqlDelight.COPY_WEBPACK_PLUGIN, ProjectDependencies.COPY_WEBPACK_PLUGIN))
             }
         }
     }
 
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    tasks.withType<KotlinCompile> {
         kotlinOptions {
             jvmTarget = "11"
         }
@@ -118,6 +124,15 @@ kotlin {
                     from(components.getByName("debug"))
                 }
             }
+        }
+    }
+}
+
+sqldelight {
+    databases {
+        create("AppDatabase") {
+            packageName.set("com.swensonhe.caching.datasource.database")
+            generateAsync.set(true)
         }
     }
 }
