@@ -49,7 +49,7 @@ class ApiDataDaoImplementation(private val apiDataQueries: ApiDataQueries) : Api
         }
     }
 
-    override suspend fun getAllListDataByModelVersionAndApiName(
+    override suspend fun getAllListDataByModelVersionAndModelName(
         modelVersion: Int,
         modelName: String
     ): List<LocalApiData> {

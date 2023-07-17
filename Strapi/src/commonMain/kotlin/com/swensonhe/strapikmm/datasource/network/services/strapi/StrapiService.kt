@@ -309,15 +309,20 @@ class StrapiService(
         } else {
             val response = JsonFlatter.flat<T>(json).convert<T>()
 
+            Logger("Strapi").log("response: $response")
             val apiPath = request.url.encodedPath
+            Logger("Strapi").log("apiPath: $apiPath")
             val requestClassName = builder.requestClassName ?: T::class.simpleName ?: ""
             val responseJson = Json.encodeToJsonElement(serializer<T>(), response)
             val jsonObject = responseJson.jsonObject["data"]?.jsonObject.orEmpty()
 
             val jsonContent = Json.encodeToString(jsonObject)
 
+            Logger("Strapi").log("jsonContent: $jsonContent")
+
             val modelVersion = serializer<T>().getModelVersion()
 
+            Logger("Strapi").log("modelVersion: $modelVersion")
             updateCachedItem(
                 apiPath,
                 modelVersion,
@@ -337,6 +342,14 @@ class StrapiService(
         jsonContent: String,
         elementId: String
     ) {
+
+        Logger("Strapi").log("updateCachedItem")
+        Logger("Strapi").log("apiPath: $apiPath")
+        Logger("Strapi").log("modelVersion: $modelVersion")
+        Logger("Strapi").log("modelName: $modelName")
+        Logger("Strapi").log("jsonContent: $jsonContent")
+        Logger("Strapi").log("elementId: $elementId")
+
         // update the oneItem
         localDataRepository.insertOrUpdateData(
             // the api name is the api path that include the id due to the fact that each item has a unique id and each item details can be fetched using the id
@@ -349,7 +362,7 @@ class StrapiService(
 
         // Get all the list with the same modelVersion and modelName
         val allListItems =
-            localDataRepository.getAllListDataByModelVersionAndApiName(modelVersion, modelName)
+            localDataRepository.getAllListDataByModelVersionAndModelName(modelVersion, modelName)
         allListItems.forEach {
             val apiName = it.apiName
             val data = it.content
@@ -409,7 +422,7 @@ class StrapiService(
         localDataRepository.deleteDataByApiName(apiName = apiPath)
 
         // Get all the list with the same modelVersion and modelName
-        val allListItems = localDataRepository.getAllListDataByModelVersionAndApiName(
+        val allListItems = localDataRepository.getAllListDataByModelVersionAndModelName(
             elementInfo.modelVersion,
             elementInfo.modelName
         )

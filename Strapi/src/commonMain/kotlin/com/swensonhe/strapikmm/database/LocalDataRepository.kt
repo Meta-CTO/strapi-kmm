@@ -17,9 +17,8 @@ class LocalDataRepository(private val databaseDriverFactory: DatabaseDriverFacto
 
     suspend fun getAllData() = provideApiDataDao().getAllData()
 
-    suspend fun getAllListDataByModelVersionAndApiName(modelVersion: Int, modelName: String) =
-        provideApiDataDao().getAllListDataByModelVersionAndApiName(modelVersion, modelName)
-
+    suspend fun getAllListDataByModelVersionAndModelName(modelVersion: Int, modelName: String) =
+        provideApiDataDao().getAllListDataByModelVersionAndModelName(modelVersion, modelName)
 
     suspend fun deleteDataByModelVersionAndApiName(modelVersion: Int, apiName: String) =
         provideApiDataDao().deleteDataByModelVersionAndApiName(modelVersion, apiName)
