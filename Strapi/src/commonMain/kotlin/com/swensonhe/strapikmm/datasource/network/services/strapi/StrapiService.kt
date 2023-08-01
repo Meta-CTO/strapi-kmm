@@ -118,20 +118,22 @@ class StrapiService(
 
         // build the builder and the request to extract the path and the url
         val builder = StrapiRequestBuilder()
+
         builder.requestBuilder()
 
         val modelSerializer = builder.modelSerializer
             ?: throw Throwable("You must provide the responseType in the requestBuilder")
+
         val modelVersion = modelSerializer.getModelVersion()
 
-
         val page = builder.queryBuilder?.pagingData?.page ?: 1
-        val pagingCacheStrategy =
-            builder.queryBuilder?.pagingData?.pagingCacheStrategy ?: PagingCacheStrategy.CACHE_FIRST
+
         val fetchStrategy = builder.requestFetchStrategy
 
         val request = buildRequest(builder, HttpMethod.Get.value)
+
         val apiPath = request.url.encodedPath
+
         val apiUrl = request.url.buildString()
 
         // get data from cache if available
@@ -170,7 +172,7 @@ class StrapiService(
 
         // Then cache the whole list and each item in the list individually
         // if the page is 1 or the paging cache strategy is CACHE_LAST
-        if (page == 1 || pagingCacheStrategy == PagingCacheStrategy.CACHE_LAST) {
+        if (page == 1) {
             // Coverting the list to json array to be able to cache it
 
             val responseJson = Json.encodeToJsonElement(serializer<T>(), response)

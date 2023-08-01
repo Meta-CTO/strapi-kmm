@@ -10,11 +10,3 @@ enum class FetchStrategy {
     @SerialName("cacheThenRemote")
     CACHE_THEN_REMOTE
 }
-
-@Serializable
-enum class PagingCacheStrategy {
-    @SerialName("cacheLast")
-    CACHE_LAST,
-    @SerialName("cacheFirst")
-    CACHE_FIRST
-}

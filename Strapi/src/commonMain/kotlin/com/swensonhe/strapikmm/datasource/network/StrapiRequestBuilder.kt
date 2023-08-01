@@ -1,14 +1,11 @@
 package com.swensonhe.strapikmm.datasource.network
 
 import com.swensonhe.strapikmm.datasource.network.services.strapi.FetchStrategy
-import com.swensonhe.strapikmm.datasource.network.services.strapi.PagingCacheStrategy
 import io.ktor.http.*
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
-import kotlin.reflect.KClass
-import kotlin.reflect.cast
 
 class StrapiRequestBuilder {
     private lateinit var requestEndpoint: String
@@ -622,8 +619,8 @@ class StrapiQueryBuilder {
         put("sort", "$updatedField${type.type}")
     }
 
-    fun paging(page: Int, pageSize: Int, pagingCacheStrategy: PagingCacheStrategy = PagingCacheStrategy.CACHE_FIRST) {
-        pagingData = PagingData(page, pageSize, pagingCacheStrategy)
+    fun paging(page: Int, pageSize: Int) {
+        pagingData = PagingData(page, pageSize)
         put("pagination[page]", page.toString())
         put("pagination[pageSize]", pageSize.toString())
         put("pagination[withCount]", true.toString())
@@ -655,7 +652,7 @@ enum class StrapiFilterType(val type: String) {
     NONE("");
 }
 
-data class PagingData(val page: Int, val pageSize: Int, val pagingCacheStrategy: PagingCacheStrategy)
+data class PagingData(val page: Int, val pageSize: Int)
 
 sealed class RequestContent {
     class Query(val key: String, val value: String) : RequestContent()
