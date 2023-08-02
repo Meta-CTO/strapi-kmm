@@ -28,10 +28,11 @@ class StrapiRequestBuilder {
         this.requestFetchStrategy = strategy
     }
 
-    inline fun <reified T : Any> responseType() {
+    inline fun <reified T : Any> responseModel() {
         requestClassName = T::class.simpleName
         modelSerializer = serializer<T>()
     }
+
 
     fun authenticated(isAuthenticated: Boolean) {
         if (this.contents.any { it is RequestContent.Authentication }) {

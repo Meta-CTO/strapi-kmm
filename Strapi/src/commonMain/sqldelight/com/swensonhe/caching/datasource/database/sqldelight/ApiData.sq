@@ -1,43 +1,95 @@
-CREATE TABLE apiDataTable (
-    apiName TEXT NOT NULL PRIMARY KEY,
+CREATE TABLE listData (
+    apiUrl TEXT NOT NULL PRIMARY KEY ON CONFLICT REPLACE,
     modelVersion INTEGER NOT NULL,
-    content TEXT NOT NULL,
-    modelName TEXT NOT NULL,
-    isList INTEGER DEFAULT 0
+    modelType TEXT NOT NULL,
+    content TEXT NOT NULL -- Ids of the list items so we can fetch them from the contentDataTable based on the modelType
 );
 
--- Get data by model version and API name
-getDataByModelVersionAndApiName:
-SELECT * FROM apiDataTable WHERE modelVersion = ? AND apiName = ?;
+CREATE TABLE contentData (
+    modelId INTEGER,
+    modelType TEXT,
+    modelVersion INTEGER,
+    content TEXT,
+    apiUrl TEXT UNIQUE ON CONFLICT REPLACE, -- In case of modelType cannot be determined and also the modelId so we will fetch using the apiUrl
+    PRIMARY KEY (modelId, modelType) ON CONFLICT REPLACE
+);
 
--- Get all list data by model version and API name
-getAllListDataByModelVersionAndModelName:
-SELECT * FROM apiDataTable WHERE modelVersion = ? AND modelName = ? AND isList = 1;
+-- -- Get list data by model version and API url
+getListDataByModelVersionAndApiUrl:
+SELECT * FROM listData WHERE modelVersion = ? AND apiUrl = ?;
 
--- Get data by API name
-getDataByApiName:
-SELECT * FROM apiDataTable WHERE apiName = ?;
+-- -- Get list data by Model version and model type
+getListDataByModelVersionAndModelType:
+SELECT * FROM listData WHERE modelVersion = ? AND modelType = ?;
 
--- Get all data
-getAllData:
-SELECT * FROM apiDataTable;
+-- -- Get list data by API url
+getListDataByApiUrl:
+SELECT * FROM listData WHERE apiUrl = ?;
 
--- Get all data by model version and model name
-getAllDataByModelVersionAndModelName:
-SELECT * FROM apiDataTable WHERE modelVersion = ? AND modelName = ?;
+-- -- Get list data by model type
+getListDataByModelType:
+SELECT * FROM listData WHERE modelType = ?;
 
--- Delete data by model version and API name
-deleteDataByModelVersionAndApiName:
-DELETE FROM apiDataTable WHERE modelVersion = ? AND apiName = ?;
+-- -- Insert or update list data
+insertOrUpdateListData:
+INSERT OR REPLACE INTO listData (apiUrl, modelVersion, modelType, content) VALUES (?, ?, ?, ?);
 
--- Delete data by API name
-deleteDataByApiName:
-DELETE FROM apiDataTable WHERE apiName = ?;
+-- -- Delete list data by model version and API url
+deleteListDataByModelVersionAndApiUrl:
+DELETE FROM listData WHERE modelVersion = ? AND apiUrl = ?;
 
--- Delete all data
-deleteAllData:
-DELETE FROM apiDataTable;
+-- -- Delete list data by API url
+deleteListDataByApiUrl:
+DELETE FROM listData WHERE apiUrl = ?;
 
--- Insert or update data
-insertOrUpdateData:
-INSERT OR REPLACE INTO apiDataTable (apiName, modelVersion, content, modelName, isList) VALUES (?, ?, ?, ?, ?);
+-- -- Get content data by model version and model type
+getContentDataByModelVersionAndModelType:
+SELECT * FROM contentData WHERE modelVersion = ? AND modelType = ?;
+
+-- -- Get content data by model version and model type and API url
+getContentDataByModelVersionAndModelTypeAndApiUrl:
+SELECT * FROM contentData WHERE modelVersion = ? AND modelType = ? AND apiUrl = ?;
+
+-- -- Get content data by model version and API url
+getContentDataByModelVersionAndApiUrl:
+SELECT * FROM contentData WHERE modelVersion = ? AND apiUrl = ?;
+
+-- -- Get content data by model type
+getContentDataByModelType:
+SELECT * FROM contentData WHERE modelType = ?;
+
+-- -- Get content data by API url
+getContentDataByApiUrl:
+SELECT * FROM contentData WHERE apiUrl = ?;
+
+-- -- Insert or update content data
+insertOrUpdateContentData:
+INSERT OR REPLACE INTO contentData (modelId, modelType, modelVersion, content, apiUrl) VALUES (?, ?, ?, ?, ?);
+
+-- -- Delete content data by model version and model type
+deleteContentDataByModelVersionAndModelType:
+DELETE FROM contentData WHERE modelVersion = ? AND modelType = ?;
+
+-- -- Delete content data by model version and API url
+deleteContentDataByModelVersionAndApiUrl:
+DELETE FROM contentData WHERE modelVersion = ? AND apiUrl = ?;
+
+-- -- Delete content data by model type
+deleteContentDataByModelType:
+DELETE FROM contentData WHERE modelType = ?;
+
+-- -- Delete content data by API url
+deleteContentDataByApiUrl:
+DELETE FROM contentData WHERE apiUrl = ?;
+
+-- -- Delete content data by model id and model type
+deleteContentDataByModelIdAndModelType:
+DELETE FROM contentData WHERE modelId = ? AND modelType = ?;
+
+-- -- Get content data by model type and model ids (for example: get all the content for a list of ids)
+getContentDataByModelTypeAndModelVersionAndModelIds:
+SELECT * FROM contentData WHERE modelType = ? AND modelVersion = ? AND modelId IN ? ;
+
+-- -- Get content data by model type and model ids (for example: get all the content for a list of ids)
+getContentDataByModelTypeAndModelVersionAndModelId:
+SELECT * FROM contentData WHERE modelType = ? AND modelVersion = ? AND modelId = ? ;

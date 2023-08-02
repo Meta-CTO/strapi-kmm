@@ -10,26 +10,85 @@ class LocalDataRepository(private val databaseDriverFactory: DatabaseDriverFacto
     private val lockMutex = Mutex()
     private lateinit var appDatabase: AppDatabase
 
-    suspend fun getDataByModelVersionAndApiName(modelVersion: Int, apiName: String) =
-        provideApiDataDao().getDataByModelVersionAndApiName(modelVersion, apiName)
+    suspend fun insertOrUpdateListData(apiUrl: String, modelVersion: Int, modelType: String, content: String) {
+        provideApiDataDao().insertOrUpdateListData(apiUrl, modelVersion, modelType, content)
+    }
 
-    suspend fun getDataByApiName(apiName: String) = provideApiDataDao().getDataByApiName(apiName)
+    suspend fun getListDataByModelVersionAndApiUrl(modelVersion: Int, apiUrl: String): List<ContentData>? {
+        return provideApiDataDao().getListDataByModelVersionAndApiUrl(modelVersion, apiUrl)
+    }
 
-    suspend fun getAllData() = provideApiDataDao().getAllData()
+    suspend fun getListDataByModelVersionAndModelType(modelVersion: Int, modelType: String): List<ContentData>? {
+        return provideApiDataDao().getListDataByModelVersionAndModelType(modelVersion, modelType)
+    }
 
-    suspend fun getAllListDataByModelVersionAndModelName(modelVersion: Int, modelName: String) =
-        provideApiDataDao().getAllListDataByModelVersionAndModelName(modelVersion, modelName)
+    suspend fun getListDataByApiUrl(apiUrl: String): List<ContentData>? {
+        return provideApiDataDao().getListDataByApiUrl(apiUrl)
+    }
 
-    suspend fun deleteDataByModelVersionAndApiName(modelVersion: Int, apiName: String) =
-        provideApiDataDao().deleteDataByModelVersionAndApiName(modelVersion, apiName)
+    suspend fun getListDataByModelType(modelType: String): List<ContentData>? {
+        return provideApiDataDao().getListDataByModelType(modelType)
+    }
 
-    suspend fun deleteDataByApiName(apiName: String) =
-        provideApiDataDao().deleteDataByApiName(apiName)
+    suspend fun deleteListDataByModelVersionAndApiUrl(modelVersion: Int, apiUrl: String) {
+        provideApiDataDao().deleteListDataByModelVersionAndApiUrl(modelVersion, apiUrl)
+    }
 
-    suspend fun deleteAllData() = provideApiDataDao().deleteAllData()
+    suspend fun deleteListDataByApiUrl(apiUrl: String) {
+        provideApiDataDao().deleteListDataByApiUrl(apiUrl)
+    }
 
-    suspend fun insertOrUpdateData(apiName: String, modelVersion: Int, data: String, modelName: String, isList: Boolean) =
-        provideApiDataDao().insertOrUpdateData(apiName, modelVersion, data, modelName, isList)
+    suspend fun getContentDataByModelVersionAndModelType(modelVersion: Int, modelType: String): List<ContentData>? {
+        return provideApiDataDao().getContentDataByModelVersionAndModelType(modelVersion, modelType)
+    }
+
+    suspend fun getContentDataByModelVersionAndApiUrl(modelVersion: Int, apiUrl: String): ContentData? {
+        return provideApiDataDao().getContentDataByModelVersionAndApiUrl(modelVersion, apiUrl)
+    }
+
+    suspend fun getContentDataByModelVersionAndModelTypeAndApiUrl(modelVersion: Int, modelType: String, apiUrl: String): ContentData? {
+        return provideApiDataDao().getContentDataByModelVersionAndModelTypeAndApiUrl(modelVersion, modelType, apiUrl)
+    }
+
+    suspend fun getContentDataByModelType(modelType: String): List<ContentData>? {
+        return provideApiDataDao().getContentDataByModelType(modelType)
+    }
+
+    suspend fun getContentDataByApiUrl(apiUrl: String): ContentData? {
+        return provideApiDataDao().getContentDataByApiUrl(apiUrl)
+    }
+
+    suspend fun insertOrUpdateContentData(modelVersion: Int?, modelType: String?, content: String?, apiUrl: String?, modelId: Int?) {
+        provideApiDataDao().insertOrUpdateContentData(modelId, modelType, modelVersion, content, apiUrl)
+    }
+
+    suspend fun deleteContentDataByModelVersionAndApiUrl(modelVersion: Int, apiUrl: String) {
+        provideApiDataDao().deleteContentDataByModelVersionAndApiUrl(modelVersion, apiUrl)
+    }
+
+    suspend fun deleteContentDataByApiUrl(apiUrl: String) {
+        provideApiDataDao().deleteContentDataByApiUrl(apiUrl)
+    }
+
+    suspend fun deleteContentDataByModelVersionAndModelType(modelVersion: Int, modelType: String) {
+        provideApiDataDao().deleteContentDataByModelVersionAndModelType(modelVersion, modelType)
+    }
+
+    suspend fun deleteContentDataByModelType(modelType: String) {
+        provideApiDataDao().deleteContentDataByModelType(modelType)
+    }
+
+    suspend fun getContentDataByModelTypeAndModelVersionAndModelIds(modelType: String, modelVersion: Int, modelIds: List<Int>): List<ContentData>? {
+        return provideApiDataDao().getContentDataByModelTypeAndModelVersionAndModelIds(modelType, modelVersion, modelIds)
+    }
+
+    suspend fun getContentDataByModelTypeAndModelVersionAndModelId(modelType: String, modelVersion: Int, modelId: Int): ContentData? {
+        return provideApiDataDao().getContentDataByModelTypeAndModelVersionAndModelId(modelType, modelVersion, modelId)
+    }
+
+    suspend fun deleteContentDataByModelIdAndModelType(modelId: Int, modelType: String) {
+        provideApiDataDao().deleteContentDataByModelIdAndModelType(modelId, modelType)
+    }
 
     private suspend fun provideApiDataDao(): ApiDataDao {
         val database = provideAppDatabase()

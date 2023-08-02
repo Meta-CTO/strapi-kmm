@@ -13,7 +13,7 @@ import com.swensonhe.strapikmm.model.PagingResponse
 import com.swensonhe.strapikmm.sharedpreference.KmmPreference
 import com.swensonhe.strapikmm.annotations.getModelVersion
 import com.swensonhe.strapikmm.database.DatabaseDriverFactory
-import com.swensonhe.strapikmm.util.Logger
+import com.swensonhe.strapikmm.util.nullIfEmpty
 import com.swensonhe.strapikmm.util.strapiNetworkLogLevel
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -83,10 +83,18 @@ class StrapiService(
 
         // get data from cache if available
         if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE) {
-            val localData =
-                localDataRepository.getDataByModelVersionAndApiName(modelVersion, apiPath)
-            if (localData != null) {
-                val json = Json.parseToJsonElement(localData.content)
+            val localData = if (requestClassName.isNotEmpty()) {
+                localDataRepository.getContentDataByModelVersionAndModelTypeAndApiUrl(
+                    modelVersion,
+                    requestClassName,
+                    apiPath
+                )
+            } else {
+                localDataRepository.getContentDataByApiUrl(apiPath)
+            }
+
+            if (localData?.content.isNullOrEmpty().not()) {
+                val json = JsonWithIgnoredUnknownKeys.parseToJsonElement(localData?.content!!)
                 emit(JsonFlatter.flat<T>(json).convert<T>())
             }
         }
@@ -96,20 +104,19 @@ class StrapiService(
         val response = JsonFlatter.flat<T>(json).convert<T>()
         // save data to cache
         if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE) {
-            // Then cache the whole list
-            localDataRepository.insertOrUpdateData(
-                // the api name is the api url itself due to the fact that the api url is unique and we can get the list using different query params
-                apiName = apiPath,
-                data = Json.encodeToString(json),
-                modelVersion = modelVersion,
-                modelName = requestClassName,
-                isList = false
+            // Then cache
+
+            localDataRepository.insertOrUpdateContentData(
+                modelVersion,
+                requestClassName,
+                Json.encodeToString(json),
+                apiPath,
+                null
             )
         }
 
         emit(response)
     }
-
 
     @Throws(Throwable::class)
     inline fun <reified T> getPaged(
@@ -132,51 +139,59 @@ class StrapiService(
 
         val request = buildRequest(builder, HttpMethod.Get.value)
 
-        val apiPath = request.url.encodedPath
+        val requestClassName = builder.requestClassName ?: ""
 
         val apiUrl = request.url.buildString()
+
+        val apiPath = request.url.encodedPath
 
         // get data from cache if available
         if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE && page == 1) {
             val localData =
-                localDataRepository.getDataByModelVersionAndApiName(modelVersion, apiUrl)
-            if (localData != null) {
-                val jsonArray = Json.parseToJsonElement(localData.content).jsonArray
-                val cachedData = jsonArray.map { jsonElement ->
-                    Json.decodeFromJsonElement(modelSerializer, jsonElement)
-                }.filterNotNull()
-
-                if (cachedData.isNotEmpty()) {
-                    emit(
-                        PagingResponse(
-                            data = cachedData,
-                            meta = MetaResponse(
-                                Paging(
-                                    page = 1,
-                                    pageSize = cachedData.size,
-                                    total = cachedData.size,
-                                    pageCount = 1
-                                )
-                            )
-                        ) as T
+                localDataRepository.getListDataByModelVersionAndApiUrl(modelVersion, apiUrl)
+            val listItems = localData.orEmpty().map { localItem ->
+                if (localItem.content.isNullOrEmpty().not()) {
+                    Json.decodeFromJsonElement(
+                        modelSerializer,
+                        JsonWithIgnoredUnknownKeys.parseToJsonElement(localItem.content!!)
                     )
+                } else {
+                    null
                 }
+            }.filterNotNull()
+
+            if (listItems.isNotEmpty()) {
+                emit(
+                    PagingResponse(
+                        data = listItems,
+                        meta = MetaResponse(
+                            Paging(
+                                page = 1,
+                                pageSize = listItems.size,
+                                total = listItems.size,
+                                pageCount = 1
+                            )
+                        )
+                    ) as T
+                )
             }
         }
 
         // get data from api
         //////
         val json = httpClient.get(request).body<JsonElement>()
-        val response = JsonFlatter.flat<T>(json).convert<T>()
+        val flatResponse = JsonFlatter.flat<T>(json)
+        val response = flatResponse.convert<T>()
         /////
 
         // Then cache the whole list and each item in the list individually
         // if the page is 1 or the paging cache strategy is CACHE_LAST
         if (page == 1) {
-            // Coverting the list to json array to be able to cache it
-
-            val responseJson = Json.encodeToJsonElement(serializer<T>(), response)
-            val jsonArray = responseJson.jsonObject["data"]?.jsonArray.orEmpty()
+            // Converting the list to json array to be able to cache it
+            val jsonArray = flatResponse.jsonObject["data"]?.jsonArray.orEmpty()
+            val elementsIds = jsonArray.mapNotNull { jsonElement ->
+                jsonElement.jsonObject["id"]?.jsonPrimitive?.content
+               }.joinToString(",")
 
             // Cache each item in the list individually so that we can update the cache when the item is updated
             jsonArray.forEach { jsonElement ->
@@ -184,32 +199,52 @@ class StrapiService(
                 val jsonContent = Json.encodeToString(jsonElement)
 
                 // get each item id
-                val id = jsonElement.jsonObject["id"]?.jsonPrimitive?.content
+                val id = jsonElement.jsonObject["id"]?.jsonPrimitive?.content?.toIntOrNull()
 
                 // cache each item individually if it has an id
-                if (id != null) {
-                    localDataRepository.insertOrUpdateData(
-                        // the api name is the api path + the id due to the fact that each item has a unique id and each item details can be fetched using the id
-                        apiName = "$apiPath/$id",
-                        data = jsonContent,
-                        modelVersion = modelVersion,
-                        modelName = builder.requestClassName ?: "",
-                        isList = false
-                    )
+                if (id != null && requestClassName.isNotEmpty()) {
+                    val localCachedItem =
+                        localDataRepository.getContentDataByModelTypeAndModelVersionAndModelId(
+                            requestClassName,
+                            modelVersion,
+                            id
+                        )
+
+                    // if the item is not cached then cache it
+                    if (localCachedItem?.content.isNullOrEmpty()) {
+                        localDataRepository.insertOrUpdateContentData(
+                            modelVersion,
+                            requestClassName,
+                            jsonContent,
+                            "$apiPath/$id",
+                            id
+                        )
+                    } else {
+                        val itemJsonElement = JsonWithIgnoredUnknownKeys.parseToJsonElement(localCachedItem?.content!!)
+                        if (itemJsonElement as? JsonObject != null && jsonElement as? JsonObject != null) {
+                            val cachedJsonObject = itemJsonElement.toMutableMap()
+                            val newJsonObject = jsonElement.toMutableMap()
+                            cachedJsonObject.putAll(newJsonObject)
+                            val jsonData = JsonObject(cachedJsonObject).toString()
+
+                            localDataRepository.insertOrUpdateContentData(
+                                modelVersion,
+                                requestClassName,
+                                jsonData,
+                                "$apiPath/$id",
+                                id
+                            )
+                        }
+                    }
                 }
             }
 
-            // get the whole list json content
-            val jsonContent = Json.encodeToString(jsonArray)
-
             // Then cache the whole list
-            localDataRepository.insertOrUpdateData(
-                // the api name is the api url itself due to the fact that the api url is unique and we can get the list using different query params
-                apiName = apiUrl,
-                data = jsonContent,
-                modelVersion = modelVersion,
-                modelName = builder.requestClassName ?: "",
-                isList = true
+            localDataRepository.insertOrUpdateListData(
+                apiUrl,
+                modelVersion,
+                requestClassName,
+                elementsIds
             )
         }
 
@@ -228,18 +263,33 @@ class StrapiService(
                 ?: throw Throwable("You must provide the responseType in the requestBuilder")
             val modelVersion = modelSerializer.getModelVersion()
 
+            val requestClassName = builder.requestClassName ?: ""
+
             val fetchStrategy = builder.requestFetchStrategy
 
             val request = buildRequest(builder, HttpMethod.Get.value)
 
             val apiPath = request.url.encodedPath
 
+            // We need to get the id from the encoded path which is the last part of the path and it can be like posts/1 or comments/1 .. etc
+            val entityId = apiPath.split("/").lastOrNull()?.toInt()
+
             // get data from cache if available
             if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE) {
-                val localData =
-                    localDataRepository.getDataByModelVersionAndApiName(modelVersion, apiPath)
-                if (localData != null) {
-                    val cachedData = Json.decodeFromString(modelSerializer, localData.content)
+                val localData = if (entityId != null && requestClassName.isNotEmpty()) {
+                    localDataRepository.getContentDataByModelTypeAndModelVersionAndModelId(
+                        requestClassName,
+                        modelVersion,
+                        entityId
+                    )
+                } else if (entityId == null && requestClassName.isEmpty()) {
+                    localDataRepository.getContentDataByModelVersionAndApiUrl(modelVersion, apiPath)
+                } else {
+                    localDataRepository.getContentDataByApiUrl(apiPath)
+                }
+
+                if (localData?.content.isNullOrEmpty().not()) {
+                    val cachedData = Json.decodeFromString(modelSerializer, localData?.content!!)
                     emit(DataWrapper(cachedData) as T)
                 }
             }
@@ -254,13 +304,14 @@ class StrapiService(
             val jsonObject = responseJson.jsonObject["data"]?.jsonObject.orEmpty()
 
             val jsonContent = Json.encodeToString(jsonObject)
-            localDataRepository.insertOrUpdateData(
-                // the api name is the api path that include the id due to the fact that each item has a unique id and each item details can be fetched using the id
-                apiName = apiPath,
-                data = jsonContent,
+
+            // Then Insert
+            localDataRepository.insertOrUpdateContentData(
                 modelVersion = modelVersion,
-                modelName = T::class.simpleName ?: "",
-                isList = false
+                modelType = requestClassName.nullIfEmpty(),
+                jsonContent,
+                apiPath,
+                entityId
             )
 
             emit(response)
@@ -287,12 +338,13 @@ class StrapiService(
     ): T {
         val builder = StrapiRequestBuilder()
         builder.requestBuilder()
-        val json =
-            httpClient.patch(buildRequest(builder, HttpMethod.Patch.value)).body<JsonElement>()
+        val request = buildRequest(builder, HttpMethod.Patch.value)
+        val json = httpClient.patch(request).body<JsonElement>()
+
         return if (T::class.simpleName == Unit::class.simpleName) {
             Unit as T
         } else {
-            JsonFlatter.flat<T>(json).convert()
+            handleUpdateItem(json, request, builder)
         }
     }
 
@@ -309,31 +361,42 @@ class StrapiService(
         return if (T::class.simpleName == Unit::class.simpleName) {
             Unit as T
         } else {
-            val response = JsonFlatter.flat<T>(json).convert<T>()
-
-            Logger("Strapi").log("response: $response")
-            val apiPath = request.url.encodedPath
-            Logger("Strapi").log("apiPath: $apiPath")
-            val requestClassName = builder.requestClassName ?: T::class.simpleName ?: ""
-            val responseJson = Json.encodeToJsonElement(serializer<T>(), response)
-            val jsonObject = responseJson.jsonObject["data"]?.jsonObject.orEmpty()
-
-            val jsonContent = Json.encodeToString(jsonObject)
-
-            Logger("Strapi").log("jsonContent: $jsonContent")
-
-            val modelVersion = serializer<T>().getModelVersion()
-
-            Logger("Strapi").log("modelVersion: $modelVersion")
-            updateCachedItem(
-                apiPath,
-                modelVersion,
-                requestClassName,
-                jsonContent,
-                elementId = jsonObject["id"]?.jsonPrimitive?.content.orEmpty()
-            )
-            response
+            handleUpdateItem(json, request, builder)
         }
+    }
+
+    /**
+     * DON'T USE THIS METHOD DIRECTLY USE [PUT, PATCH] INSTEAD
+     * This method is used to update the cache when an item is updated
+     * @param json the json response from the api
+     * @param request the request that was sent to the api
+     * @param builder the request builder
+     */
+    @Throws(Throwable::class)
+    suspend inline fun <reified T> handleUpdateItem(
+        json: JsonElement,
+        request: HttpRequestBuilder,
+        builder: StrapiRequestBuilder
+    ): T {
+        val response = JsonFlatter.flat<T>(json).convert<T>()
+        val apiPath = request.url.encodedPath
+        val requestClassName = builder.requestClassName ?: T::class.simpleName ?: ""
+        val responseJson = Json.encodeToJsonElement(serializer<T>(), response)
+        val jsonObject = responseJson.jsonObject["data"]?.jsonObject.orEmpty()
+
+        val jsonContent = Json.encodeToString(jsonObject)
+
+        val modelVersion = serializer<T>().getModelVersion()
+
+        updateCachedItem(
+            apiPath,
+            modelVersion,
+            requestClassName,
+            jsonContent,
+            elementId = jsonObject["id"]?.jsonPrimitive?.content.orEmpty()
+        )
+
+        return response
     }
 
     @Throws(Throwable::class)
@@ -344,50 +407,14 @@ class StrapiService(
         jsonContent: String,
         elementId: String
     ) {
-
-        Logger("Strapi").log("updateCachedItem")
-        Logger("Strapi").log("apiPath: $apiPath")
-        Logger("Strapi").log("modelVersion: $modelVersion")
-        Logger("Strapi").log("modelName: $modelName")
-        Logger("Strapi").log("jsonContent: $jsonContent")
-        Logger("Strapi").log("elementId: $elementId")
-
-        // update the oneItem
-        localDataRepository.insertOrUpdateData(
-            // the api name is the api path that include the id due to the fact that each item has a unique id and each item details can be fetched using the id
-            apiName = apiPath,
-            data = jsonContent,
+        val elementIdInt = elementId.toIntOrNull()
+        localDataRepository.insertOrUpdateContentData(
             modelVersion = modelVersion,
-            modelName = modelName,
-            isList = false
+            modelType = modelName.nullIfEmpty(),
+            jsonContent,
+            apiPath,
+            elementIdInt
         )
-
-        // Get all the list with the same modelVersion and modelName
-        val allListItems =
-            localDataRepository.getAllListDataByModelVersionAndModelName(modelVersion, modelName)
-        allListItems.forEach {
-            val apiName = it.apiName
-            val data = it.content
-            val jsonArray = Json.parseToJsonElement(data).jsonArray
-            val updatedArray = jsonArray.map { jsonElement ->
-                if (jsonElement.jsonObject["id"]?.jsonPrimitive?.content == elementId) {
-                    val updatedJson = Json.parseToJsonElement(jsonContent)
-                    updatedJson
-                } else {
-                    jsonElement
-                }
-            }
-
-            // update the list
-            localDataRepository.insertOrUpdateData(
-                // the api name is the api path that include the id due to the fact that each item has a unique id and each item details can be fetched using the id
-                apiName = apiName,
-                data = Json.encodeToString(updatedArray),
-                modelVersion = modelVersion,
-                modelName = modelName,
-                isList = true
-            )
-        }
     }
 
     @Throws(Throwable::class)
@@ -399,6 +426,11 @@ class StrapiService(
         val request = buildRequest(builder, HttpMethod.Delete.value)
         val apiPath = request.url.encodedPath
 
+        val modelSerializer = builder.modelSerializer
+        val modelVersion = modelSerializer?.getModelVersion()
+        val requestClassName = builder.requestClassName
+
+
         val json =
             httpClient.put(request).body<JsonElement>()
 
@@ -408,47 +440,35 @@ class StrapiService(
             JsonFlatter.flat<T>(json).convert()
         }
         val elementId = apiPath.split("/").lastOrNull()
-        if (elementId != null) {
-            deleteCachedItem(apiPath, elementId)
-        }
+        deleteCachedItem(
+            apiPath,
+            elementId,
+            modelVersion,
+            requestClassName
+        )
         return response
     }
 
     @Throws(Throwable::class)
     suspend fun deleteCachedItem(
         apiPath: String,
-        elementId: String
+        elementId: String?,
+        modelVersion: Int?,
+        requestClassName: String?
     ) {
-        val elementInfo = localDataRepository.getDataByApiName(apiName = apiPath) ?: return
-        // update the oneItem
-        localDataRepository.deleteDataByApiName(apiName = apiPath)
-
-        // Get all the list with the same modelVersion and modelName
-        val allListItems = localDataRepository.getAllListDataByModelVersionAndModelName(
-            elementInfo.modelVersion,
-            elementInfo.modelName
-        )
-        allListItems.forEach {
-            val apiName = it.apiName
-            val data = it.content
-            val jsonArray = Json.parseToJsonElement(data).jsonArray
-            val updatedArray = jsonArray.mapNotNull { jsonElement ->
-                if (jsonElement.jsonObject["id"]?.jsonPrimitive?.content == elementId) {
-                    null
-                } else {
-                    jsonElement
-                }
-            }
-
-            // update the list
-            localDataRepository.insertOrUpdateData(
-                // the api name is the api path that include the id due to the fact that each item has a unique id and each item details can be fetched using the id
-                apiName = apiName,
-                data = Json.encodeToString(updatedArray),
-                modelVersion = it.modelVersion,
-                modelName = it.modelName,
-                isList = true
+        val elementIdInt = elementId?.toIntOrNull()
+        if (elementIdInt != null && requestClassName != null) {
+            localDataRepository.deleteContentDataByModelIdAndModelType(
+                elementIdInt,
+                requestClassName
             )
+        } else if (elementIdInt == null && modelVersion != null) {
+            localDataRepository.deleteContentDataByModelVersionAndApiUrl(
+                modelVersion,
+                apiPath
+            )
+        } else {
+            localDataRepository.deleteContentDataByApiUrl(apiPath)
         }
     }
 
