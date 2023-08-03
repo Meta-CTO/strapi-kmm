@@ -26,7 +26,33 @@ val libName = "strapiKMM"
 
 version = currentVersion
 
+
+
 kotlin {
+
+
+    cocoapods {
+
+        version = "1.0.0"
+        summary = "Some description for the Shared Module"
+        homepage = "Link to the Shared Module homepage"
+        ios.deploymentTarget = "14.1"
+
+        noPodspec()
+
+        pod("GoogleSignIn")
+
+        // For reference: We will add these in the app kmm module it self
+        pod("FirebaseAuth", linkOnly = true)
+//        pod("FirebaseAnalytics", linkOnly = true)
+
+        framework {
+            baseName = libName
+//            isStatic = true
+        }
+    }
+
+
 
     android {
         publishLibraryVariants("debug", "release")
@@ -64,6 +90,8 @@ kotlin {
                 api(Ktor.logback)
                 api(Ktor.logging)
                 api(ProjectDependencies.sharedPreferencesMultiplatformSettings)
+
+                implementation("dev.gitlive:firebase-auth:1.7.10.innertech-1")
             }
         }
         val androidMain by getting {
@@ -71,6 +99,9 @@ kotlin {
                 implementation("androidx.security:security-crypto:1.0.0")
                 api(Ktor.android)
                 implementation(ProjectDependencies.SqlDelight.ANDROID_DRIVER)
+
+                implementation("androidx.activity:activity-compose:1.7.2")
+                implementation("com.google.android.gms:play-services-auth:20.6.0")
             }
         }
 
