@@ -21,7 +21,7 @@ val publishEmail: String = gradleLocalProperties(rootDir).getProperty("publishEm
 val publishRepository: String = gradleLocalProperties(rootDir).getProperty("publishRepository")
 val publishDeveloper: String = gradleLocalProperties(rootDir).getProperty("publishDeveloper")
 
-val currentVersion = "7.1.9"
+val currentVersion = "7.2.1"
 val libName = "strapiKMM"
 
 version = currentVersion
@@ -41,6 +41,7 @@ kotlin {
 //        noPodspec()
         pod("FirebaseAuth", linkOnly = true)
         pod("GoogleSignIn")
+        pod("FirebaseDynamicLinks")
         framework {
             baseName = libName
             isStatic = true
@@ -95,6 +96,8 @@ kotlin {
                 implementation(ProjectDependencies.SqlDelight.ANDROID_DRIVER)
                 implementation("androidx.activity:activity-ktx:1.7.2")
                 implementation("com.google.android.gms:play-services-auth:20.6.0")
+                implementation(platform("com.google.firebase:firebase-bom:32.1.1"))
+                implementation("com.google.firebase:firebase-dynamic-links-ktx")
             }
         }
 
