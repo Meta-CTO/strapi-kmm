@@ -21,14 +21,14 @@ val publishEmail: String = gradleLocalProperties(rootDir).getProperty("publishEm
 val publishRepository: String = gradleLocalProperties(rootDir).getProperty("publishRepository")
 val publishDeveloper: String = gradleLocalProperties(rootDir).getProperty("publishDeveloper")
 
-val currentVersion = "7.1.6"
+val currentVersion = "7.1.9"
 val libName = "strapiKMM"
 
 version = currentVersion
 
-
-
+@OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
+    targetHierarchy.default()
 
 
     cocoapods {
@@ -37,22 +37,15 @@ kotlin {
         summary = "Some description for the Shared Module"
         homepage = "Link to the Shared Module homepage"
         ios.deploymentTarget = "14.1"
-
-        noPodspec()
-
-        pod("GoogleSignIn")
-
-        // For reference: We will add these in the app kmm module it self
+        podfile = project.file("../iosApp/Podfile")
+//        noPodspec()
         pod("FirebaseAuth", linkOnly = true)
-//        pod("FirebaseAnalytics", linkOnly = true)
-
+        pod("GoogleSignIn")
         framework {
             baseName = libName
-//            isStatic = true
+            isStatic = true
         }
     }
-
-
 
     android {
         publishLibraryVariants("debug", "release")
@@ -66,6 +59,7 @@ kotlin {
     ).forEach {
         it.binaries.framework(libName) {
             baseName = libName
+            isStatic = true
             xcf.add(this)
         }
     }
@@ -91,7 +85,7 @@ kotlin {
                 api(Ktor.logging)
                 api(ProjectDependencies.sharedPreferencesMultiplatformSettings)
 
-                implementation("dev.gitlive:firebase-auth:1.7.10.innertech-1")
+                api("dev.gitlive:firebase-auth:1.7.10.innertech-1")
             }
         }
         val androidMain by getting {
@@ -99,8 +93,7 @@ kotlin {
                 implementation("androidx.security:security-crypto:1.0.0")
                 api(Ktor.android)
                 implementation(ProjectDependencies.SqlDelight.ANDROID_DRIVER)
-
-                implementation("androidx.activity:activity-compose:1.7.2")
+                implementation("androidx.activity:activity-ktx:1.7.2")
                 implementation("com.google.android.gms:play-services-auth:20.6.0")
             }
         }
@@ -108,7 +101,7 @@ kotlin {
         val iosX64Main by getting
         val iosArm64Main by getting
         val iosSimulatorArm64Main by getting
-        val iosMain by creating {
+        val iosMain by getting {
             dependsOn(commonMain)
             dependencies {
                 api(Ktor.ios)
