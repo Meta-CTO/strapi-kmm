@@ -1,8 +1,7 @@
 package com.swensonhe.strapikmm.auth
 
-expect class AuthClient(
-    activity: Any? = null,
-    authStateChangeListener: OnAuthStateChangeListener
-) : AuthProvider {
+expect class AuthClient(options: AuthOptions?) : AuthProvider {
     fun init()
 }
+
+expect class AuthOptions
