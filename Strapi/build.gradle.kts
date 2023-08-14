@@ -21,7 +21,7 @@ val publishEmail: String = gradleLocalProperties(rootDir).getProperty("publishEm
 val publishRepository: String = gradleLocalProperties(rootDir).getProperty("publishRepository")
 val publishDeveloper: String = gradleLocalProperties(rootDir).getProperty("publishDeveloper")
 
-val currentVersion = "7.2.3"
+val currentVersion = "7.2.4"
 val libName = "strapiKMM"
 
 version = currentVersion
@@ -129,7 +129,7 @@ kotlin {
 
     tasks.withType<KotlinCompile> {
         kotlinOptions {
-            jvmTarget = "11"
+            jvmTarget = "17"
         }
     }
 
@@ -173,8 +173,8 @@ android {
         consumerProguardFiles("consumer-rules.pro")
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
