@@ -16,5 +16,5 @@ pluginManagement {
 }
 
 rootProject.name = "StrapiKMM"
-include(":Strapi")
+include(":strapi")
 include(":app")
