@@ -21,7 +21,7 @@ val publishEmail: String = gradleLocalProperties(rootDir).getProperty("publishEm
 val publishRepository: String = gradleLocalProperties(rootDir).getProperty("publishRepository")
 val publishDeveloper: String = gradleLocalProperties(rootDir).getProperty("publishDeveloper")
 
-val currentVersion = "7.2.4"
+val currentVersion = "7.2.6"
 val libName = "strapiKMM"
 
 version = currentVersion
@@ -86,7 +86,7 @@ kotlin {
                 api(Ktor.logging)
                 api(ProjectDependencies.sharedPreferencesMultiplatformSettings)
 
-                api("dev.gitlive:firebase-auth:1.7.10.innertech-1")
+                api("dev.gitlive:firebase-auth:1.8.2-swensonhe")
             }
         }
         val androidMain by getting {
@@ -190,16 +190,26 @@ afterEvaluate {
 
 publishing {
     repositories {
-        maven {
-            name = "oss"
-            setUrl("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-            val releasesRepoUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-            val snapshotsRepoUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-            url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
+//        maven {
+//            name = "oss"
+//            setUrl("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+//            val releasesRepoUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+//            val snapshotsRepoUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+//            url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
+//
+//            credentials {
+//                username = publishUsername
+//                password = publishPassword
+//            }
+//        }
 
-            credentials {
-                username = publishUsername
-                password = publishPassword
+        repositories {
+            maven("https://maven.pkg.github.com/swensonhe/kmm-internal") {
+                name = "Github"
+                credentials {
+                    username = gradleLocalProperties(rootDir).getProperty("githubRepoUser") as String
+                    password = gradleLocalProperties(rootDir).getProperty("githubRepoToken") as String
+                }
             }
         }
     }
@@ -212,7 +222,7 @@ publishing {
         artifact(javadocJar)
 
         pom {
-            name.set("Strapi-Kmm")
+            name.set("strapi-kmm")
             description.set("Shared KMM Module")
             url.set(publishRepository)
 
@@ -236,10 +246,10 @@ publishing {
     }
 }
 
-signing {
-    useInMemoryPgpKeys(publishKey,publishSecret, publishUsername)
-    sign(publishing.publications)
-}
+//signing {
+//    useInMemoryPgpKeys(publishKey,publishSecret, publishUsername)
+//    sign(publishing.publications)
+//}
 
 afterEvaluate {
     val compilation = kotlin.targets["metadata"].compilations["iosMain"]

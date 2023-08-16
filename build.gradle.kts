@@ -4,7 +4,7 @@ buildscript {
         google()
         mavenCentral()
         maven {
-            url = uri("https://maven.pkg.github.com/innertech/firebase-kotlin-")
+            url = uri("https://maven.pkg.github.com/swensonhe/firebase-kotlin-sdk")
             credentials {
                 // TODO: Remove this before publishing to our repo
                 username = "developer-swensonhe"
@@ -24,7 +24,7 @@ allprojects {
         google()
         mavenCentral()
         maven {
-            url = uri("https://maven.pkg.github.com/innertech/firebase-kotlin-")
+            url = uri("https://maven.pkg.github.com/swensonhe/firebase-kotlin-sdk")
             credentials {
                 // TODO: Remove this before publishing to our repo
                 username = "developer-swensonhe"
