@@ -19,8 +19,7 @@ import kotlinx.serialization.json.Json
 
 class UserRepository(
     val userService: StrapiService,
-    val sharedPreference: KmmPreference,
-    val userQueryBuilder: StrapiQueryBuilder.() -> Unit = {}
+    val sharedPreference: KmmPreference
 ) {
     val userBroadcastChannel = BroadcastChannel<Unit>(Channel.BUFFERED)
 
@@ -29,7 +28,10 @@ class UserRepository(
         userBroadcastChannel.openSubscription().consumeAsFlow().asCommonFlow()
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T> getCurrentUser(forceUpdate: Boolean = false): T {
+    suspend inline fun <reified T> getCurrentUser(
+        forceUpdate: Boolean = false,
+        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {}
+    ): T {
         val cachedUser = sharedPreference.getString(SharedConstants.CACHED_USER_DATA)
         return if (cachedUser.isNullOrEmpty() || forceUpdate) {
             val user = userService.get<T> {
@@ -63,7 +65,10 @@ class UserRepository(
 
 
     @OptIn(ObsoleteCoroutinesApi::class, DelicateCoroutinesApi::class)
-    suspend inline fun <reified T> updateUserData(data: Any): T {
+    suspend inline fun <reified T, reified D> updateUserData(
+        data: D,
+        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {}
+    ): T {
         val updatedUser = userService.put<T> {
             endpoint("/users/me")
             strapiQueryBuilder(userQueryBuilder)

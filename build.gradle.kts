@@ -3,6 +3,8 @@ buildscript {
         gradlePluginPortal()
         google()
         mavenCentral()
+        maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+
         maven {
             url = uri("https://maven.pkg.github.com/swensonhe/firebase-kotlin-sdk")
             credentials {
@@ -13,7 +15,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.22")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0")
         classpath("com.android.tools.build:gradle:7.2.1")
         classpath(ProjectDependencies.SqlDelight.PLUGIN)
     }
@@ -31,6 +33,9 @@ allprojects {
                 password = "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"
             }
         }
+
+        maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+
     }
 }
 

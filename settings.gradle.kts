@@ -3,6 +3,7 @@ pluginManagement {
         google()
         gradlePluginPortal()
         mavenCentral()
+        maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 
         maven {
             url = uri("https://maven.pkg.github.com/swensonhe/firebase-kotlin-sdk")

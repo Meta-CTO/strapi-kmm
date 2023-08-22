@@ -4,8 +4,6 @@ fun <T> T.matches(vararg items: T): Boolean {
     return items.contains(this)
 }
 
-fun String?.nullIfEmpty() = if (isNullOrEmpty()) null else this
-
 fun String.list() = listOf(this)
 
 fun Int?.orZero() = this ?: 0

@@ -21,7 +21,7 @@ val publishEmail: String = gradleLocalProperties(rootDir).getProperty("publishEm
 val publishRepository: String = gradleLocalProperties(rootDir).getProperty("publishRepository")
 val publishDeveloper: String = gradleLocalProperties(rootDir).getProperty("publishDeveloper")
 
-val currentVersion = "7.2.7"
+val currentVersion = "7.2.16"
 val libName = "strapiKMM"
 
 version = currentVersion
@@ -87,13 +87,20 @@ kotlin {
                 api(ProjectDependencies.sharedPreferencesMultiplatformSettings)
                 api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
                 api("dev.gitlive:firebase-auth:1.8.2-swensonhe")
+
+                api("io.github.luca992.libphonenumber-kotlin:libphonenumber:0.1.0-SNAPSHOT")
+                implementation("dev.icerock.moko:resources:0.23.0")
+                implementation("co.touchlab:kermit:2.0.0-RC5")
+                implementation("co.touchlab:kermit:2.0.0-RC5")
+
+
             }
         }
         val androidMain by getting {
             dependencies {
                 implementation("androidx.security:security-crypto:1.0.0")
                 api(Ktor.android)
-                implementation(ProjectDependencies.SqlDelight.ANDROID_DRIVER)
+                api(ProjectDependencies.SqlDelight.ANDROID_DRIVER)
                 implementation("androidx.activity:activity-ktx:1.7.2")
                 implementation("com.google.android.gms:play-services-auth:20.6.0")
                 implementation(platform("com.google.firebase:firebase-bom:32.1.1"))
@@ -108,7 +115,7 @@ kotlin {
             dependsOn(commonMain)
             dependencies {
                 api(Ktor.ios)
-                implementation(ProjectDependencies.SqlDelight.NATIVE_DRIVER)
+                api(ProjectDependencies.SqlDelight.NATIVE_DRIVER)
             }
 
             iosX64Main.dependsOn(this)
@@ -121,8 +128,10 @@ kotlin {
             dependencies {
                 api(Ktor.js)
                 api(Ktor.jsSeralization)
-                implementation(ProjectDependencies.SqlDelight.JS_DRIVER)
-                implementation(devNpm(ProjectDependencies.SqlDelight.COPY_WEBPACK_PLUGIN, ProjectDependencies.COPY_WEBPACK_PLUGIN))
+                api(ProjectDependencies.SqlDelight.JS_DRIVER)
+
+                api(npm(ProjectDependencies.SqlDelight.SQL_JS, ProjectDependencies.SQL_JS))
+                api(devNpm(ProjectDependencies.SqlDelight.COPY_WEBPACK_PLUGIN, ProjectDependencies.COPY_WEBPACK_PLUGIN))
             }
         }
     }
@@ -157,6 +166,7 @@ kotlin {
 
 sqldelight {
     databases {
+//        linkSqlite.set(false)
         create("AppDatabase") {
             packageName.set("com.swensonhe.caching.datasource.database")
             generateAsync.set(true)
@@ -251,11 +261,11 @@ publishing {
 //    sign(publishing.publications)
 //}
 
-afterEvaluate {
-    val compilation = kotlin.targets["metadata"].compilations["iosMain"]
-    compilation.compileKotlinTask.doFirst {
-        compilation.compileDependencyFiles = files(
-            compilation.compileDependencyFiles.filterNot { it.absolutePath.endsWith("klib/common/stdlib") }
-        )
-    }
-}
+//afterEvaluate {
+//    val compilation = kotlin.targets["metadata"].compilations["iosMain"]
+//    compilation.compileKotlinTask.doFirst {
+//        compilation.compileDependencyFiles = files(
+//            compilation.compileDependencyFiles.filterNot { it.absolutePath.endsWith("klib/common/stdlib") }
+//        )
+//    }
+//}

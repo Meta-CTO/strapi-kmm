@@ -5,6 +5,7 @@ object ProjectDependencies {
 
     const val SQL_DELIGHT = "2.0.0-rc01"
     const val COPY_WEBPACK_PLUGIN = "9.1.0"
+    const val SQL_JS = "1.6.2"
 
     object SqlDelight {
         const val PLUGIN = "app.cash.sqldelight:gradle-plugin:${SQL_DELIGHT}"
@@ -12,5 +13,6 @@ object ProjectDependencies {
         const val NATIVE_DRIVER = "app.cash.sqldelight:native-driver:${SQL_DELIGHT}"
         const val JS_DRIVER = "app.cash.sqldelight:web-worker-driver:${SQL_DELIGHT}"
         const val COPY_WEBPACK_PLUGIN = "copy-webpack-plugin"
+        const val SQL_JS = "sql.js"
     }
 }

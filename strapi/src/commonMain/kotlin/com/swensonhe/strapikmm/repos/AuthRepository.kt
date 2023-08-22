@@ -25,7 +25,7 @@ class AuthRepository(
     private val actionCodeSettings: ActionCodeSettings
 ) {
     @Throws(Throwable::class)
-    suspend inline fun <reified T : AuthResponse<T>> signInWithGoogle(authOptions: AuthOptions?): T {
+    suspend inline fun <reified T> signInWithGoogle(authOptions: AuthOptions?): T {
         val authClient = AuthClient(authOptions)
         val credentials = suspendCancellableCoroutine { cont ->
             authClient.signInWithGoogle({
@@ -39,7 +39,7 @@ class AuthRepository(
     }
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T : AuthResponse<T>> signInWithApple(): T {
+    suspend inline fun <reified T> signInWithApple(): T {
         val authClient = AuthClient(null)
         val credentials = suspendCancellableCoroutine { cont ->
             authClient.signInWithApple({
@@ -74,7 +74,7 @@ class AuthRepository(
     }
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T : AuthResponse<T>> exchangeFirebaseToken(idToken: String): T {
+    suspend inline fun <reified T> exchangeFirebaseToken(idToken: String): T {
         val response = authService.post<AuthResponse<T>> {
             endpoint("/firebase-auth")
             authenticated(false)
@@ -89,7 +89,7 @@ class AuthRepository(
     }
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T : AuthResponse<T>> signInWithCredentials(credentials: AuthCredential): T {
+    suspend inline fun <reified T> signInWithCredentials(credentials: AuthCredential): T {
         val token = Firebase.auth.signInWithCredential(credentials).user?.getIdToken(true)
         return exchangeFirebaseToken(token.orEmpty())
     }
@@ -120,7 +120,7 @@ class AuthRepository(
     }
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T : AuthResponse<T>> verifyPhoneNumber(otp: String): T {
+    suspend inline fun <reified T> verifyPhoneNumber(otp: String): T {
         val verificationId =
             sharedPreference.getSecureString(SharedConstants.VERIFICATION_PHONE_NUMBER_VERIFICATION_ID)
         if (verificationId.isNullOrEmpty()) throw Throwable("Unable to verify phone number")
