@@ -66,7 +66,7 @@ class AuthRepository(
     }
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T : AuthResponse<T>> signInWithEmailLink(emailLink: String): T {
+    suspend inline fun <reified T> signInWithEmailLink(emailLink: String): T {
         val email = sharedPreference.getSecureString(SharedConstants.SIGN_IN_EMAIL_LINK_EMAIL)
         if (email.isNullOrEmpty()) throw Throwable("Email is null or empty, please try again.")
         val token = Firebase.auth.signInWithEmailLink(email, emailLink).user?.getIdToken(true)
