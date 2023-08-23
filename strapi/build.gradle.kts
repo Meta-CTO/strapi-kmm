@@ -9,7 +9,7 @@ plugins {
     kotlin(Plugins.cocoapods)
     id(Plugins.mavenPublish)
     id(Plugins.signing)
-    id(Plugins.SQL_DELIGHT)
+//    id(Plugins.SQL_DELIGHT)
 }
 
 val publishKey: String = gradleLocalProperties(rootDir).getProperty("publishKey")
@@ -21,7 +21,7 @@ val publishEmail: String = gradleLocalProperties(rootDir).getProperty("publishEm
 val publishRepository: String = gradleLocalProperties(rootDir).getProperty("publishRepository")
 val publishDeveloper: String = gradleLocalProperties(rootDir).getProperty("publishDeveloper")
 
-val currentVersion = "7.2.16"
+val currentVersion = "7.3.3"
 val libName = "strapiKMM"
 
 version = currentVersion
@@ -32,7 +32,6 @@ kotlin {
 
 
     cocoapods {
-
         version = "1.0.0"
         summary = "Some description for the Shared Module"
         homepage = "Link to the Shared Module homepage"
@@ -88,10 +87,10 @@ kotlin {
                 api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
                 api("dev.gitlive:firebase-auth:1.8.2-swensonhe")
 
-                api("io.github.luca992.libphonenumber-kotlin:libphonenumber:0.1.0-SNAPSHOT")
-                implementation("dev.icerock.moko:resources:0.23.0")
-                implementation("co.touchlab:kermit:2.0.0-RC5")
-                implementation("co.touchlab:kermit:2.0.0-RC5")
+//                api("io.github.luca992.libphonenumber-kotlin:libphonenumber:0.1.0-SNAPSHOT")
+//                implementation("dev.icerock.moko:resources:0.23.0")
+//                implementation("co.touchlab:kermit:2.0.0-RC5")
+//                implementation("co.touchlab:kermit:2.0.0-RC5")
 
 
             }
@@ -100,7 +99,7 @@ kotlin {
             dependencies {
                 implementation("androidx.security:security-crypto:1.0.0")
                 api(Ktor.android)
-                api(ProjectDependencies.SqlDelight.ANDROID_DRIVER)
+//                api(ProjectDependencies.SqlDelight.ANDROID_DRIVER)
                 implementation("androidx.activity:activity-ktx:1.7.2")
                 implementation("com.google.android.gms:play-services-auth:20.6.0")
                 implementation(platform("com.google.firebase:firebase-bom:32.1.1"))
@@ -115,7 +114,7 @@ kotlin {
             dependsOn(commonMain)
             dependencies {
                 api(Ktor.ios)
-                api(ProjectDependencies.SqlDelight.NATIVE_DRIVER)
+//                api(ProjectDependencies.SqlDelight.NATIVE_DRIVER)
             }
 
             iosX64Main.dependsOn(this)
@@ -128,10 +127,10 @@ kotlin {
             dependencies {
                 api(Ktor.js)
                 api(Ktor.jsSeralization)
-                api(ProjectDependencies.SqlDelight.JS_DRIVER)
-
-                api(npm(ProjectDependencies.SqlDelight.SQL_JS, ProjectDependencies.SQL_JS))
-                api(devNpm(ProjectDependencies.SqlDelight.COPY_WEBPACK_PLUGIN, ProjectDependencies.COPY_WEBPACK_PLUGIN))
+//                api(ProjectDependencies.SqlDelight.JS_DRIVER)
+//
+//                api(npm(ProjectDependencies.SqlDelight.SQL_JS, ProjectDependencies.SQL_JS))
+//                api(devNpm(ProjectDependencies.SqlDelight.COPY_WEBPACK_PLUGIN, ProjectDependencies.COPY_WEBPACK_PLUGIN))
             }
         }
     }
@@ -164,15 +163,15 @@ kotlin {
     }
 }
 
-sqldelight {
-    databases {
-//        linkSqlite.set(false)
-        create("AppDatabase") {
-            packageName.set("com.swensonhe.caching.datasource.database")
-            generateAsync.set(true)
-        }
-    }
-}
+//sqldelight {
+//    databases {
+////        linkSqlite.set(false)
+//        create("AppDatabase") {
+//            packageName.set("com.swensonhe.caching.datasource.database")
+//            generateAsync.set(true)
+//        }
+//    }
+//}
 
 android {
     compileSdkVersion(Application.compileSdk)
