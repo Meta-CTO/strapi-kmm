@@ -4,7 +4,7 @@ import cocoapods.FirebaseAuth.FIROAuthProvider
 import dev.gitlive.firebase.auth.AuthCredential
 actual class AuthOptions
 
-actual class AuthClient actual constructor(options: AuthOptions?) : AuthProvider {
+actual class AuthClient: AuthProvider {
     private lateinit var onResult: (AuthCredential) -> Unit
     private lateinit var onError: (Throwable) -> Unit
 
@@ -55,6 +55,9 @@ actual class AuthClient actual constructor(options: AuthOptions?) : AuthProvider
         this.onResult = onSuccess
         this.onError = onFail
         signInWithAppleProvider.start()
+    }
+
+    actual fun setAuthOptions(options: AuthOptions?) {
     }
 }
 

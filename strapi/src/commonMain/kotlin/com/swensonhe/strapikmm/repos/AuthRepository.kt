@@ -24,9 +24,13 @@ class AuthRepository(
     val sharedPreference: KmmPreference,
     private val actionCodeSettings: ActionCodeSettings
 ) {
+
+    val authClient by lazy { AuthClient() }
+
     @Throws(Throwable::class)
     suspend inline fun <reified T> signInWithGoogle(authOptions: AuthOptions?): T {
-        val authClient = AuthClient(authOptions)
+        authClient.setAuthOptions(authOptions)
+        authClient.init()
         val credentials = suspendCancellableCoroutine { cont ->
             authClient.signInWithGoogle({
                 cont.resumeWith(Result.success(it))
@@ -40,7 +44,6 @@ class AuthRepository(
 
     @Throws(Throwable::class)
     suspend inline fun <reified T> signInWithApple(): T {
-        val authClient = AuthClient(null)
         val credentials = suspendCancellableCoroutine { cont ->
             authClient.signInWithApple({
                 cont.resumeWith(Result.success(it))
