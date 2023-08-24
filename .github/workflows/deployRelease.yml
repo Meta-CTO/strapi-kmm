@@ -46,8 +46,8 @@ jobs:
         env:
           PUBLISH_REPO_USER: ${{ secrets.PUBLISH_REPO_USER }}
           PUBLISH_REPO_TOKEN: ${{ secrets.PUBLISH_REPO_TOKEN }}
-        run: echo GITHUB_REPO_USER=$PUBLISH_REPO_USER$'\n'
-         GITHUB_REPO_TOKEN=$PUBLISH_REPO_TOKEN > ./local.properties
+        run: echo PUBLISH_REPO_USER=$PUBLISH_REPO_USER$'\n'
+          PUBLISH_REPO_TOKEN=$PUBLISH_REPO_TOKEN > ./local.properties
 
       - name: Print versions.properties content
         run: cat ./versions.properties

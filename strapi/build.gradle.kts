@@ -22,9 +22,6 @@ val publishDeveloper: String = project.property("publishDeveloper") as String
 val versionProperties = Properties().apply {
     load(FileInputStream(File(rootProject.rootDir, "versions.properties")))
 }
-val localProperties = Properties().apply {
-    load(FileInputStream(File(rootProject.rootDir, "local.properties")))
-}
 
 val currentVersion = versionProperties.getProperty("PUBLISH_VERSION") as String
 val libName = "strapiKMM"
@@ -217,15 +214,15 @@ publishing {
 //            }
 //        }
 
-        println("PUBLISH_REPO_USER: ${localProperties.getProperty("PUBLISH_REPO_USER")}")
-        println("PUBLISH_REPO_TOKEN: ${localProperties.getProperty("PUBLISH_REPO_TOKEN")}")
+        println("PUBLISH_REPO_USER: ${gradleLocalProperties(rootDir).getProperty("PUBLISH_REPO_USER")}")
+        println("PUBLISH_REPO_TOKEN: ${gradleLocalProperties(rootDir).getProperty("PUBLISH_REPO_TOKEN")}")
 
         repositories {
             maven("https://maven.pkg.github.com/swensonhe/kmm-internal") {
                 name = "Github"
                 credentials {
-                    username = localProperties.getProperty("PUBLISH_REPO_USER") as String
-                    password = localProperties.getProperty("PUBLISH_REPO_TOKEN") as String
+                    username = gradleLocalProperties(rootDir).getProperty("PUBLISH_REPO_USER") as String
+                    password = gradleLocalProperties(rootDir).getProperty("PUBLISH_REPO_TOKEN") as String
                 }
             }
         }
