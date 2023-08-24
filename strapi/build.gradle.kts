@@ -214,6 +214,9 @@ publishing {
 //            }
 //        }
 
+        println("PUBLISH_REPO_USER: ${gradleLocalProperties(rootDir).getProperty("PUBLISH_REPO_USER")}")
+        println("PUBLISH_REPO_TOKEN: ${gradleLocalProperties(rootDir).getProperty("PUBLISH_REPO_TOKEN")}")
+
         repositories {
             maven("https://maven.pkg.github.com/swensonhe/kmm-internal") {
                 name = "Github"
