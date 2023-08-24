@@ -40,7 +40,7 @@ jobs:
       - name: Update library version
         env:
           PUBLISH_VERSION: 8.0.${{ github.run_number }}
-          run: echo PUBLISH_VERSION=$PUBLISH_VERSION > ./versions.properties
+        run: echo PUBLISH_VERSION=$PUBLISH_VERSION > ./versions.properties
 
       - name: Print versions.properties content
         run: cat ./versions.properties
