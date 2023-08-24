@@ -52,5 +52,8 @@ jobs:
       - name: Print versions.properties content
         run: cat ./versions.properties
 
+      - name: Print local.properties content
+        run: cat ./local.properties
+
       - name: Publish to GitHub Packages
         run: ./gradlew publishAllPublicationsToGithubRepository
