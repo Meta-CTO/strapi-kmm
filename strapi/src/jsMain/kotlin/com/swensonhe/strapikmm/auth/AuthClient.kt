@@ -4,7 +4,7 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.AuthCredential
 import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firebase
-actual class AuthClient actual constructor(options: AuthOptions?) : AuthProvider {
+actual class AuthClient : AuthProvider {
 
     actual fun init() {}
 
@@ -29,6 +29,9 @@ actual class AuthClient actual constructor(options: AuthOptions?) : AuthProvider
         }.catch {
             onFail.invoke(it)
         }
+    }
+
+    actual fun setAuthOptions(options: AuthOptions?) {
     }
 }
 

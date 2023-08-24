@@ -19,24 +19,16 @@ actual class AuthOptions(
     var onResult: (ActivityResult) -> Unit = {}
 }
 
-actual class AuthClient actual constructor(
-    private val options: AuthOptions?
-) : AuthProvider {
+actual class AuthClient  : AuthProvider {
 
     private lateinit var gClient: GoogleSignInClient
     private lateinit var onResult: (AuthCredential) -> Unit
     private lateinit var onError: (Throwable) -> Unit
-
-    init {
-        require(options != null) {
-            "AuthMetaData must be initialized"
-        }
-        init()
-    }
+    private lateinit var options: AuthOptions
 
     actual fun init() {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(options!!.activity.getString(R.string.default_web_client_id))
+            .requestIdToken(options.activity.getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
 
@@ -72,6 +64,11 @@ actual class AuthClient actual constructor(
     ) {
         this.onResult = onSuccess
         this.onError = onFail
-        options!!.launcher.launch(gClient.signInIntent)
+        options.launcher.launch(gClient.signInIntent)
+    }
+
+    actual fun setAuthOptions(options: AuthOptions?) {
+        if (options == null) throw IllegalArgumentException("options cannot be null")
+        this.options = options
     }
 }
