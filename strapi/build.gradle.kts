@@ -218,8 +218,8 @@ publishing {
             maven("https://maven.pkg.github.com/swensonhe/kmm-internal") {
                 name = "Github"
                 credentials {
-                    username = gradleLocalProperties(rootDir).getProperty("githubRepoUser") as String
-                    password = gradleLocalProperties(rootDir).getProperty("githubRepoToken") as String
+                    username = gradleLocalProperties(rootDir).getProperty("PUBLISH_REPO_USER") as String
+                    password = gradleLocalProperties(rootDir).getProperty("PUBLISH_REPO_TOKEN") as String
                 }
             }
         }

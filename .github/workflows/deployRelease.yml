@@ -42,6 +42,13 @@ jobs:
           PUBLISH_VERSION: 8.0.${{ github.run_number }}
         run: echo PUBLISH_VERSION=$PUBLISH_VERSION > ./versions.properties
 
+      - name: Update local properties
+        env:
+          PUBLISH_REPO_USER: ${{ secrets.PUBLISH_REPO_USER }}
+          PUBLISH_REPO_TOKEN: ${{ secrets.PUBLISH_REPO_TOKEN }}
+        run: echo GITHUB_REPO_USER=$PUBLISH_REPO_USER$'\n'
+          GITHUB_REPO_TOKEN=$PUBLISH_REPO_TOKEN > ./local.properties
+
       - name: Print versions.properties content
         run: cat ./versions.properties
 
