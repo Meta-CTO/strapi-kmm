@@ -1,6 +1,8 @@
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.konan.properties.Properties
+import java.io.FileInputStream
 
 plugins {
     id(Plugins.androidLibrary)
@@ -12,16 +14,16 @@ plugins {
 //    id(Plugins.SQL_DELIGHT)
 }
 
-val publishKey: String = gradleLocalProperties(rootDir).getProperty("publishKey")
-val publishSecret: String = gradleLocalProperties(rootDir).getProperty("publishSecret")
-val publishUsername: String = gradleLocalProperties(rootDir).getProperty("publishUsername")
-val publishPassword: String = gradleLocalProperties(rootDir).getProperty("publishPassword")
-val publishGroupId: String = gradleLocalProperties(rootDir).getProperty("publishGroupId")
-val publishEmail: String = gradleLocalProperties(rootDir).getProperty("publishEmail")
-val publishRepository: String = gradleLocalProperties(rootDir).getProperty("publishRepository")
-val publishDeveloper: String = gradleLocalProperties(rootDir).getProperty("publishDeveloper")
+val publishGroupId: String = project.property("publishGroupId") as String
+val publishEmail: String = project.property("publishEmail") as String
+val publishRepository: String = project.property("publishRepository") as String
+val publishDeveloper: String = project.property("publishDeveloper") as String
 
-val currentVersion = "7.4.1"
+val prop = Properties().apply {
+    load(FileInputStream(File(rootProject.rootDir, "versions.properties")))
+}
+
+val currentVersion = prop.getProperty("PUBLISH_VERSION") as String
 val libName = "strapiKMM"
 
 version = currentVersion
