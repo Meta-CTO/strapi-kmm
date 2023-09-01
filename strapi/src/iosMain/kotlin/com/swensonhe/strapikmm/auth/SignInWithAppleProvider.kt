@@ -31,7 +31,7 @@ class SignInWithAppleProvider(val onSuccess: (String) -> Unit, val onFailure: (T
 
         idToken?.let {
             onSuccess(idToken)
-        } ?: onFailure(IllegalStateException())
+        } ?: onFailure(Throwable("IdToken is not found!"))
     }
 
     override fun authorizationController(

@@ -8,25 +8,33 @@ import platform.UIKit.UIApplication
 import platform.UIKit.UIWindow
 import platform.UIKit.UIWindowScene
 
-class SignInWithGoogleProvider(val onSuccess: (String) -> Unit, val onFailure: (Throwable) -> Unit) {
+class SignInWithGoogleProvider(
+    val onSuccess: (String) -> Unit,
+    val onFailure: (Throwable) -> Unit
+) {
+    @Throws(Throwable::class)
     fun start() {
-        FIRApp.defaultApp()?.options?.clientID?.let {clientID ->
-            GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientID)
-            val windowScene = UIApplication.sharedApplication.connectedScenes().firstOrNull() as? UIWindowScene
-            val window = windowScene?.windows?.firstOrNull() as? UIWindow
-            val rootViewController = window?.rootViewController
+        val clientId =
+            FIRApp.defaultApp()?.options?.clientID ?: throw Throwable("Client Id cannot be null")
+        val windowScene =
+            UIApplication.sharedApplication.connectedScenes().firstOrNull() as? UIWindowScene
+        val window = windowScene?.windows?.firstOrNull() as? UIWindow
+        val presentingViewController =
+            window?.rootViewController ?: throw Throwable("Cannot find presentingViewController")
 
-            rootViewController?.let { presentingViewController ->
-                GIDSignIn.sharedInstance.signInWithPresentingViewController(presentingViewController, completion = { result, error ->
-                    error?.let {
-                        onFailure(Throwable(it.localizedDescription))
-                    }
+        GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientId)
 
-                    result?.user?.idToken?.tokenString?.let { idToken ->
-                        onSuccess(idToken)
-                    }
-                })
+        GIDSignIn.sharedInstance.signInWithPresentingViewController(
+            presentingViewController,
+            completion = { result, error ->
+                error?.let {
+                    onFailure(Throwable(it.localizedDescription))
+                }
+
+                result?.user?.idToken?.tokenString?.let { idToken ->
+                    onSuccess(idToken)
+                }
             }
-        }
+        )
     }
 }
