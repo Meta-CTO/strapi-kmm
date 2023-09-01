@@ -15,12 +15,12 @@ class SignInWithGoogleProvider(
     @Throws(Throwable::class)
     fun start() {
         val clientId =
-            FIRApp.defaultApp()?.options?.clientID ?: throw Throwable("Client Id cannot be null")
+            FIRApp.defaultApp()?.options?.clientID ?: throw Throwable("clientId cannot be null")
         val windowScene =
             UIApplication.sharedApplication.connectedScenes().firstOrNull() as? UIWindowScene
         val window = windowScene?.windows?.firstOrNull() as? UIWindow
         val presentingViewController =
-            window?.rootViewController ?: throw Throwable("Cannot find presentingViewController")
+            window?.rootViewController ?: throw Throwable("presentingViewController cannot be null")
 
         GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientId)
 
