@@ -28,6 +28,12 @@ class AuthRepository(
     val authClient by lazy { AuthClient() }
 
     @Throws(Throwable::class)
+    suspend inline fun <reified T> signInWithCurrentIdToken(): T {
+        val token = Firebase.auth.currentUser?.getIdTokenResult(forceRefresh = true)?.token
+        return exchangeFirebaseToken(token.orEmpty())
+    }
+
+    @Throws(Throwable::class)
     suspend inline fun <reified T> signInWithGoogle(authOptions: AuthOptions?): T {
         authClient.setAuthOptions(authOptions)
         authClient.init()
