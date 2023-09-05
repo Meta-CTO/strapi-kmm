@@ -64,4 +64,14 @@ class AppConfigurationRepository(
             endpoint("/app-configuration")
             strapiQueryBuilder(appConfigurationQueryBuilder)
         }.data
+
+    @Throws(Throwable::class)
+    inline fun <reified T> getCachedAppConfiguration(): T? {
+        val cachedData = sharedPreference.getString(SharedConstants.CACHED_APP_CONFIG)
+        return if (cachedData.isNullOrEmpty()) {
+            null
+        } else {
+            Json.decodeFromString(cachedData)
+        }
+    }
 }
