@@ -9,7 +9,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
-import com.swensonhe.strapikmm.R
+import com.swensonhe.strapiKMM.R
 import dev.gitlive.firebase.auth.AuthCredential
 
 actual class AuthOptions(

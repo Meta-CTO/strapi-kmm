@@ -1,5 +1,5 @@
-import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.konan.properties.Properties
 import java.io.FileInputStream
@@ -11,7 +11,7 @@ plugins {
     kotlin(Plugins.cocoapods)
     id(Plugins.mavenPublish)
     id(Plugins.signing)
-//    id(Plugins.SQL_DELIGHT)
+    id(Plugins.SQL_DELIGHT)
 }
 
 val publishGroupId: String = project.property("publishGroupId") as String
@@ -44,7 +44,7 @@ kotlin {
         pod("GoogleSignIn")
         pod("FirebaseDynamicLinks")
         framework {
-            baseName = libName
+            baseName = libName + "pods" // DON'T CHANGE THIS LINE, there is a bug in the plugin that requires unique names for each framework
             isStatic = true
         }
     }
@@ -101,7 +101,7 @@ kotlin {
             dependencies {
                 implementation("androidx.security:security-crypto:1.0.0")
                 api(Ktor.android)
-//                api(ProjectDependencies.SqlDelight.ANDROID_DRIVER)
+                api(ProjectDependencies.SqlDelight.ANDROID_DRIVER)
                 implementation("androidx.activity:activity-ktx:1.7.2")
                 implementation("com.google.android.gms:play-services-auth:20.6.0")
                 implementation(platform("com.google.firebase:firebase-bom:32.1.1"))
@@ -116,7 +116,7 @@ kotlin {
             dependsOn(commonMain)
             dependencies {
                 api(Ktor.ios)
-//                api(ProjectDependencies.SqlDelight.NATIVE_DRIVER)
+                api(ProjectDependencies.SqlDelight.NATIVE_DRIVER)
             }
 
             iosX64Main.dependsOn(this)
@@ -129,10 +129,9 @@ kotlin {
             dependencies {
                 api(Ktor.js)
                 api(Ktor.jsSeralization)
-//                api(ProjectDependencies.SqlDelight.JS_DRIVER)
-//
-//                api(npm(ProjectDependencies.SqlDelight.SQL_JS, ProjectDependencies.SQL_JS))
-//                api(devNpm(ProjectDependencies.SqlDelight.COPY_WEBPACK_PLUGIN, ProjectDependencies.COPY_WEBPACK_PLUGIN))
+                api(ProjectDependencies.SqlDelight.JS_DRIVER)
+                api(npm(ProjectDependencies.SqlDelight.SQL_JS, ProjectDependencies.SQL_JS))
+                api(devNpm(ProjectDependencies.SqlDelight.COPY_WEBPACK_PLUGIN, ProjectDependencies.COPY_WEBPACK_PLUGIN))
             }
         }
     }
@@ -143,39 +142,41 @@ kotlin {
         }
     }
 
-    afterEvaluate {
-        publishing {
-            publications {
-                create<MavenPublication>("release") {
-                    groupId = publishGroupId
-                    artifactId = libName.toLowerCase()
-                    version = currentVersion
+    // DON'T REMOVE OR UNCOMMENT THIS
+//    afterEvaluate {
+//        publishing {
+//            publications {
+//                create<MavenPublication>("release") {
+//                    groupId = publishGroupId
+//                    artifactId = libName.toLowerCase()
+//                    version = currentVersion
+//
+//                    from(components.getByName("release"))
+//                }
+//                create<MavenPublication>("debug") {
+//                    groupId = publishGroupId
+//                    artifactId = "${libName.toLowerCase()}-debug"
+//                    version = currentVersion
+//
+//                    from(components.getByName("debug"))
+//                }
+//            }
+//        }
+//    }
+}
 
-                    from(components.getByName("release"))
-                }
-                create<MavenPublication>("debug") {
-                    groupId = publishGroupId
-                    artifactId = "${libName.toLowerCase()}-debug"
-                    version = currentVersion
-
-                    from(components.getByName("debug"))
-                }
-            }
+sqldelight {
+    databases {
+//        linkSqlite.set(false)
+        create("AppDatabase") {
+            packageName.set("com.swensonhe.caching.datasource.database")
+            generateAsync.set(true)
         }
     }
 }
 
-//sqldelight {
-//    databases {
-////        linkSqlite.set(false)
-//        create("AppDatabase") {
-//            packageName.set("com.swensonhe.caching.datasource.database")
-//            generateAsync.set(true)
-//        }
-//    }
-//}
-
 android {
+    namespace = "com.swensonhe.strapiKMM"
     compileSdkVersion(Application.compileSdk)
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
@@ -201,6 +202,7 @@ afterEvaluate {
 
 publishing {
     repositories {
+        // DON'T REMOVE OR UNCOMMENT THIS TILL WE REMOVE sonatype FROM PROJECT
 //        maven {
 //            name = "oss"
 //            setUrl("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
@@ -260,6 +262,7 @@ publishing {
     }
 }
 
+// DON'T REMOVE SIGNING FOR NOW
 //signing {
 //    useInMemoryPgpKeys(publishKey,publishSecret, publishUsername)
 //    sign(publishing.publications)

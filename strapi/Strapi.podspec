@@ -6,7 +6,7 @@ Pod::Spec.new do |spec|
     spec.authors                  = ''
     spec.license                  = ''
     spec.summary                  = 'Some description for the Shared Module'
-    spec.vendored_frameworks      = 'build/cocoapods/framework/strapiKMM.framework'
+    spec.vendored_frameworks      = 'build/cocoapods/framework/strapiKMMpods.framework'
     spec.libraries                = 'c++'
     spec.ios.deployment_target = '14.1'
     spec.dependency 'FirebaseAuth'
@@ -15,7 +15,7 @@ Pod::Spec.new do |spec|
                 
     spec.pod_target_xcconfig = {
         'KOTLIN_PROJECT_PATH' => ':strapi',
-        'PRODUCT_MODULE_NAME' => 'strapiKMM',
+        'PRODUCT_MODULE_NAME' => 'strapiKMMpods',
     }
                 
     spec.script_phases = [
