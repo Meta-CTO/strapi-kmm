@@ -9,6 +9,8 @@ Pod::Spec.new do |spec|
     spec.vendored_frameworks      = 'build/cocoapods/framework/strapiKMMpods.framework'
     spec.libraries                = 'c++'
     spec.ios.deployment_target = '14.1'
+    spec.dependency 'Amplitude'
+    spec.dependency 'CleverTap-iOS-SDK'
     spec.dependency 'FirebaseAuth'
     spec.dependency 'FirebaseDynamicLinks'
     spec.dependency 'GoogleSignIn'
