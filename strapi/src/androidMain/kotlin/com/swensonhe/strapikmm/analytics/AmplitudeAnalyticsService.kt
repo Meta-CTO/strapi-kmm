@@ -33,15 +33,19 @@ actual class AmplitudeAnalyticsService actual constructor(
         profileUpdate.putAll(extraProperties)
 
         // submit user data
-        Amplitude.getInstance().setUserId(userId)
-        Amplitude.getInstance().setUserProperties(profileUpdate.toJSONObject())
+        Amplitude.getInstance().apply {
+            setUserId(userId)
+            setUserProperties(profileUpdate.toJSONObject())
+        }
     }
 
     override fun logout() {
-        Amplitude.getInstance().uploadEvents()
-        Amplitude.getInstance().clearUserProperties()
-        Amplitude.getInstance().setUserId(null)
-        Amplitude.getInstance().regenerateDeviceId()
+        Amplitude.getInstance().apply {
+            uploadEvents()
+            clearUserProperties()
+            userId = null
+            regenerateDeviceId()
+        }
     }
 
     override fun track(event: String, properties: Map<String, Any>) {

@@ -15,19 +15,24 @@ actual class AmplitudeAnalyticsService actual constructor(
     }
 
     override fun identifyUser(userId: String, email: String?, phone: String?, extraProperties: Map<String, Any>) {
-        Amplitude.instance().setUserId(userId)
         val properties = mutableMapOf<Any?, Any?>()
         email?.let { properties["email"] = it }
         phone?.let { properties["phone"] = it }
         extraProperties.forEach { (key, value) ->
             properties[key] = value
         }
-        Amplitude.instance().setUserProperties(properties)
+
+        Amplitude.instance().apply {
+            setUserId(userId)
+            setUserProperties(properties)
+        }
     }
 
     override fun logout() {
-        Amplitude.instance().setUserId(null)
-        Amplitude.instance().setUserProperties(mapOf<Any?, Any>())
+        Amplitude.instance().apply {
+            setUserId(null)
+            setUserProperties(mapOf<Any?, Any>())
+        }
     }
 
     override fun track(event: String, properties: Map<String, Any>) {
