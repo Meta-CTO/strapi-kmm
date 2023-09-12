@@ -39,15 +39,15 @@ kotlin {
         homepage = "Link to the Shared Module homepage"
         ios.deploymentTarget = "14.1"
         podfile = project.file("../iosApp/Podfile")
-//        noPodspec()
+
         pod("FirebaseAuth", linkOnly = true)
         pod("GoogleSignIn")
         pod("FirebaseDynamicLinks")
         pod("Amplitude")
-        pod("AWSS3")
         pod("CleverTap-iOS-SDK") {
             moduleName = "CleverTapSDK"
         }
+
         framework {
             baseName = libName + "pods" // DON'T CHANGE THIS LINE, there is a bug in the plugin that requires unique names for each framework
             isStatic = true
@@ -107,7 +107,6 @@ kotlin {
                 api("com.amplitude:android-sdk:2.39.8")
                 api("com.clevertap.android:clevertap-android-sdk:5.2.0")
                 api("com.android.installreferrer:installreferrer:2.2")
-                api("com.amazonaws:aws-android-sdk-s3:2.73.0")
             }
         }
 
