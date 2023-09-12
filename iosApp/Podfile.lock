@@ -8,9 +8,6 @@ PODS:
   - AppAuth/Core (1.6.2)
   - AppAuth/ExternalUserAgent (1.6.2):
     - AppAuth/Core
-  - AWSCore (2.33.4)
-  - AWSS3 (2.33.4):
-    - AWSCore (= 2.33.4)
   - CleverTap-iOS-SDK (5.2.0):
     - SDWebImage (~> 5.11)
   - FirebaseAppCheckInterop (10.12.0)
@@ -57,7 +54,6 @@ PODS:
   - SDWebImage/Core (5.18.0)
   - strapi (1.0.0):
     - Amplitude
-    - AWSS3
     - CleverTap-iOS-SDK
     - FirebaseAuth
     - FirebaseDynamicLinks
@@ -79,8 +75,6 @@ SPEC REPOS:
     - PromisesObjC
   trunk:
     - AppAuth
-    - AWSCore
-    - AWSS3
     - CleverTap-iOS-SDK
     - FirebaseDynamicLinks
     - GoogleUtilities
@@ -95,8 +89,6 @@ SPEC CHECKSUMS:
   Amplitude: a43a03b98ce379b1fd7a08b5733d199ff5d9130f
   AnalyticsConnector: eccd7e1cd3dd18e6bd09ac2506e37d4ed43ba3f4
   AppAuth: 3bb1d1cd9340bd09f5ed189fb00b1cc28e1e8570
-  AWSCore: 83e3416d2224ba98b61d8eadcfcb1f90f48fab82
-  AWSS3: a0d31bc565dc8a6c5eaa756610ac15704c100674
   CleverTap-iOS-SDK: 6a38eea6d2f0c336fb142baadcca2cd8aafd2290
   FirebaseAppCheckInterop: f95a4feb9089867aff1a4bdc2ce309137e07736a
   FirebaseAuth: a66c1e14ec58f41d154a4b41ce1a23ea00ad4805
@@ -109,7 +101,7 @@ SPEC CHECKSUMS:
   GTMSessionFetcher: e8647203b65cee28c5f73d0f473d096653945e72
   PromisesObjC: c50d2056b5253dadbd6c2bea79b0674bd5a52fa4
   SDWebImage: 182830bcddc30cde95fbc60dfe4badc3553d94ba
-  strapi: c29b0e9bd1ca035ee20f31e66fb2f0541f37c2f5
+  strapi: 63448ddb9fc586a52a2ecf9470a9b69eb102b4a2
 
 PODFILE CHECKSUM: 8fdbab4a3f34faf6824d9bda0b6882b6b75583dd
 
