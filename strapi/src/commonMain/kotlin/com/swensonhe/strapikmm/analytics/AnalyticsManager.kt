@@ -1,8 +1,7 @@
 package com.swensonhe.strapikmm.analytics
 
 class AnalyticsManager private constructor(
-    private val amplitudeService: AnalyticsService?,
-    private val cleverTapAnalyticsService: AnalyticsService?
+    private val services: MutableList<AnalyticsService> = mutableListOf()
 ) {
     fun setUserProperties(
         id: String,
@@ -10,41 +9,45 @@ class AnalyticsManager private constructor(
         phone: String?,
         extraProperties: Map<String, Any>
     ) {
-        amplitudeService?.identifyUser(id, email, phone, extraProperties)
-        cleverTapAnalyticsService?.identifyUser(id, email, phone, extraProperties)
+        services.forEach {
+            it.identifyUser(id, email, phone, extraProperties)
+        }
     }
 
     fun logout() {
-        amplitudeService?.logout()
-        cleverTapAnalyticsService?.logout()
+        services.forEach {
+            it.logout()
+        }
     }
 
     fun trackEvent(eventName: String) {
         val trackingEvent = TrackingEvent.Builder(eventName)
-            .withAmplitude()
-            .withCleverTap()
+            .trackOnAllAnalyticsPlatform()
             .build()
+
         trackEvent(trackingEvent)
     }
 
     fun trackEvent(eventName: String, eventProperties: Map<String, Any>) {
         val trackingEvent = TrackingEvent.Builder(eventName)
             .addProperties(eventProperties)
-            .withAmplitude()
-            .withCleverTap()
+            .trackOnAllAnalyticsPlatform()
             .build()
+
         trackEvent(trackingEvent)
     }
 
     fun trackEvent(event: TrackingEvent) {
         val eventProperties = event.properties.toMutableMap()
-        if (event.platforms.contains(AnalyticsPlatform.AMPLITUDE)) {
-            amplitudeService?.track(event.name, eventProperties)
+        val platforms = event.platforms
+        val matchingServices = services.filter { platforms.contains(it.platform) }
+        matchingServices.forEach {
+            it.track(event.name, eventProperties)
         }
+    }
 
-        if (event.platforms.contains(AnalyticsPlatform.CLEVERTAP)) {
-            cleverTapAnalyticsService?.track(event.name, eventProperties)
-        }
+    private fun registerService(service: AnalyticsService) {
+        services.add(service)
     }
 
     class Builder(private val context: Any?) {
@@ -62,7 +65,17 @@ class AnalyticsManager private constructor(
         }
 
         fun build(): AnalyticsManager {
-            return AnalyticsManager(amplitudeService, cleverTapAnalyticsService)
+            val analyticsManager = AnalyticsManager()
+
+            amplitudeService?.let {
+                analyticsManager.registerService(it)
+            }
+
+            cleverTapAnalyticsService?.let {
+                analyticsManager.registerService(it)
+            }
+
+            return analyticsManager
         }
     }
 }

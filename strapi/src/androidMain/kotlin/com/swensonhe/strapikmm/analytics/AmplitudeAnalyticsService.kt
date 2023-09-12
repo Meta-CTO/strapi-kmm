@@ -8,6 +8,9 @@ actual class AmplitudeAnalyticsService actual constructor(
     private val context: Any?,
     private val apiKey: String
 ) : AnalyticsService {
+    override val platform: AnalyticsPlatform
+        get() = AnalyticsPlatform.AMPLITUDE
+
     init {
         if (context == null || context !is android.content.Context) {
             throw IllegalArgumentException("Context must be an Android Context")

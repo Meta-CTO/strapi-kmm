@@ -4,19 +4,22 @@ actual class AmplitudeAnalyticsService actual constructor(
     context: Any?,
     apiKey: String
 ) : AnalyticsService {
+    override val platform: AnalyticsPlatform
+        get() = AnalyticsPlatform.AMPLITUDE
+
     override fun initialize() {
-        // Not needed
+        // no-op
     }
 
     override fun identifyUser(userId: String, email: String?, phone: String?, extraProperties: Map<String, Any>) {
-        // Not needed
+        // no-op
     }
 
     override fun logout() {
-        // Not needed
+        // no-op
     }
 
     override fun track(event: String, properties: Map<String, Any>) {
-        // Not needed
+        // no-op
     }
 }

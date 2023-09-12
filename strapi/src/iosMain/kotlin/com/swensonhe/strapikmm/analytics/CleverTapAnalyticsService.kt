@@ -5,6 +5,9 @@ import cocoapods.CleverTap_iOS_SDK.CleverTap
 actual class CleverTapAnalyticsService actual constructor(
     private val context: Any?
 ) : AnalyticsService {
+    override val platform: AnalyticsPlatform
+        get() = AnalyticsPlatform.CLEVERTAP
+
     init {
         initialize()
     }

@@ -6,6 +6,9 @@ actual class AmplitudeAnalyticsService actual constructor(
     private val context: Any?,
     private val apiKey: String
 ) : AnalyticsService {
+    override val platform: AnalyticsPlatform
+        get() = AnalyticsPlatform.AMPLITUDE
+
     init {
         initialize()
     }
@@ -15,7 +18,7 @@ actual class AmplitudeAnalyticsService actual constructor(
     }
 
     override fun identifyUser(userId: String, email: String?, phone: String?, extraProperties: Map<String, Any>) {
-        val properties = mutableMapOf<Any?, Any?>()
+        val properties = mutableMapOf<Any?, Any>()
         email?.let { properties["email"] = it }
         phone?.let { properties["phone"] = it }
         extraProperties.forEach { (key, value) ->
@@ -37,10 +40,11 @@ actual class AmplitudeAnalyticsService actual constructor(
 
     override fun track(event: String, properties: Map<String, Any>) {
         // To avoid casting issues, we copy the properties to a mutable map
-        val trackingProperties = mutableMapOf<Any?, Any?>()
+        val trackingProperties = mutableMapOf<Any?, Any>()
         properties.forEach { (key, value) ->
             trackingProperties[key] = value
         }
+
         Amplitude.instance().logEvent(event, trackingProperties)
     }
 }

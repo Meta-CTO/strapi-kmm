@@ -6,6 +6,8 @@ import com.clevertap.android.sdk.CleverTapAPI
 actual class CleverTapAnalyticsService actual constructor(
     private val context: Any?
 ) : AnalyticsService {
+    override val platform: AnalyticsPlatform
+        get() = AnalyticsPlatform.CLEVERTAP
 
     init {
         if (context == null || context !is Context) {

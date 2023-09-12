@@ -1,5 +1,8 @@
 package com.swensonhe.strapikmm.analytics
+
 interface AnalyticsService {
+    val platform: AnalyticsPlatform
+
     fun initialize()
 
     fun identifyUser(userId: String, email: String?, phone: String?, extraProperties: Map<String, Any>)

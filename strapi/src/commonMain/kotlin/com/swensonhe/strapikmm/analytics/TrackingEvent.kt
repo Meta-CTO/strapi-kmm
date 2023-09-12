@@ -18,13 +18,18 @@ class TrackingEvent private constructor(builder: Builder) {
             return this
         }
 
-        fun withCleverTap(): Builder {
+        fun trackOnCleverTap(): Builder {
             platforms.add(AnalyticsPlatform.CLEVERTAP)
             return this
         }
 
-        fun withAmplitude(): Builder {
+        fun trackOnAmplitude(): Builder {
             platforms.add(AnalyticsPlatform.AMPLITUDE)
+            return this
+        }
+
+        fun trackOnAllAnalyticsPlatform(): Builder {
+            platforms.addAll(listOf(AnalyticsPlatform.CLEVERTAP, AnalyticsPlatform.AMPLITUDE))
             return this
         }
 
