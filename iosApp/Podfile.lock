@@ -70,13 +70,11 @@ SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
     - Amplitude
     - AnalyticsConnector
-    - AppAuth
     - FirebaseAppCheckInterop
     - FirebaseAuth
     - FirebaseCore
     - FirebaseCoreInternal
     - GoogleSignIn
-    - GoogleUtilities
     - GTMAppAuth
     - PromisesObjC
   trunk:
