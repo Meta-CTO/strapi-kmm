@@ -13,7 +13,7 @@ actual class CleverTapAnalyticsService actual constructor(
     }
 
     override fun initialize() {
-        CleverTap.initialize()
+        CleverTap.autoIntegrate()
     }
 
     override fun identifyUser(
