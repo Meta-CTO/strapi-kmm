@@ -12,7 +12,7 @@ actual class AmplitudeAnalyticsService actual constructor(
         get() = AnalyticsPlatform.AMPLITUDE
 
     init {
-        if (context == null || context !is android.content.Context) {
+        if (context == null || context !is Context) {
             throw IllegalArgumentException("Context must be an Android Context")
         }
 
@@ -29,16 +29,16 @@ actual class AmplitudeAnalyticsService actual constructor(
     }
 
     override fun identifyUser(userId: String, email: String?, phone: String?, extraProperties: Map<String, Any>) {
-        val profileUpdate = HashMap<String, Any>()
-        profileUpdate["user_id"] = userId
-        email?.let { profileUpdate["email"] = it }
-        phone?.let { profileUpdate.put("phone", it) }
-        profileUpdate.putAll(extraProperties)
+        val userProperties = HashMap<String, Any>()
+        userProperties["user_id"] = userId
+        email?.let { userProperties["email"] = it }
+        phone?.let { userProperties["phone"] = it }
+        userProperties.putAll(extraProperties)
 
         // submit user data
         Amplitude.getInstance().apply {
             setUserId(userId)
-            setUserProperties(profileUpdate.toJSONObject())
+            setUserProperties(userProperties.toJSONObject())
         }
     }
 
@@ -47,7 +47,6 @@ actual class AmplitudeAnalyticsService actual constructor(
             uploadEvents()
             clearUserProperties()
             userId = null
-            regenerateDeviceId()
         }
     }
 

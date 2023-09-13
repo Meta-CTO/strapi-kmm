@@ -17,34 +17,35 @@ actual class AmplitudeAnalyticsService actual constructor(
         Amplitude.instance().initializeApiKey(apiKey)
     }
 
-    override fun identifyUser(userId: String, email: String?, phone: String?, extraProperties: Map<String, Any>) {
-        val properties = mutableMapOf<Any?, Any>()
-        email?.let { properties["email"] = it }
-        phone?.let { properties["phone"] = it }
-        extraProperties.forEach { (key, value) ->
-            properties[key] = value
-        }
+    override fun identifyUser(
+        userId: String,
+        email: String?,
+        phone: String?,
+        extraProperties: Map<String, Any>
+    ) {
+        val userProperties = mutableMapOf<Any?, Any>()
+        email?.let { userProperties["email"] = it }
+        phone?.let { userProperties["phone"] = it }
+        userProperties.putAll(extraProperties)
 
         Amplitude.instance().apply {
             setUserId(userId)
-            setUserProperties(properties)
+            setUserProperties(userProperties)
         }
     }
 
     override fun logout() {
         Amplitude.instance().apply {
+            uploadEvents()
+            clearUserProperties()
             setUserId(null)
-            setUserProperties(mapOf<Any?, Any>())
         }
     }
 
     override fun track(event: String, properties: Map<String, Any>) {
         // To avoid casting issues, we copy the properties to a mutable map
-        val trackingProperties = mutableMapOf<Any?, Any>()
-        properties.forEach { (key, value) ->
-            trackingProperties[key] = value
-        }
-
-        Amplitude.instance().logEvent(event, trackingProperties)
+        val eventProperties = mutableMapOf<Any?, Any>()
+        eventProperties.putAll(properties)
+        Amplitude.instance().logEvent(event, eventProperties)
     }
 }

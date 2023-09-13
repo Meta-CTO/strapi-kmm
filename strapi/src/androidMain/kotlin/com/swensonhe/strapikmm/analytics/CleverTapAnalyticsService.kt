@@ -21,25 +21,28 @@ actual class CleverTapAnalyticsService actual constructor(
 
     }
 
-    override fun identifyUser(userId: String, email: String?, phone: String?, extraProperties: Map<String, Any>) {
-        val profileUpdate = HashMap<String, Any>()
-        profileUpdate["Identity"] = userId
-        email?.let { profileUpdate["Email"] = it }
-        phone?.let { profileUpdate.put("Phone", it) }
-        extraProperties.forEach { (key, value) ->
-            profileUpdate[key] = value
-        }
+    override fun identifyUser(
+        userId: String,
+        email: String?,
+        phone: String?,
+        extraProperties: Map<String, Any>
+    ) {
+        val userProperties = HashMap<String, Any>()
+        userProperties["Identity"] = userId
+        email?.let { userProperties["Email"] = it }
+        phone?.let { userProperties["Phone"] = it }
+        userProperties.putAll(extraProperties)
 
         CleverTapAPI.getDefaultInstance(context as Context)?.apply {
-            onUserLogin(profileUpdate, userId)
-            pushProfile(profileUpdate)
+            onUserLogin(userProperties, userId)
+            pushProfile(userProperties)
         }
     }
 
     override fun logout() {
         CleverTapAPI.getDefaultInstance(context as Context)?.apply {
-            pushProfile(hashMapOf())
             onUserLogin(hashMapOf(), null)
+            pushProfile(hashMapOf())
         }
     }
 

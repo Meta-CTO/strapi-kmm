@@ -28,17 +28,24 @@ actual class CleverTapAnalyticsService actual constructor(
         phone?.let { userProperties["Phone"] = it }
         userProperties.putAll(extraProperties)
 
-        CleverTap.sharedInstance()?.onUserLogin(userProperties)
+        CleverTap.sharedInstance()?.apply {
+            onUserLogin(userProperties, userId)
+            profilePush(userProperties)
+        }
     }
 
     override fun logout() {
-        CleverTap.sharedInstance()?.onUserLogin(mapOf<Any?, Any>())
+        CleverTap.sharedInstance()?.apply {
+            onUserLogin(mapOf<Any?, Any>(), "")
+            profilePush(mapOf<Any?, Any>())
+        }
     }
 
     override fun track(event: String, properties: Map<String, Any>) {
         // To avoid casting issues, we convert to type Any? and Any
         val eventProperties = mutableMapOf<Any?, Any>()
         eventProperties.putAll(properties)
+
         CleverTap.sharedInstance()?.recordEvent(event, eventProperties)
     }
 }
