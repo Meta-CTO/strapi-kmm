@@ -39,10 +39,15 @@ kotlin {
         homepage = "Link to the Shared Module homepage"
         ios.deploymentTarget = "14.1"
         podfile = project.file("../iosApp/Podfile")
-//        noPodspec()
+
         pod("FirebaseAuth", linkOnly = true)
         pod("GoogleSignIn")
         pod("FirebaseDynamicLinks")
+        pod("Amplitude")
+        pod("CleverTap-iOS-SDK") {
+            moduleName = "CleverTapSDK"
+        }
+
         framework {
             baseName = libName + "pods" // DON'T CHANGE THIS LINE, there is a bug in the plugin that requires unique names for each framework
             isStatic = true
@@ -88,13 +93,6 @@ kotlin {
                 api(ProjectDependencies.sharedPreferencesMultiplatformSettings)
                 api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
                 api("dev.gitlive:firebase-auth:1.8.2-swensonhe")
-
-//                api("io.github.luca992.libphonenumber-kotlin:libphonenumber:0.1.0-SNAPSHOT")
-//                implementation("dev.icerock.moko:resources:0.23.0")
-//                implementation("co.touchlab:kermit:2.0.0-RC5")
-//                implementation("co.touchlab:kermit:2.0.0-RC5")
-
-
             }
         }
         val androidMain by getting {
@@ -103,9 +101,12 @@ kotlin {
                 api(Ktor.android)
                 api(ProjectDependencies.SqlDelight.ANDROID_DRIVER)
                 implementation("androidx.activity:activity-ktx:1.7.2")
-                implementation("com.google.android.gms:play-services-auth:20.6.0")
+                implementation("com.google.android.gms:play-services-auth:20.7.0")
                 implementation(platform("com.google.firebase:firebase-bom:32.1.1"))
                 implementation("com.google.firebase:firebase-dynamic-links-ktx")
+                api("com.amplitude:android-sdk:2.39.8")
+                api("com.clevertap.android:clevertap-android-sdk:5.2.0")
+                api("com.android.installreferrer:installreferrer:2.2")
             }
         }
 
