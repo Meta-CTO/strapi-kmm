@@ -1,5 +1,9 @@
 package com.swensonhe.strapikmm.util
 
+import kotlinx.coroutines.CancellableContinuation
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+
 fun <T> T.matches(vararg items: T): Boolean {
     return items.contains(this)
 }
@@ -31,3 +35,15 @@ fun Boolean.toInt() = if (this) 1 else 0
 fun Int.toBoolean() = this == 1
 
 fun String.nullIfEmpty() = this.ifEmpty { null }
+
+fun Int.to2DigitsFormat(): String {
+    return if (this < 10) "0$this" else this.toString()
+}
+
+fun <T> CancellableContinuation<T>.resumeIfActive(value: T) {
+    if (isActive) resume(value)
+}
+
+fun CancellableContinuation<*>.exceptionIfActive(throwable: Throwable) {
+    if (isActive) resumeWithException(throwable)
+}

@@ -1,0 +1,3 @@
+package com.swensonhe.strapikmm.contact
+
+expect class ContactsDataCollectorOptions
