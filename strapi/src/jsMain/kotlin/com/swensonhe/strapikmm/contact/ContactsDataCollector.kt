@@ -4,7 +4,7 @@ import com.swensonhe.strapikmm.model.contact.Contact
 
 actual class ContactsDataCollector {
     actual fun setOptions(options: ContactsDataCollectorOptions?) {
-        // no-op
+        // no-op in JS
     }
 
     actual suspend fun requestAccess(): Boolean {
