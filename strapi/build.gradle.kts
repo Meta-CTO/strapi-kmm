@@ -12,6 +12,7 @@ plugins {
     id(Plugins.mavenPublish)
     id(Plugins.signing)
     id(Plugins.SQL_DELIGHT)
+    id(Plugins.SWIFT_KLIB) version Plugins.Version.SWIFT_KLIB
 }
 
 val publishGroupId: String = project.property("publishGroupId") as String
@@ -69,6 +70,21 @@ kotlin {
             isStatic = true
             xcf.add(this)
         }
+
+        it.compilations {
+            val main by getting {
+                cinterops {
+                    create("ContactsDataCollector")
+                }
+            }
+        }
+    }
+
+    swiftklib {
+        create("ContactsDataCollector") {
+            path = file("src/iosMain/native/contactsdatacollector")
+            packageName("com.swensonhe.strapikmm.common.contacts.contactsdatacollector")
+        }
     }
 
     js(IR) {
@@ -96,6 +112,8 @@ kotlin {
             }
         }
         val androidMain by getting {
+            val contactsVersion = "1.4.0"
+
             dependencies {
                 implementation("androidx.security:security-crypto:1.0.0")
                 api(Ktor.android)
@@ -107,6 +125,9 @@ kotlin {
                 api("com.amplitude:android-sdk:2.39.8")
                 api("com.clevertap.android:clevertap-android-sdk:5.2.0")
                 api("com.android.installreferrer:installreferrer:2.2")
+
+                implementation("com.alexstyl:contactstore:$contactsVersion")
+                implementation("com.alexstyl:contactstore-coroutines:$contactsVersion")
             }
         }
 
