@@ -13,6 +13,10 @@ pluginManagement {
                 password = "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"
             }
         }
+
+        jcenter()
+        mavenLocal()
+        maven(url = "https://jitpack.io")
     }
 }
 

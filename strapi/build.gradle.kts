@@ -75,6 +75,7 @@ kotlin {
             val main by getting {
                 cinterops {
                     create("ContactsDataCollector")
+                    create("BackgroundDownloader")
                 }
             }
         }
@@ -84,6 +85,10 @@ kotlin {
         create("ContactsDataCollector") {
             path = file("src/iosMain/native/contactsdatacollector")
             packageName("com.swensonhe.strapikmm.common.contacts.contactsdatacollector")
+        }
+        create("BackgroundDownloader") {
+            path = file("src/iosMain/native/backgrounddownloader")
+            packageName("com.swensonhe.strapikmm.common.downloader.backgrounddownloader")
         }
     }
 
@@ -113,6 +118,7 @@ kotlin {
         }
         val androidMain by getting {
             val contactsVersion = "1.4.0"
+            val fetchVersion = "3.1.6"
 
             dependencies {
                 implementation("androidx.security:security-crypto:1.0.0")
@@ -128,6 +134,8 @@ kotlin {
 
                 implementation("com.alexstyl:contactstore:$contactsVersion")
                 implementation("com.alexstyl:contactstore-coroutines:$contactsVersion")
+
+                implementation("com.tonyodev.fetch2:fetch2:3.0.12")
             }
         }
 
