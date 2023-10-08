@@ -6,6 +6,7 @@ import android.net.Uri
 import com.swensonhe.strapikmm.util.exceptionIfActive
 import com.swensonhe.strapikmm.util.resumeIfActive
 import com.swensonhe.strapikmm.util.Logger
+import com.swensonhe.strapikmm.util.applyIf
 import com.tonyodev.fetch2.*
 import kotlinx.coroutines.suspendCancellableCoroutine
 
@@ -22,6 +23,7 @@ actual class BackgroundDownloader(
     private val logger = Logger(LOG_TAG)
     private lateinit var fetch: Fetch
     private var progressListener: ((DownloadInfo) -> Unit)? = null
+    private var onDownloadError: ((Download, Error) -> Unit)? = null
 
     init {
         validateNotificationsPermission()
@@ -83,7 +85,8 @@ actual class BackgroundDownloader(
                 FetchStatusListener(
                     onDownloadingListener = ::onDownloading,
                     onDownloadDoneListener = ::onDownloadDone,
-                    onDownloadProgressListener = ::onDownloadProgress
+                    onDownloadProgressListener = ::onDownloadProgress,
+                    onDownloadErrorListener = ::onDownloadError
                 )
             )
         }
@@ -146,13 +149,13 @@ actual class BackgroundDownloader(
         progressListener = listener
     }
 
-    private fun onDownloading() {
-        // Start downloads service if required
-        val intent = Intent(context, BackgroundDownloaderService::class.java)
-        context.startService(intent)
+    fun setDownloadErrorListener(listener: (Download, Error) -> Unit) {
+        onDownloadError = listener
+        // Stop downloads service if required
+        stopNotificationServiceIfRequired()
     }
 
-    private fun onDownloadDone() {
+    private fun stopNotificationServiceIfRequired() {
         // Stop downloads service if required
         fetch.hasActiveDownloads(true) { hasActiveDownloads ->
             if (hasActiveDownloads) return@hasActiveDownloads
@@ -161,8 +164,23 @@ actual class BackgroundDownloader(
         }
     }
 
+    private fun onDownloading() {
+        // Start downloads service if required
+        val intent = Intent(context, BackgroundDownloaderService::class.java)
+        context.startService(intent)
+    }
+
+    private fun onDownloadDone() {
+        // Stop downloads service if required
+        stopNotificationServiceIfRequired()
+    }
+
     private fun onDownloadProgress(download: DownloadInfo) {
         progressListener?.invoke(download)
+    }
+
+    private fun onDownloadError(download: Download, error: Error) {
+        onDownloadError?.invoke(download, error)
     }
 
     companion object {

@@ -1,13 +1,15 @@
 package com.swensonhe.strapikmm.backgrounddownloader
 
 import com.tonyodev.fetch2.Download
+import com.tonyodev.fetch2.Error
 import com.tonyodev.fetch2.FetchListener
 import com.tonyodev.fetch2core.DownloadBlock
 
 internal class FetchStatusListener(
     private val onDownloadingListener: (() -> Unit)? = null,
     private val onDownloadDoneListener: (() -> Unit)? = null,
-    private val onDownloadProgressListener: ((DownloadInfo) -> Unit)? = null
+    private val onDownloadProgressListener: ((DownloadInfo) -> Unit)? = null,
+    private val onDownloadErrorListener: ((Download, Error) -> Unit)? = null,
 ) : FetchListener {
 
     override fun onAdded(download: Download) {
@@ -23,10 +25,6 @@ internal class FetchStatusListener(
     }
 
     override fun onDeleted(download: Download) {
-        onDownloadDoneListener?.invoke()
-    }
-
-    override fun onError(download: Download, error: Error, throwable: Throwable?) {
         onDownloadDoneListener?.invoke()
     }
 
@@ -70,5 +68,9 @@ internal class FetchStatusListener(
         downloadBlock: DownloadBlock,
         totalBlocks: Int
     ) {
+    }
+
+    override fun onError(download: Download, error: Error, throwable: Throwable?) {
+        onDownloadErrorListener?.invoke(download, error)
     }
 }

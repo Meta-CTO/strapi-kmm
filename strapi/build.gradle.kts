@@ -135,7 +135,7 @@ kotlin {
                 implementation("com.alexstyl:contactstore:$contactsVersion")
                 implementation("com.alexstyl:contactstore-coroutines:$contactsVersion")
 
-                implementation("com.tonyodev.fetch2:fetch2:3.0.12")
+                implementation("androidx.tonyodev.fetch2:xfetch2:$fetchVersion")
             }
         }
 
@@ -207,7 +207,7 @@ sqldelight {
 
 android {
     namespace = "com.swensonhe.strapiKMM"
-    compileSdkVersion(Application.compileSdk)
+    compileSdk = Application.compileSdk
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
         minSdk = Application.minSdk
