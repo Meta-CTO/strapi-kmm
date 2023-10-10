@@ -1,11 +1,12 @@
 package com.swensonhe.strapikmm.uploader
 
- import com.swensonhe.strapikmm.repos.UploaderRepository
+import com.swensonhe.strapikmm.repos.UploaderRepository
 
- expect class S3UploadManager : IUploadManager{
-     val bucket: String
-     val accessKey: String
-     val secretKey: String
-     val awsS3BaseUrl: String
-     val uploaderRepository: UploaderRepository
- }
+expect class S3UploadManager constructor(
+    bucket: String,
+    accessKey: String,
+    secretKey: String,
+    awsS3BaseUrl: String,
+    uploaderRepository: UploaderRepository,
+    context: Any?
+) : IUploadManager

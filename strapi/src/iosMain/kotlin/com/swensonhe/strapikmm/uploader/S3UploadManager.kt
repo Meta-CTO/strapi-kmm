@@ -1,6 +1,5 @@
 package com.swensonhe.strapikmm.uploader
 
- import com.swensonhe.strapikmm.model.file.File
  import com.swensonhe.strapikmm.repos.UploaderRepository
  import cocoapods.AWSS3.AWSS3TransferUtility
  import cocoapods.AWSS3.AWSS3TransferUtilityTask
@@ -9,13 +8,14 @@ package com.swensonhe.strapikmm.uploader
  import kotlinx.coroutines.suspendCancellableCoroutine
  import kotlin.coroutines.resumeWithException
 
- actual class S3UploadManager constructor(
-     actual val bucket: String,
-     actual val accessKey: String,
-     actual val secretKey: String,
-     actual val awsS3BaseUrl: String,
-     actual val uploaderRepository: UploaderRepository
- ) : IUploadManager {
+actual class S3UploadManager actual constructor(
+    private val bucket: String,
+    private val accessKey: String,
+    private val secretKey: String,
+    private val awsS3BaseUrl: String,
+    override val uploaderRepository: UploaderRepository,
+    private val context: Any?
+) : IUploadManager {
 
      init {
          init()
@@ -25,7 +25,7 @@ package com.swensonhe.strapikmm.uploader
          // TODO: Handle the configuration
      }
 
-     override suspend fun upload(file: UploadableFile): File {
+     override suspend fun performUpload(file: UploadableFile): UploadFileRequest {
          // TODO: Implement the upload and verify that following code works for iOS
  //        val expression = AWSS3TransferUtilityUploadExpression()
  //        expression.setValue("public-read",  "x-amz-acl")
@@ -52,22 +52,5 @@ package com.swensonhe.strapikmm.uploader
  //        return uploadToStrapi(file)
 
             throw NotImplementedError()
-     }
-
-     @Throws(Throwable::class)
-     private suspend fun uploadToStrapi(
-         file: UploadableFile
-     ): File {
-        val fileSizeInMb = file.data.length.toFloat() / 1024f / 1024f
-         val fileUrl = "$awsS3BaseUrl/${file.fileName}"
-         val fileRequest = UploadFileRequest(
-             name = file.fileName,
-             mime = file.contentType,
-             ext = file.extension,
-             size = fileSizeInMb.toString(),
-             url = fileUrl
-         )
-
-         return uploaderRepository.uploadFiles(listOf(fileRequest))[0]
      }
  }
