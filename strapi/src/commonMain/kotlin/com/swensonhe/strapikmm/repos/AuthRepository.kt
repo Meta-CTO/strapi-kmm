@@ -2,6 +2,7 @@ package com.swensonhe.strapikmm.repos
 
 import com.swensonhe.strapikmm.auth.AuthClient
 import com.swensonhe.strapikmm.auth.AuthOptions
+import com.swensonhe.strapikmm.auth.ProfileMetadata
 import com.swensonhe.strapikmm.constants.SharedConstants
 import com.swensonhe.strapikmm.datasource.network.services.strapi.StrapiService
 import com.swensonhe.strapikmm.model.AuthResponse
@@ -37,28 +38,28 @@ class AuthRepository(
     suspend inline fun <reified T> signInWithGoogle(authOptions: AuthOptions?): T {
         authClient.setAuthOptions(authOptions)
         authClient.init()
-        val credentials = suspendCancellableCoroutine { cont ->
-            authClient.signInWithGoogle({
-                cont.resumeWith(Result.success(it))
+        val result = suspendCancellableCoroutine { cont ->
+            authClient.signInWithGoogle({ credentials, profileMetadata ->
+                cont.resumeWith(Result.success(Pair(credentials, profileMetadata)))
             }, {
                 cont.resumeWithException(it)
             })
         }
 
-        return signInWithCredentials(credentials)
+        return signInWithCredentials(result.first, result.second)
     }
 
     @Throws(Throwable::class)
     suspend inline fun <reified T> signInWithApple(): T {
-        val credentials = suspendCancellableCoroutine { cont ->
-            authClient.signInWithApple({
-                cont.resumeWith(Result.success(it))
+        val result = suspendCancellableCoroutine { cont ->
+            authClient.signInWithApple({ credentials, profileMetadata ->
+                cont.resumeWith(Result.success(Pair(credentials, profileMetadata)))
             }, {
                 cont.resumeWithException(it)
             })
         }
 
-        return signInWithCredentials(credentials)
+        return signInWithCredentials(result.first, result.second)
     }
 
     @Throws(Throwable::class)
@@ -83,11 +84,14 @@ class AuthRepository(
     }
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T> exchangeFirebaseToken(idToken: String): T {
+    suspend inline fun <reified T> exchangeFirebaseToken(
+        idToken: String,
+        profileMetadata: ProfileMetadata? = null
+    ): T {
         val response = authService.post<AuthResponse<T>> {
             endpoint("/firebase-auth")
             authenticated(false)
-            body(FirebaseAuthRequest(idToken))
+            body(FirebaseAuthRequest(idToken, profileMetadata))
         }
 
         saveUserToken(response.jwt.orEmpty())
@@ -98,9 +102,12 @@ class AuthRepository(
     }
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T> signInWithCredentials(credentials: AuthCredential): T {
+    suspend inline fun <reified T> signInWithCredentials(
+        credentials: AuthCredential,
+        profileMetadata: ProfileMetadata? = null
+    ): T {
         val token = Firebase.auth.signInWithCredential(credentials).user?.getIdToken(true)
-        return exchangeFirebaseToken(token.orEmpty())
+        return exchangeFirebaseToken(token.orEmpty(), profileMetadata)
     }
 
     @Throws(Throwable::class)

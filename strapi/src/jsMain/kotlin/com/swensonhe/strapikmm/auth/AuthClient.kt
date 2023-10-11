@@ -4,28 +4,44 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.AuthCredential
 import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firebase
+
 actual class AuthClient : AuthProvider {
 
     actual fun init() {}
 
-    override fun signInWithApple(onSuccess: (AuthCredential) -> Unit, onFail: (Throwable) -> Unit) {
+    override fun signInWithApple(
+        onSuccess: (AuthCredential, ProfileMetadata) -> Unit, onFail: (Throwable) -> Unit
+    ) {
         Firebase.auth.js.signInWithPopup(
             firebase.auth.OAuthProvider("apple.com")
         ).then {
-            onSuccess.invoke(AuthCredential(it.credential!!))
+            val profile = ProfileMetadata(
+                firstName = it.user?.displayName,
+                lastName = null,
+                email = it.user?.email,
+                phoneNumber = it.user?.phoneNumber,
+                pictureUrl = it.user?.photoURL
+            )
+            onSuccess.invoke(AuthCredential(it.credential!!), profile)
         }.catch {
             onFail.invoke(it)
         }
     }
 
     override fun signInWithGoogle(
-        onSuccess: (AuthCredential) -> Unit,
-        onFail: (Throwable) -> Unit
+        onSuccess: (AuthCredential, ProfileMetadata) -> Unit, onFail: (Throwable) -> Unit
     ) {
         Firebase.auth.js.signInWithPopup(
             firebase.auth.GoogleAuthProvider()
         ).then {
-            onSuccess.invoke(AuthCredential(it.credential!!))
+            val profile = ProfileMetadata(
+                firstName = it.user?.displayName,
+                lastName = null,
+                email = it.user?.email,
+                phoneNumber = it.user?.phoneNumber,
+                pictureUrl = it.user?.photoURL
+            )
+            onSuccess.invoke(AuthCredential(it.credential!!), profile)
         }.catch {
             onFail.invoke(it)
         }

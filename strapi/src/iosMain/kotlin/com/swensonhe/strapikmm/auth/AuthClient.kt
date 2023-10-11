@@ -2,24 +2,25 @@ package com.swensonhe.strapikmm.auth
 
 import cocoapods.FirebaseAuth.FIROAuthProvider
 import dev.gitlive.firebase.auth.AuthCredential
+
 actual class AuthOptions
 
-actual class AuthClient: AuthProvider {
-    private lateinit var onResult: (AuthCredential) -> Unit
+actual class AuthClient : AuthProvider {
+    private lateinit var onResult: (AuthCredential, ProfileMetadata) -> Unit
     private lateinit var onError: (Throwable) -> Unit
 
     actual fun init() {}
 
     private val signInWithAppleProvider = SignInWithAppleProvider(
-        onSuccess = {
+        onSuccess = { token, profileMetadata ->
             val credential = FIROAuthProvider.credentialWithProviderID(
                 providerID = "apple.com",
-                IDToken = it,
+                IDToken = token,
                 rawNonce = "",
                 accessToken = null
             )
 
-            onResult.invoke(AuthCredential(credential))
+            onResult.invoke(AuthCredential(credential), profileMetadata)
         },
         onFailure = {
             onError.invoke(it)
@@ -27,15 +28,15 @@ actual class AuthClient: AuthProvider {
     )
 
     private val signInWithGoogleProvider = SignInWithGoogleProvider(
-        onSuccess = {
+        onSuccess = { token, profileMetadata ->
             val credential = FIROAuthProvider.credentialWithProviderID(
                 providerID = "google.com",
-                IDToken = it,
+                IDToken = token,
                 rawNonce = "",
                 accessToken = null
             )
 
-            onResult.invoke(AuthCredential(credential))
+            onResult.invoke(AuthCredential(credential), profileMetadata)
         },
         onFailure = {
             onError.invoke(it)
@@ -43,7 +44,7 @@ actual class AuthClient: AuthProvider {
     )
 
     override fun signInWithGoogle(
-        onSuccess: (AuthCredential) -> Unit,
+        onSuccess: (AuthCredential, ProfileMetadata) -> Unit,
         onFail: (Throwable) -> Unit
     ) {
         this.onResult = onSuccess
@@ -51,7 +52,10 @@ actual class AuthClient: AuthProvider {
         signInWithGoogleProvider.start()
     }
 
-    override fun signInWithApple(onSuccess: (AuthCredential) -> Unit, onFail: (Throwable) -> Unit) {
+    override fun signInWithApple(
+        onSuccess: (AuthCredential, ProfileMetadata) -> Unit,
+        onFail: (Throwable) -> Unit
+    ) {
         this.onResult = onSuccess
         this.onError = onFail
         signInWithAppleProvider.start()

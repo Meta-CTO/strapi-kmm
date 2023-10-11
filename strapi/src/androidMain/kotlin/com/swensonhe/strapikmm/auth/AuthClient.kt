@@ -19,10 +19,10 @@ actual class AuthOptions(
     var onResult: (ActivityResult) -> Unit = {}
 }
 
-actual class AuthClient  : AuthProvider {
+actual class AuthClient : AuthProvider {
 
     private lateinit var gClient: GoogleSignInClient
-    private lateinit var onResult: (AuthCredential) -> Unit
+    private lateinit var onResult: (AuthCredential, ProfileMetadata) -> Unit
     private lateinit var onError: (Throwable) -> Unit
     private lateinit var options: AuthOptions
 
@@ -46,7 +46,14 @@ actual class AuthClient  : AuthProvider {
                 try {
                     val account = task.getResult(ApiException::class.java)
                     val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-                    onResult.invoke(AuthCredential(credential))
+                    val profile = ProfileMetadata(
+                        firstName = account.givenName,
+                        lastName = account.familyName,
+                        email = account.email,
+                        phoneNumber = null,
+                        pictureUrl = account.photoUrl?.toString()
+                    )
+                    onResult.invoke(AuthCredential(credential), profile)
                 } catch (throwable: Throwable) {
                     onError.invoke(throwable)
                 }
@@ -54,12 +61,15 @@ actual class AuthClient  : AuthProvider {
         }
     }
 
-    override fun signInWithApple(onSuccess: (AuthCredential) -> Unit, onFail: (Throwable) -> Unit) {
+    override fun signInWithApple(
+        onSuccess: (AuthCredential, ProfileMetadata) -> Unit,
+        onFail: (Throwable) -> Unit
+    ) {
         // NOT Needed
     }
 
     override fun signInWithGoogle(
-        onSuccess: (AuthCredential) -> Unit,
+        onSuccess: (AuthCredential, ProfileMetadata) -> Unit,
         onFail: (Throwable) -> Unit
     ) {
         this.onResult = onSuccess
