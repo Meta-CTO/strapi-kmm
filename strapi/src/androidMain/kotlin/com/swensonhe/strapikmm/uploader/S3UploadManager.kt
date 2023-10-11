@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resumeWithException
 
 /**
- * Implementation of [IUploadManager] for uploading files to AWS S3.
+ * Implementation of [UploadManager] for uploading files to AWS S3.
  *
  * @param bucket The name of the AWS S3 bucket.
  * @param accessKey The AWS access key.
@@ -43,7 +43,7 @@ actual class S3UploadManager actual constructor(
     private val awsS3BaseUrl: String,
     override val uploaderRepository: UploaderRepository,
     private val context: Any?
-) : IUploadManager {
+) : UploadManager {
     private val fileUtils by lazy { FileUtilsImpl(context as Context) }
 
     private val transferUtility by lazy {

@@ -7,7 +7,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 
-interface IUploadManager {
+interface UploadManager {
     val uploaderRepository: UploaderRepository
 
     /**

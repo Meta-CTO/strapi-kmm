@@ -1,12 +1,7 @@
 package com.swensonhe.strapikmm.uploader
 
  import com.swensonhe.strapikmm.repos.UploaderRepository
- import cocoapods.AWSS3.AWSS3TransferUtility
- import cocoapods.AWSS3.AWSS3TransferUtilityTask
- import cocoapods.AWSS3.AWSS3TransferUtilityUploadExpression
  import com.swensonhe.strapikmm.model.file.UploadFileRequest
- import kotlinx.coroutines.suspendCancellableCoroutine
- import kotlin.coroutines.resumeWithException
 
 actual class S3UploadManager actual constructor(
     private val bucket: String,
@@ -15,7 +10,7 @@ actual class S3UploadManager actual constructor(
     private val awsS3BaseUrl: String,
     override val uploaderRepository: UploaderRepository,
     private val context: Any?
-) : IUploadManager {
+) : UploadManager {
 
      init {
          init()

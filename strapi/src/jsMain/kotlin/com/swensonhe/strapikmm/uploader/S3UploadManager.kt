@@ -9,7 +9,7 @@ actual class S3UploadManager actual constructor(
     private val awsS3BaseUrl: String,
     override val uploaderRepository: UploaderRepository,
     private val context: Any?
-) : IUploadManager {
+) : UploadManager {
      override suspend fun performUpload(file: UploadableFile): UploadFileRequest {
          throw NotImplementedError()
      }

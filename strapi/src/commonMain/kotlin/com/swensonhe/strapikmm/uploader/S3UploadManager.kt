@@ -9,4 +9,4 @@ expect class S3UploadManager constructor(
     awsS3BaseUrl: String,
     uploaderRepository: UploaderRepository,
     context: Any?
-) : IUploadManager
+) : UploadManager
