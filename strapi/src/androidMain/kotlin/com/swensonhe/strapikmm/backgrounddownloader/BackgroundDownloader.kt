@@ -93,7 +93,7 @@ actual class BackgroundDownloader(
     }
 
     @Throws(Throwable::class)
-    actual suspend fun download(url: String): Int = suspendCancellableCoroutine { cont ->
+    actual suspend fun download(url: String): String = suspendCancellableCoroutine { cont ->
         // Create the download file path
         val filePath = getDownloadFileFullPath(url)
 
@@ -107,7 +107,7 @@ actual class BackgroundDownloader(
         fetch.enqueue(
             request = request,
             func = {
-                cont.resumeIfActive(it.id)
+                cont.resumeIfActive(it.id.toString())
             },
             func2 = {
                 cont.exceptionIfActive(
@@ -118,7 +118,7 @@ actual class BackgroundDownloader(
     }
 
     @Throws(Throwable::class)
-    actual suspend fun download(urls: List<String>): List<Int> {
+    actual suspend fun download(urls: List<String>): List<String> {
         return urls.map { download(it) }
     }
 
@@ -139,8 +139,18 @@ actual class BackgroundDownloader(
         return "$downloadsFolder/$fileName"
     }
 
-    suspend fun getDownloadInfo(downloadId: Int) = suspendCancellableCoroutine { cont ->
-        fetch.getDownload(id = downloadId) { download ->
+    suspend fun getDownloadInfo(downloadId: String) = suspendCancellableCoroutine { cont ->
+        /*
+        * iOS team need the download id as string so we returned it as string here
+        * And to get the download info we use fetch.getDownload(id = downloadId) and downloadId should be Int
+        * So we convert the download id to int here, or return null if the download id is not a number
+         */
+        if (downloadId.toIntOrNull() == null) {
+            cont.resumeIfActive(null)
+            return@suspendCancellableCoroutine
+        }
+
+        fetch.getDownload(id = downloadId.toInt()) { download ->
             cont.resumeIfActive(download?.toDownloadInfo())
         }
     }

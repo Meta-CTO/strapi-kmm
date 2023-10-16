@@ -30,7 +30,7 @@ actual class BackgroundDownloader(
     }
 
     @Throws(Throwable::class)
-    actual suspend fun download(url: String): Int {
+    actual suspend fun download(url: String): String {
         memScoped {
             val errorPtr: ObjCObjectVar<NSError?> = alloc()
             SHBackgroundDownloader.shared().downloadURL(NSURL(string = url), errorPtr.ptr)
@@ -40,11 +40,11 @@ actual class BackgroundDownloader(
         }
 
         // TODO: check if you will really return a download id
-        return 0
+        return "0"
     }
 
     @Throws(Throwable::class)
-    actual suspend fun download(urls: List<String>): List<Int> {
+    actual suspend fun download(urls: List<String>): List<String> {
         memScoped {
             val errorPtr: ObjCObjectVar<NSError?> = alloc()
             SHBackgroundDownloader.shared().downloadURLs(urls.map { NSURL(string = it) }, errorPtr.ptr)

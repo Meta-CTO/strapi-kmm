@@ -5,11 +5,11 @@ actual class BackgroundDownloader(
     actual val allowsCellularDownloads: Boolean
 ) {
 
-    actual suspend fun download(url: String): Int {
+    actual suspend fun download(url: String): String {
         TODO("Not yet implemented")
     }
 
-    actual suspend fun download(urls: List<String>): List<Int> {
+    actual suspend fun download(urls: List<String>): List<String> {
         TODO("Not yet implemented")
     }
 

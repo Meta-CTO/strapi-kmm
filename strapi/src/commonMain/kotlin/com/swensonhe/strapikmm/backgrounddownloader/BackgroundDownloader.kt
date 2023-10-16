@@ -5,10 +5,10 @@ expect class BackgroundDownloader {
     val allowsCellularDownloads: Boolean
 
     @Throws(Throwable::class)
-    suspend fun download(url: String): Int
+    suspend fun download(url: String): String
 
     @Throws(Throwable::class)
-    suspend fun download(urls: List<String>): List<Int>
+    suspend fun download(urls: List<String>): List<String>
 
     fun resumeUnfinishedDownloads()
 
