@@ -14,7 +14,8 @@ import platform.darwin.NSObject
 
 actual class BackgroundDownloader(
     actual val maximumNumberOfConcurrentDownloads: Int,
-    actual val allowsCellularDownloads: Boolean
+    actual val allowsCellularDownloads: Boolean,
+    actual val downloadStatusListener: DownloadStatusListener
 ) {
     private val delegate = BackgroundDownloaderDelegate()
 
@@ -89,10 +90,5 @@ actual class BackgroundDownloader(
             Logger("BackgroundDownloader").log("Did update progress $progress for asset with identifier $id")
         }
 
-    }
-
-    actual fun setProgressListener(listener: (DownloadInfo) -> Unit) {
-        // TODO: implement this
-        // As per my discussion with Garrett, We need to implement this in the iOS side as well
     }
 }

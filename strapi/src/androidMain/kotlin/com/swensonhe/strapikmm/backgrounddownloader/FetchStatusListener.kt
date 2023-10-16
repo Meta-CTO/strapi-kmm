@@ -6,29 +6,33 @@ import com.tonyodev.fetch2.FetchListener
 import com.tonyodev.fetch2core.DownloadBlock
 
 internal class FetchStatusListener(
-    private val onDownloadingListener: (() -> Unit)? = null,
-    private val onDownloadDoneListener: (() -> Unit)? = null,
-    private val onDownloadProgressListener: ((DownloadInfo) -> Unit)? = null,
-    private val onDownloadErrorListener: ((Download, Error) -> Unit)? = null,
+    private val downloadStatusListener: DownloadStatusListener,
+    private val stopNotificationServiceIfRequired: () -> Unit,
+    private val startDownloadServiceIfRequired: () -> Unit
 ) : FetchListener {
 
     override fun onAdded(download: Download) {
-        onDownloadingListener?.invoke()
+        downloadStatusListener.onDownloadStart(download.toDownloadInfo())
+        startDownloadServiceIfRequired.invoke()
     }
 
     override fun onCancelled(download: Download) {
-        onDownloadDoneListener?.invoke()
+        downloadStatusListener.onDownloadCancelled(download.toDownloadInfo())
+        stopNotificationServiceIfRequired.invoke()
     }
 
     override fun onCompleted(download: Download) {
-        onDownloadDoneListener?.invoke()
+        downloadStatusListener.onDownloadDone(download.toDownloadInfo())
+        stopNotificationServiceIfRequired.invoke()
     }
 
     override fun onDeleted(download: Download) {
-        onDownloadDoneListener?.invoke()
+        downloadStatusListener.onDownloadCancelled(download.toDownloadInfo())
+        stopNotificationServiceIfRequired.invoke()
     }
 
     override fun onPaused(download: Download) {
+        downloadStatusListener.onDownloadPaused(download.toDownloadInfo())
     }
 
     override fun onProgress(
@@ -36,19 +40,23 @@ internal class FetchStatusListener(
         etaInMilliSeconds: Long,
         downloadedBytesPerSecond: Long
     ) {
-        onDownloadProgressListener?.invoke(download.toDownloadInfo())
+        downloadStatusListener.onDownloadProgress(download.toDownloadInfo())
+        startDownloadServiceIfRequired.invoke()
     }
 
     override fun onQueued(download: Download, waitingOnNetwork: Boolean) {
-        onDownloadingListener?.invoke()
+        downloadStatusListener.onDownloading(download.toDownloadInfo())
+        startDownloadServiceIfRequired.invoke()
     }
 
     override fun onRemoved(download: Download) {
-        onDownloadDoneListener?.invoke()
+        downloadStatusListener.onDownloadCancelled(download.toDownloadInfo())
+        stopNotificationServiceIfRequired.invoke()
     }
 
     override fun onResumed(download: Download) {
-        onDownloadingListener?.invoke()
+        downloadStatusListener.onDownloading(download.toDownloadInfo())
+        startDownloadServiceIfRequired.invoke()
     }
 
     override fun onStarted(
@@ -56,11 +64,13 @@ internal class FetchStatusListener(
         downloadBlocks: List<DownloadBlock>,
         totalBlocks: Int
     ) {
-        onDownloadingListener?.invoke()
+        downloadStatusListener.onDownloadStart(download.toDownloadInfo())
+        startDownloadServiceIfRequired.invoke()
     }
 
     override fun onWaitingNetwork(download: Download) {
-        onDownloadingListener?.invoke()
+        downloadStatusListener.onDownloading(download.toDownloadInfo())
+        startDownloadServiceIfRequired.invoke()
     }
 
     override fun onDownloadBlockUpdated(
@@ -71,6 +81,7 @@ internal class FetchStatusListener(
     }
 
     override fun onError(download: Download, error: Error, throwable: Throwable?) {
-        onDownloadErrorListener?.invoke(download, error)
+        downloadStatusListener.onDownloadError(download.toDownloadInfo(), error)
+        stopNotificationServiceIfRequired.invoke()
     }
 }
