@@ -1,8 +1,9 @@
 package com.swensonhe.strapikmm.backgrounddownloader
 
-actual interface DownloadStatusListener: DownloadListener {
+import platform.Foundation.NSError
 
-    // You can add more methods here if you want to that related to iOS only.
-    // Or you can customize the method signature to match the iOS one.
-    fun onDownloadError(downloadInfo: DownloadInfo, error: Throwable)
+actual interface DownloadStatusListener: DownloadListener {
+    fun onUnfinishedDownloadStart(downloadInfo: DownloadInfo)
+    fun onDownloadError(downloadInfo: DownloadInfo, error: NSError)
+    fun onResumeUnfinishedDownloadsError(error: NSError)
 }

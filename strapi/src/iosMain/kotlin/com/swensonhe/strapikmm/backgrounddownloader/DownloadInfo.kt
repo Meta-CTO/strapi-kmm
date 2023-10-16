@@ -1,9 +1,10 @@
 package com.swensonhe.strapikmm.backgrounddownloader
 
+import platform.Foundation.NSURL
+
 actual data class DownloadInfo(
     val id: String,
-    val url: String?,
-    val total: Long,
-    val progress: Int,
+    val url: NSURL?,
+    val progress: Double,
     val isDownloadComplete: Boolean
 )

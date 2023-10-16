@@ -1,23 +1,25 @@
 import Foundation
 
+public typealias DownloadIdentifier = String
+
 @objc public protocol SHBackgroundDownloaderDelegate: AnyObject {
-    @objc(downloaderDidStartDownloadingAsset:)
-    func downloaderDidStartDownloadingAsset(id: String)
+    @objc(downloaderDidStartDownloadingAsset:url:)
+    func downloaderDidStartDownloadingAsset(id: String, url: URL?)
 
     @objc(downloaderDidDownloadAssetWithIdentifier:url:)
-    func downloaderDidDownloadAssetWithIdentifierAndURL(id: String, url: URL)
+    func downloaderDidDownloadAssetWithIdentifierAndURL(id: String, url: URL?)
 
-    @objc(downloaderDidFailToDownloadAssetWithIdentifier:errorCode:)
-    func downloaderDidFailToDownloadAssetWithIdentifierAndErrorCode(id: String, errorCode: Int)
+    @objc(downloaderDidFailToDownloadAssetWithIdentifier:url:error:)
+    func downloaderDidFailToDownloadAssetWithIdentifierAndError(id: String, url: URL?, error: Error)
 
-    @objc(downloaderDidUpdateProgress:id:)
-    func downloaderDidUpdateProgressForAssetWithIdentifier(progress: Double, id: String)
+    @objc(downloaderDidUpdateProgress:url:progress:)
+    func downloaderDidUpdateProgressForAssetWithIdentifier(id: String, url: URL?, progress: Double)
 
     @objc(downloaderDidFailToResumeUnfinishedDownloadsWithError:)
     func downloaderDidFailToResumeUnfinishedDownloads(error: Error)
 
-    @objc(downloaderDidResumeUnfinishedDownloadWithIdentifier:)
-    func downloaderDidResumeUnfinishedDownloadWithIdentifier(id: String)
+    @objc(downloaderDidResumeUnfinishedDownloadWithIdentifier:url:)
+    func downloaderDidResumeUnfinishedDownloadWithIdentifier(id: String, url: URL?)
 }
 
 @objc public final class SHBackgroundDownloader: NSObject {
@@ -53,41 +55,43 @@ import Foundation
         return URLSession(configuration: config, delegate: self, delegateQueue: nil)
     }()
     
-    @objc(downloadURL:error:) public func download(url: URL) throws {
+    @objc(downloadURL:error:) public func download(url: URL) throws -> DownloadIdentifier {
         if !Self.allowsCellularDownloads && PathMonitor.shared.isExpensive {
             throw DownloaderError.cellularDownloadNotAllowed
         }
 
-        download(asset: url)
+        return download(asset: url)
     }
     
-    @objc(downloadURLs:error:) public func download(urls: [URL]) throws {
+    @objc(downloadURLs:error:) public func download(urls: [URL]) throws -> [DownloadIdentifier] {
         if !Self.allowsCellularDownloads && PathMonitor.shared.isExpensive {
             throw DownloaderError.cellularDownloadNotAllowed
         }
 
-        download(assets: urls)
+        return download(assets: urls)
     }
 
     @objc public func resumeUnfinishedDownloads() {
         do {
             let partiallyDownloadedAssets = try cacheManager.getCachedDownloadedAssets().filter { $0.downloadEndTime == nil }
-            download(assets: partiallyDownloadedAssets)
+            _ = download(assets: partiallyDownloadedAssets)
         } catch {
             delegate?.downloaderDidFailToResumeUnfinishedDownloads(error: error)
         }
     }
     
-    private func download(asset: Asset) {
+    private func download(asset: Asset) -> String {
         if let path = cacheManager.pathForCachedAsset(for: asset, purgeInvalidFiles: false) {
             delegate?.downloaderDidDownloadAssetWithIdentifierAndURL(id: asset.identifier, url: path)
         } else {
             queue.enqueue(asset)
             processQueue()
         }
+        
+        return asset.identifier
     }
     
-    private func download(assets: [Asset]) {
+    private func download(assets: [Asset]) -> [String] {
         for asset in assets {
             if let path = cacheManager.pathForCachedAsset(for: asset, purgeInvalidFiles: false) {
                 delegate?.downloaderDidDownloadAssetWithIdentifierAndURL(id: asset.identifier, url: path)
@@ -98,6 +102,8 @@ import Foundation
         }
         
         processQueue()
+        
+        return assets.map(\.identifier)
     }
     
     private func isAssetQueuedForDownload(asset: Asset) -> Bool {
@@ -144,7 +150,7 @@ import Foundation
         numberOfRunningTasks += 1
         cacheManager.assetDidBeginDownload(asset: asset)
 
-        delegate?.downloaderDidStartDownloadingAsset(id: asset.identifier)
+        delegate?.downloaderDidStartDownloadingAsset(id: asset.identifier, url: asset.url)
     }
 
     private enum DownloaderError: LocalizedError {
@@ -191,17 +197,23 @@ extension SHBackgroundDownloader: URLSessionDownloadDelegate {
                 
                 cacheManager.assetDidDownloadSuccessfully(identifier: assetIdentifier)
             } catch {
-                delegate?.downloaderDidFailToDownloadAssetWithIdentifierAndErrorCode(
+                delegate?.downloaderDidFailToDownloadAssetWithIdentifierAndError(
                     id: assetIdentifier,
-                    errorCode: (error as NSError).code
+                    url: response.url,
+                    error: error
                  )
                 
                 cacheManager.assetDidFailToDownload(identifier: assetIdentifier)
             }
         } else {
-            delegate?.downloaderDidFailToDownloadAssetWithIdentifierAndErrorCode(
+            delegate?.downloaderDidFailToDownloadAssetWithIdentifierAndError(
                 id: assetIdentifier,
-                errorCode: response.statusCode
+                url: response.url,
+                error: NSError(
+                    domain: "SHBackgroundDownloader",
+                    code: response.statusCode,
+                    userInfo: [NSLocalizedDescriptionKey: "Unable to download asset due to network error"]
+                )
             )
 
             cacheManager.assetDidFailToDownload(identifier: assetIdentifier)
@@ -225,7 +237,11 @@ extension SHBackgroundDownloader: URLSessionDownloadDelegate {
 
         let assetIdentifier = downloadTask.taskDescription ?? ""
         let progress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
-        delegate?.downloaderDidUpdateProgressForAssetWithIdentifier(progress: progress, id: assetIdentifier)
+        delegate?.downloaderDidUpdateProgressForAssetWithIdentifier(
+            id: assetIdentifier,
+            url: downloadTask.originalRequest?.url,
+            progress: progress
+        )
     }
 
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
@@ -234,6 +250,9 @@ extension SHBackgroundDownloader: URLSessionDownloadDelegate {
         resumeTask.taskDescription = task.taskDescription
         resumeTask.resume()
         numberOfRunningTasks += 1
-        delegate?.downloaderDidResumeUnfinishedDownloadWithIdentifier(id: task.taskDescription ?? "")
+        delegate?.downloaderDidResumeUnfinishedDownloadWithIdentifier(
+            id: task.taskDescription ?? "",
+            url: task.originalRequest?.url
+        )
     }
 }

@@ -35,12 +35,12 @@ actual class BackgroundDownloader(
     actual suspend fun download(url: String): String {
         return memScoped {
             val errorPtr: ObjCObjectVar<NSError?> = alloc()
-            SHBackgroundDownloader.shared().downloadURL(NSURL(string = url), errorPtr.ptr)
+            val identifier = SHBackgroundDownloader.shared().downloadURL(NSURL(string = url), errorPtr.ptr)
             errorPtr.value?.let {
                 throw Throwable(it.localizedDescription)
             }
 
-            "0"
+            identifier ?: ""
         }
     }
 
@@ -54,32 +54,74 @@ actual class BackgroundDownloader(
     }
 
     private inner class BackgroundDownloaderDelegate: NSObject(), SHBackgroundDownloaderDelegateProtocol {
-        override fun downloaderDidDownloadAssetWithIdentifier(id: String, url: NSURL) {
-            logger.log("Did download asset with identifier $id at $url")
+        override fun downloaderDidDownloadAssetWithIdentifier(id: String, url: NSURL?) {
+            logger.log("Did download asset with identifier: $id url: $url")
+            downloadStatusListener.onDownloadDone(
+                DownloadInfo(
+                    id = id,
+                    url = url,
+                    progress = 1.0,
+                    isDownloadComplete = true
+                )
+            )
         }
 
         override fun downloaderDidFailToDownloadAssetWithIdentifier(
             id: String,
-            errorCode: NSInteger
+            url: NSURL?,
+            error: NSError
         ) {
-            logger.log("Did fail to download asset with identifier $id errorCode: $errorCode")
+            logger.log("Did fail to download asset with identifier: $id url: $url error: $error")
+            downloadStatusListener.onDownloadError(
+                downloadInfo = DownloadInfo(
+                    id = id,
+                    url = url,
+                    progress = 0.0,
+                    isDownloadComplete = false
+                ),
+                error = error
+            )
         }
 
         override fun downloaderDidFailToResumeUnfinishedDownloadsWithError(error: NSError) {
-            logger.log("Did fail to resume unfinished downloads $error")
+            logger.log("Did fail to resume unfinished downloads error: $error")
+            downloadStatusListener.onResumeUnfinishedDownloadsError(error)
         }
 
-        override fun downloaderDidResumeUnfinishedDownloadWithIdentifier(id: String) {
-            logger.log("Did resume unfinished download with identifier $id")
+        override fun downloaderDidResumeUnfinishedDownloadWithIdentifier(id: String, url: NSURL?) {
+            logger.log("Did resume unfinished download with identifier: $id url: $url")
+            downloadStatusListener.onUnfinishedDownloadStart(
+                DownloadInfo(
+                    id = id,
+                    url = url,
+                    progress = 0.0,
+                    isDownloadComplete = false
+                )
+            )
         }
 
-        override fun downloaderDidStartDownloadingAsset(id: String) {
-            logger.log("Did start downloading asset with identifier $id")
+        override fun downloaderDidStartDownloadingAsset(id: String, url: NSURL?) {
+            logger.log("Did start downloading asset with identifier: $id url: $url")
+            downloadStatusListener.onDownloadStart(
+                DownloadInfo(
+                    id = id,
+                    url = url,
+                    progress = 0.0,
+                    isDownloadComplete = false
+                )
+            )
         }
 
-        override fun downloaderDidUpdateProgress(progress: Double, id: String) {
-            logger.log("Did update progress $progress for asset with identifier $id")
+        override fun downloaderDidUpdateProgress(id: String, url: NSURL?, progress: Double) {
+            logger.log("Did update progress identifier: $id url: $url progress: $progress")
+            downloadStatusListener.onDownloadProgress(
+                DownloadInfo(
+                    id = id,
+                    url = url,
+                    progress = progress,
+                    isDownloadComplete = false
+                )
+            )
         }
-
     }
 }
