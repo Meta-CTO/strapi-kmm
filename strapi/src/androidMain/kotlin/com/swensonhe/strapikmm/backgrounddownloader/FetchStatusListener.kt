@@ -45,7 +45,7 @@ internal class FetchStatusListener(
     }
 
     override fun onQueued(download: Download, waitingOnNetwork: Boolean) {
-        downloadStatusListener.onDownloading(download.toDownloadInfo())
+        downloadStatusListener.onDownloadProgress(download.toDownloadInfo())
         startDownloadServiceIfRequired.invoke()
     }
 
@@ -55,7 +55,7 @@ internal class FetchStatusListener(
     }
 
     override fun onResumed(download: Download) {
-        downloadStatusListener.onDownloading(download.toDownloadInfo())
+        downloadStatusListener.onDownloadProgress(download.toDownloadInfo())
         startDownloadServiceIfRequired.invoke()
     }
 
@@ -69,7 +69,7 @@ internal class FetchStatusListener(
     }
 
     override fun onWaitingNetwork(download: Download) {
-        downloadStatusListener.onDownloading(download.toDownloadInfo())
+        downloadStatusListener.onDownloadProgress(download.toDownloadInfo())
         startDownloadServiceIfRequired.invoke()
     }
 
