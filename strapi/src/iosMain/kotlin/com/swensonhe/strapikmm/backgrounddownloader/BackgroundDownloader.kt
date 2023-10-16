@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalForeignApi::class)
+@file:OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 
 package com.swensonhe.strapikmm.backgrounddownloader
 
@@ -17,6 +17,7 @@ actual class BackgroundDownloader(
     actual val allowsCellularDownloads: Boolean
 ) {
     private val delegate = BackgroundDownloaderDelegate()
+    private val logger = Logger("BackgroundDownloader")
 
     init {
         PathMonitor.shared().startMonitoring()
@@ -31,30 +32,20 @@ actual class BackgroundDownloader(
 
     @Throws(Throwable::class)
     actual suspend fun download(url: String): String {
-        memScoped {
+        return memScoped {
             val errorPtr: ObjCObjectVar<NSError?> = alloc()
             SHBackgroundDownloader.shared().downloadURL(NSURL(string = url), errorPtr.ptr)
             errorPtr.value?.let {
                 throw Throwable(it.localizedDescription)
             }
-        }
 
-        // TODO: check if you will really return a download id
-        return "0"
+            "0"
+        }
     }
 
     @Throws(Throwable::class)
     actual suspend fun download(urls: List<String>): List<String> {
-        memScoped {
-            val errorPtr: ObjCObjectVar<NSError?> = alloc()
-            SHBackgroundDownloader.shared().downloadURLs(urls.map { NSURL(string = it) }, errorPtr.ptr)
-            errorPtr.value?.let {
-                throw Throwable(it.localizedDescription)
-            }
-        }
-
-        // TODO: check if you will really return a downloads ids
-        return emptyList()
+        return urls.map { download(it) }
     }
 
     actual fun resumeUnfinishedDownloads() {
@@ -63,36 +54,36 @@ actual class BackgroundDownloader(
 
     private inner class BackgroundDownloaderDelegate: NSObject(), SHBackgroundDownloaderDelegateProtocol {
         override fun downloaderDidDownloadAssetWithIdentifier(id: String, url: NSURL) {
-            Logger("BackgroundDownloader").log("Did download asset with identifier $id at $url")
+            logger.log("Did download asset with identifier $id at $url")
         }
 
         override fun downloaderDidFailToDownloadAssetWithIdentifier(
             id: String,
             errorCode: NSInteger
         ) {
-            Logger("BackgroundDownloader").log("Did fail to download asset with identifier $id errorCode: $errorCode")
+            logger.log("Did fail to download asset with identifier $id errorCode: $errorCode")
         }
 
         override fun downloaderDidFailToResumeUnfinishedDownloadsWithError(error: NSError) {
-            Logger("BackgroundDownloader").log("Did fail to resume unfinished downloads $error")
+            logger.log("Did fail to resume unfinished downloads $error")
         }
 
         override fun downloaderDidResumeUnfinishedDownloadWithIdentifier(id: String) {
-            Logger("BackgroundDownloader").log("Did resume unfinished download with identifier $id")
+            logger.log("Did resume unfinished download with identifier $id")
         }
 
         override fun downloaderDidStartDownloadingAsset(id: String) {
-            Logger("BackgroundDownloader").log("Did start downloading asset with identifier $id")
+            logger.log("Did start downloading asset with identifier $id")
         }
 
         override fun downloaderDidUpdateProgress(progress: Double, id: String) {
-            Logger("BackgroundDownloader").log("Did update progress $progress for asset with identifier $id")
+            logger.log("Did update progress $progress for asset with identifier $id")
         }
 
     }
 
     actual fun setProgressListener(listener: (DownloadInfo) -> Unit) {
-        // TODO: implement this
-        // As per my discussion with Garrett, We need to implement this in the iOS side as well
+
     }
+
 }
