@@ -2,7 +2,8 @@ package com.swensonhe.strapikmm.backgrounddownloader
 
 actual class BackgroundDownloader(
     actual val maximumNumberOfConcurrentDownloads: Int,
-    actual val allowsCellularDownloads: Boolean
+    actual val allowsCellularDownloads: Boolean,
+    actual val downloadStatusListener: DownloadStatusListener
 ) {
 
     actual suspend fun download(url: String): String {
@@ -14,10 +15,6 @@ actual class BackgroundDownloader(
     }
 
     actual fun resumeUnfinishedDownloads() {
-        TODO("Not yet implemented")
-    }
-
-    actual fun setProgressListener(listener: (DownloadInfo) -> Unit) {
         TODO("Not yet implemented")
     }
 }

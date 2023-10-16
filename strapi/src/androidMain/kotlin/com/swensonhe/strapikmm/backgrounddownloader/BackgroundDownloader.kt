@@ -10,7 +10,6 @@ import com.swensonhe.strapikmm.util.applyIf
 import com.tonyodev.fetch2.*
 import kotlinx.coroutines.suspendCancellableCoroutine
 
-
 actual class BackgroundDownloader(
     private val context: Context,
     actual val maximumNumberOfConcurrentDownloads: Int = DEFAULT_CONCURRENT_DOWNLOADS_COUNT,
@@ -18,12 +17,11 @@ actual class BackgroundDownloader(
     private val downloadsFolder: String = context.cacheDir.toString(),
     private val showNotifications: Boolean = true,
     private val canPauseDownloads: Boolean = true,
-    private val canCancelDownloads: Boolean = true
+    private val canCancelDownloads: Boolean = true,
+    actual val downloadStatusListener: DownloadStatusListener
 ) {
     private val logger = Logger(LOG_TAG)
     private lateinit var fetch: Fetch
-    private var progressListener: ((DownloadInfo) -> Unit)? = null
-    private var onDownloadError: ((Download, Error) -> Unit)? = null
 
     init {
         validateNotificationsPermission()
@@ -83,10 +81,9 @@ actual class BackgroundDownloader(
             // Add status update listener
             addListener(
                 FetchStatusListener(
-                    onDownloadingListener = ::onDownloading,
-                    onDownloadDoneListener = ::onDownloadDone,
-                    onDownloadProgressListener = ::onDownloadProgress,
-                    onDownloadErrorListener = ::onDownloadError
+                    downloadStatusListener,
+                    ::stopDownloadNotificationServiceIfRequired,
+                    ::startDownloadNotificationServiceIfRequired
                 )
             )
         }
@@ -155,17 +152,7 @@ actual class BackgroundDownloader(
         }
     }
 
-    actual fun setProgressListener(listener: (DownloadInfo) -> Unit) {
-        progressListener = listener
-    }
-
-    fun setDownloadErrorListener(listener: (Download, Error) -> Unit) {
-        onDownloadError = listener
-        // Stop downloads service if required
-        stopNotificationServiceIfRequired()
-    }
-
-    private fun stopNotificationServiceIfRequired() {
+    private fun stopDownloadNotificationServiceIfRequired() {
         // Stop downloads service if required
         fetch.hasActiveDownloads(true) { hasActiveDownloads ->
             if (hasActiveDownloads) return@hasActiveDownloads
@@ -174,23 +161,10 @@ actual class BackgroundDownloader(
         }
     }
 
-    private fun onDownloading() {
+    private fun startDownloadNotificationServiceIfRequired() {
         // Start downloads service if required
         val intent = Intent(context, BackgroundDownloaderService::class.java)
         context.startService(intent)
-    }
-
-    private fun onDownloadDone() {
-        // Stop downloads service if required
-        stopNotificationServiceIfRequired()
-    }
-
-    private fun onDownloadProgress(download: DownloadInfo) {
-        progressListener?.invoke(download)
-    }
-
-    private fun onDownloadError(download: Download, error: Error) {
-        onDownloadError?.invoke(download, error)
     }
 
     companion object {

@@ -14,7 +14,8 @@ import platform.darwin.NSObject
 
 actual class BackgroundDownloader(
     actual val maximumNumberOfConcurrentDownloads: Int,
-    actual val allowsCellularDownloads: Boolean
+    actual val allowsCellularDownloads: Boolean,
+    actual val downloadStatusListener: DownloadStatusListener
 ) {
     private val delegate = BackgroundDownloaderDelegate()
     private val logger = Logger("BackgroundDownloader")
@@ -81,9 +82,4 @@ actual class BackgroundDownloader(
         }
 
     }
-
-    actual fun setProgressListener(listener: (DownloadInfo) -> Unit) {
-
-    }
-
 }

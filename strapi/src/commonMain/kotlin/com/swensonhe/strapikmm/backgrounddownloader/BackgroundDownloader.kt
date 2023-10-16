@@ -1,6 +1,7 @@
 package com.swensonhe.strapikmm.backgrounddownloader
 
 expect class BackgroundDownloader {
+    val downloadStatusListener: DownloadStatusListener
     val maximumNumberOfConcurrentDownloads: Int
     val allowsCellularDownloads: Boolean
 
@@ -11,6 +12,4 @@ expect class BackgroundDownloader {
     suspend fun download(urls: List<String>): List<String>
 
     fun resumeUnfinishedDownloads()
-
-    fun setProgressListener(listener: (DownloadInfo) -> Unit)
 }
