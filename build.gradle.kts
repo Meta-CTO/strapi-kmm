@@ -13,6 +13,9 @@ buildscript {
                 password = "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"
             }
         }
+        jcenter()
+        mavenLocal()
+        maven(url = "https://jitpack.io")
     }
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.10")
@@ -35,6 +38,9 @@ allprojects {
         }
 
         maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+        jcenter()
+        mavenLocal()
+        maven(url = "https://jitpack.io")
 
     }
 }
