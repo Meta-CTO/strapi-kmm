@@ -1,7 +1,7 @@
 package com.swensonhe.strapikmm.backgrounddownloader
 
 actual data class DownloadInfo(
-    val id: Int,
+    val id: String,
     val url: String,
     val path: String,
     val downloaded: Long,

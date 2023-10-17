@@ -10,7 +10,7 @@ import com.tonyodev.fetch2.Status
 import java.io.File
 
 internal fun Download.toDownloadInfo() = DownloadInfo(
-    id = id,
+    id = id.toString(),
     url = url,
     path = file,
     downloaded = downloaded,
