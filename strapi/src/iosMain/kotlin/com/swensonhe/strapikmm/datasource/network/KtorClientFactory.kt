@@ -1,6 +1,6 @@
 package com.swensonhe.strapikmm.datasource.network
 
-import com.swensonhe.strapikmm.constants.SharedConstants
+import com.swensonhe.strapikmm.datasource.network.extensions.handleAuthenticationHeader
 import com.swensonhe.strapikmm.datasource.network.services.strapi.JsonFlatter
 import com.swensonhe.strapikmm.datasource.network.services.strapi.JsonWithIgnoredUnknownKeys
 import com.swensonhe.strapikmm.errorhandling.NetworkError

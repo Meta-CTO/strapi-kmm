@@ -60,17 +60,3 @@ fun HttpRequestBuilder.printCURLDescription(
     Logger("").log(message)
     Logger("").log("================================================")
 }
-
-fun DefaultRequest.DefaultRequestBuilder.handleAuthenticationHeader(preference: KmmPreference) {
-    val token = preference.getSecureString(SharedConstants.ACCESS_TOKEN)
-    if (token.isNullOrEmpty()
-            .not() && (headers[KmmBaseService.IS_AUTHENTICATED] ?: true.toString()).toBooleanStrict()
-    ) {
-        headers.append(
-            SharedConstants.AUTHORIZATION_HEADER,
-            "${SharedConstants.BEARER} $token"
-        )
-    }
-
-    headers.remove(KmmBaseService.IS_AUTHENTICATED)
-}
