@@ -432,7 +432,7 @@ class StrapiService(
 
 
         val json =
-            httpClient.put(request).body<JsonElement>()
+            httpClient.delete(request).body<JsonElement>()
 
         val response = if (T::class.simpleName == Unit::class.simpleName) {
             Unit as T
