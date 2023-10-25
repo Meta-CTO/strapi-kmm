@@ -26,6 +26,17 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
 import kotlinx.serialization.serializer
 
+/**
+ * A service class that provides functions for performing HTTP requests and parsing the responses.
+ *
+ * @param httpClient An instance of [HttpClient] to use for sending HTTP requests.
+ * @param baseUrl The base URL to use for all requests.
+ * @param kmmPreference An instance of [KmmPreference] to use for storing and retrieving data.
+ * @param context An optional context object to use for accessing platform-specific functionality.
+ *
+ * @see HttpClient
+ * @see KmmPreference
+ */
 class StrapiService(
     val httpClient: HttpClient,
     baseUrl: String,
@@ -36,7 +47,6 @@ class StrapiService(
     val localDataRepository by lazy {
         LocalDataRepository(DatabaseDriverFactory(context))
     }
-
 
     /**
      * Perform an HTTP GET request and parse the response into an object of type [T].
@@ -79,7 +89,7 @@ class StrapiService(
         builder.requestBuilder()
 
         // Build the HTTP request using the request builder
-        val request = buildRequest(builder, HttpMethod.Get.value)
+        val request = buildRequest(builder, HttpMethod.Get)
 
         // Send the HTTP request and get the response as a JSON element
         val json = httpClient.get(request).body<JsonElement>()
@@ -186,7 +196,7 @@ class StrapiService(
         builder.requestBuilder()
 
         // Build the HTTP request to extract the path, URL, and fetch strategy
-        val request = buildRequest(builder, HttpMethod.Get.value)
+        val request = buildRequest(builder, HttpMethod.Get)
 
         // Get the url path from the request
         val apiPath = request.url.encodedPath
@@ -245,6 +255,8 @@ class StrapiService(
     }
 
     /**
+     *  DO NOT USE THIS METHOD DIRECTLY, USE [getFlow] INSTEAD**
+     *
      * Perform an HTTP GET request to fetch paged data of type [T] with caching support.
      * This function is designed for use with the Strapi API and returns a Flow for reactive programming.
      *
@@ -301,7 +313,7 @@ class StrapiService(
         val fetchStrategy = builder.requestFetchStrategy
 
         // Build the HTTP request to extract the URL, class name, and API path
-        val request = buildRequest(builder, HttpMethod.Get.value)
+        val request = buildRequest(builder, HttpMethod.Get)
 
         // Get the class name of the request type [T] if available (used for caching) or use simple name of [T] as a fallback (e.g., "User")
         val requestClassName = builder.requestClassName ?: ""
@@ -436,61 +448,112 @@ class StrapiService(
         emit(response)
     }
 
+    /**
+     *  DO NOT USE THIS METHOD DIRECTLY, USE [getFlow] INSTEAD**
+     *
+     * Retrieve a single item of type [T] using an HTTP GET request and a provided request builder, while optionally
+     * handling cache updates.
+     *
+     * @param requestBuilder A lambda function that allows you to customize the request using [StrapiRequestBuilder].
+     * @return A [Flow] of type [T] representing the retrieved item.
+     *
+     * @throws Throwable if any errors occur during the request, response processing, or cache updates.
+     *
+     * Usage Example:
+     * ```kotlin
+     * val itemFlow: Flow<Item> = getOne {
+     *     endpoint("/items/1")
+     *     // Customize the request, add headers or other configuration as needed
+     * }
+     * ```
+     *
+     * In this example, an HTTP GET request is made to retrieve a single item, and the response is processed. Cache updates
+     * are handled when the response indicates an item update.
+     *
+     * Note: The [reified] type parameter [T] is used to determine the expected type of the response. The function provides
+     * flexibility to customize the GET request, process the response, and optionally handle cache updates. It can throw a `Throwable`
+     * in case of errors during the request, response processing, or cache updates.
+     *
+     * @see StrapiRequestBuilder
+     * @see HttpMethod
+     * @see FetchStrategy
+     * @see JsonElement
+     * @see DataWrapper
+     * @see localDataRepository
+     */
     @Throws(Throwable::class)
     inline fun <reified T> getOne(crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {}): Flow<T> =
         flow {
 
-            // build the builder and the request to extract the path and the url
+            // Create a new StrapiRequestBuilder
             val builder = StrapiRequestBuilder()
+            // Execute the provided lambda to configure the request
             builder.requestBuilder()
 
+            // Get the model serializer for response parsing, or throw an exception if not provided
             val modelSerializer = builder.modelSerializer
                 ?: throw Throwable("You must provide the responseType in the requestBuilder")
+
+            // Get the model version for serialization and caching purposes from the model serializer
             val modelVersion = modelSerializer.getModelVersion()
 
+            // Get the class name of the request type [T] if available (used for caching) or use simple name of [T] as a fallback (e.g., "User")
             val requestClassName = builder.requestClassName ?: ""
 
+            // Get the fetch strategy from the request builder
             val fetchStrategy = builder.requestFetchStrategy
 
-            val request = buildRequest(builder, HttpMethod.Get.value)
+            // Build the HTTP request using the request builder
+            val request = buildRequest(builder, HttpMethod.Get)
 
+            // Get the API path from the request URL (e.g., "/users") to be used for caching
             val apiPath = request.url.encodedPath
 
             // We need to get the id from the encoded path which is the last part of the path and it can be like posts/1 or comments/1 .. etc
+            // so we need to get the last part of the path and check if it's a number then it's the id
             val entityId = apiPath.split("/").lastOrNull()?.toInt()
 
-            // get data from cache if available
+            // get data from cache if the fetch strategy is CACHE_THEN_REMOTE
             if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE) {
                 val localData = if (entityId != null && requestClassName.isNotEmpty()) {
+                    // get the cached data by model version and model type and model id if available
                     localDataRepository.getContentDataByModelTypeAndModelVersionAndModelId(
                         requestClassName,
                         modelVersion,
                         entityId
                     )
+                    // if the class name is not available then get the cached data by model version and api url
                 } else if (entityId == null && requestClassName.isEmpty()) {
+                    // get the cached data by model version and api url
                     localDataRepository.getContentDataByModelVersionAndApiUrl(modelVersion, apiPath)
                 } else {
+                    // if the class name is available then get the cached data by api url
                     localDataRepository.getContentDataByApiUrl(apiPath)
                 }
 
+                // if the cached data is not null or empty then emit it
                 if (localData?.content.isNullOrEmpty().not()) {
+                    // parse the cached data based on the model serializer provided
                     val cachedData = Json.decodeFromString(modelSerializer, localData?.content!!)
+                    // emit the cached data to the flow
                     emit(DataWrapper(cachedData) as T)
                 }
             }
 
-            // get data from api
-            //////
+            // Send the HTTP request and get the response as a JSON element
             val json = httpClient.get(request).body<JsonElement>()
+            // Flatten the JSON response and convert it to the specified type [T]
             val response = JsonFlatter.flat<T>(json).convert<T>()
-            /////
 
+            // convert the response to json element to be able to cache it
             val responseJson = Json.encodeToJsonElement(serializer<T>(), response)
+            // get the data from the response if available
             val jsonObject = responseJson.jsonObject["data"]?.jsonObject.orEmpty()
 
+            // convert the data to json string to be able to cache it
             val jsonContent = Json.encodeToString(jsonObject)
 
-            // Then Insert
+            // insert or update the cached data in the database based on the fetch strategy
             localDataRepository.insertOrUpdateContentData(
                 modelVersion = modelVersion,
                 modelType = requestClassName.nullIfEmpty(),
@@ -499,20 +562,56 @@ class StrapiService(
                 entityId
             )
 
+            // then emit the response data to the flow
             emit(response)
         }
 
+    /**
+     * Perform an HTTP POST request and process the response of type [T].
+     *
+     * @param requestBuilder A lambda function that allows you to customize the request using [StrapiRequestBuilder].
+     * @return An object of type [T] representing the parsed response from the POST request.
+     *
+     * @throws Throwable if any errors occur during the request or response processing.
+     *
+     * Usage Example:
+     * ```kotlin
+     * val createdItem: Item = post {
+     *     endpoint("/items")
+     *     body(ItemObject())
+     *     // Customize the request, add request body or headers as needed
+     * }
+     * ```
+     *
+     * In this example, an HTTP POST request is made to create a new item, and the response is processed.
+     *
+     * Note: The [reified] type parameter [T] is used to determine the expected type of the response. The function provides
+     * flexibility to customize the POST request and process the response. It can throw a `Throwable` in case of errors during
+     * the request or response processing.
+     *
+     * @see StrapiRequestBuilder
+     * @see buildRequest
+     * @see HttpMethod
+     * @see JsonElement
+     * @see JsonFlatter
+     */
     @Throws(Throwable::class)
     suspend inline fun <reified T> post(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
     ): T {
+        // Create a new StrapiRequestBuilder
         val builder = StrapiRequestBuilder()
+        // Execute the provided lambda to configure the request
         builder.requestBuilder()
-        val json =
-            httpClient.post(buildRequest(builder, HttpMethod.Post.value)).body<JsonElement>()
+        // Send the HTTP POST request and get the response as a JSON element
+        val json = httpClient.post(buildRequest(builder, HttpMethod.Post)).body<JsonElement>()
+
+        // Process the response based on the type [T]
         return if (T::class.simpleName == Unit::class.simpleName) {
+            // If the response type is Unit, return Unit
             Unit as T
         } else {
+            // Otherwise, flatten the JSON response and convert it to an object of type [T]
             JsonFlatter.flat<T>(json).convert()
         }
     }
@@ -556,7 +655,7 @@ class StrapiService(
         // Execute the provided lambda to configure the request
         builder.requestBuilder()
         // Build the HTTP request using the request builder
-        val request = buildRequest(builder, HttpMethod.Patch.value)
+        val request = buildRequest(builder, HttpMethod.Patch)
         // Send the HTTP request and get the response as a JSON element
         val json = httpClient.patch(request).body<JsonElement>()
 
@@ -608,7 +707,7 @@ class StrapiService(
         // Execute the provided lambda to configure the request
         builder.requestBuilder()
         // Build the HTTP request using the request builder
-        val request = buildRequest(builder, HttpMethod.Put.value)
+        val request = buildRequest(builder, HttpMethod.Put)
         // Send the HTTP request and get the response as a JSON element
         val json = httpClient.put(request).body<JsonElement>()
 
@@ -773,7 +872,7 @@ class StrapiService(
         // Execute the provided lambda to configure the request
         builder.requestBuilder()
         // Build the HTTP DELETE request and extract the API path
-        val request = buildRequest(builder, HttpMethod.Delete.value)
+        val request = buildRequest(builder, HttpMethod.Delete)
         // Get the API path from the request URL
         val apiPath = request.url.encodedPath
 

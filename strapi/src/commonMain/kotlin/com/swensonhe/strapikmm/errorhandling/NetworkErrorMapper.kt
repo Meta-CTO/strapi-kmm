@@ -5,8 +5,17 @@ import com.swensonhe.strapikmm.errorhandling.errortype.UnexpectedException
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 
+/**
+ * A utility class for mapping network-related errors to application-specific exceptions.
+ */
 class NetworkErrorMapper {
 
+    /**
+     * Maps a [Throwable] to an [AppException] representing an unexpected error.
+     *
+     * @param throwable The [Throwable] to be mapped to an exception.
+     * @return An [UnexpectedException] containing information about the unexpected error.
+     */
     fun mapThrowable(throwable: Throwable): AppException {
         return UnexpectedException(
             code = UNEXPECTED,
@@ -15,6 +24,16 @@ class NetworkErrorMapper {
         )
     }
 
+    /**
+     * Maps a server error response to an appropriate [AppException].
+     *
+     * @param httpErrorCode The HTTP status code associated with the error.
+     * @param errorCode An optional error code providing more details about the error.
+     * @param errorMessage A human-readable error message.
+     * @param errorBody The body of the error response.
+     * @param throwable The [Throwable] associated with the error.
+     * @return An [AppException] representing the mapped server error.
+     */
     fun mapServerError(
         httpErrorCode: Int?,
         errorCode: Int?,
@@ -50,6 +69,13 @@ class NetworkErrorMapper {
     }
 }
 
+/**
+ * Creates a JSON error response as a [String].
+ *
+ * @param message The error message to be included in the response.
+ * @param code The error code to be included in the response.
+ * @return A JSON error response as a [String].
+ */
 private fun createErrorJsonResponse(message: String, code: Int) = JsonObject(
     mapOf(
         "message" to JsonPrimitive(message),
