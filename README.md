@@ -115,8 +115,9 @@ the `AuthRepository` class.
 Remember to use the recommended Firebase authentication plugin for a more streamlined authentication
 process.
 
+-----
 
-##### Tracking
+#### Tracking
 
 The `AnalyticsManager` in the Strapi KMM Library simplifies event tracking by allowing you to manage multiple analytics services seamlessly. It supports services like Amplitude and CleverTap.
 
@@ -161,6 +162,7 @@ The library handles service initialization and registration, streamlining the an
 
 By using the `AnalyticsManager` in the Strapi KMM Library, you can efficiently manage and track events on multiple analytics services in your KMM project.
 
+-----
 
 #### Background Downloader
 
@@ -184,7 +186,7 @@ The `BackgroundDownloader` is an essential component in the Strapi KMM Library, 
 
 ##### Platform Compatibility
 
-Integrate the `BackgroundDownloader` into your KMM project for efficient background content downloading and management.
+Integrate the `BackgroundDownloader` into your KMM project for efficient background content downloading and management, it
 
 
 ## Contributing
