@@ -255,7 +255,7 @@ class StrapiService(
     }
 
     /**
-     *  DO NOT USE THIS METHOD DIRECTLY, USE [getFlow] INSTEAD**
+     *  **DO NOT USE THIS METHOD DIRECTLY, USE [getFlow] INSTEAD**
      *
      * Perform an HTTP GET request to fetch paged data of type [T] with caching support.
      * This function is designed for use with the Strapi API and returns a Flow for reactive programming.
@@ -656,6 +656,7 @@ class StrapiService(
         builder.requestBuilder()
         // Build the HTTP request using the request builder
         val request = buildRequest(builder, HttpMethod.Patch)
+
         // Send the HTTP request and get the response as a JSON element
         val json = httpClient.patch(request).body<JsonElement>()
 
@@ -708,6 +709,7 @@ class StrapiService(
         builder.requestBuilder()
         // Build the HTTP request using the request builder
         val request = buildRequest(builder, HttpMethod.Put)
+
         // Send the HTTP request and get the response as a JSON element
         val json = httpClient.put(request).body<JsonElement>()
 
@@ -873,6 +875,7 @@ class StrapiService(
         builder.requestBuilder()
         // Build the HTTP DELETE request and extract the API path
         val request = buildRequest(builder, HttpMethod.Delete)
+
         // Get the API path from the request URL
         val apiPath = request.url.encodedPath
 

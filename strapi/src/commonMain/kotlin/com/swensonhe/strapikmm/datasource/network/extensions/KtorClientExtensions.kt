@@ -86,6 +86,7 @@ fun HttpCallValidator.Config.handleResponseError() {
  * @param preference The preference instance used for retrieving the access token.
  */
 fun DefaultRequest.DefaultRequestBuilder.handleAuthenticationHeader(preference: KmmPreference) {
+
     val sharedToken = preference.getSecureString(SharedConstants.ACCESS_TOKEN)
     val customToken = CustomTokenHandler.getToken()
 
