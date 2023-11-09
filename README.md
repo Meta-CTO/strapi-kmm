@@ -188,6 +188,63 @@ The `BackgroundDownloader` is an essential component in the Strapi KMM Library, 
 
 Integrate the `BackgroundDownloader` into your KMM project for efficient background content downloading and management, it
 
+-----
+
+#### Files Upload Manager
+
+The `UploadManager` interface in the Strapi KMM Library is a fundamental component for efficiently uploading files to a specified destination. It offers a unified way to handle file uploads with the flexibility to upload both single and multiple files asynchronously.
+
+
+##### Key Features
+
+- **Simplified File Upload:** The `UploadManager` simplifies file uploads, reducing complexity and providing a consistent interface for uploading various types of files.
+
+- **Asynchronous Upload:** It leverages Kotlin's coroutines to enable asynchronous uploading, ensuring that the UI thread remains responsive while files are uploaded in the background.
+
+- **Parallel Upload:** For uploading multiple files, it utilizes Kotlin's `async` and `awaitAll` to perform parallel uploads, optimizing the process and reducing wait times.
+
+- **Error Handling:** The interface defines error handling through exceptions, allowing you to gracefully manage and recover from any issues during the upload process.
+
+- **Upload to AWS S3:** The `S3UploadManager` class implements the `UploadManager` interface and provides a way to upload files to AWS S3.
+- 
+##### Functions
+
+1. `upload(file: UploadableFile)`: Uploads a single file asynchronously and returns the uploaded file result. If any errors occur during the upload, a `Throwable` is thrown.
+
+2. `upload(files: List<UploadableFile>)`: Uploads multiple files in parallel. Although AWS S3 does not support uploading multiple files at once, this function uploads them sequentially, providing you with a list of uploaded files. It uses `async` to enable parallel execution and `awaitAll` to ensure all uploads complete. Any errors encountered during the upload process are handled by throwing a `Throwable`.
+
+##### Platform Compatibility
+
+The `UploadManager` is compatible with both iOS and Android platforms in Kotlin Multiplatform Mobile (KMM) projects. It offers a seamless and unified approach to file uploads, making it easier to manage file upload operations on different platforms.
+
+-----
+
+#### Contacts Data Collector
+
+The `ContactsDataCollector` is a core component in the Strapi KMM Library designed to provide a unified approach for managing contact information across various platforms. It allows you to collect and manipulate contact data efficiently in your Kotlin Multiplatform Mobile (KMM) project.
+
+##### Key Features
+
+- **Cross-Platform Abstraction:** The `ContactsDataCollector` is an expect class designed for cross-platform compatibility. It abstracts the complexities of contact data management, ensuring a consistent interface for each platform (Web, Android, iOS).
+
+- **Configuration Options:** You can configure the behavior of the data collector by setting options using the `setOptions` function. This flexibility allows you to customize how contact data is collected and managed.
+
+- **Contact Access Request:** The library includes a `requestAccess` function to request access to the device's contact data. It returns `true` if access is granted, providing a way to handle permissions seamlessly.
+
+- **Contact Data Loading:** The `loadContacts` function enables you to load a list of contacts from the device's storage. It returns a list of `Contact` objects representing the loaded contact data.
+
+##### Functions
+
+1. `setOptions(options: ContactsDataCollectorOptions?)`: Configures the contact data collection process by providing an instance of `ContactsDataCollectorOptions`. Any errors during this configuration are handled by throwing a `Throwable`.
+
+2. `requestAccess()`: Requests access to the device's contact data and returns `true` if access is granted. If any errors occur during the access request, a `Throwable` is thrown.
+
+3. `loadContacts()`: Loads a list of contacts from the device's storage, returning a list of `Contact` objects representing the loaded contact data. If any errors occur during the contact data loading process, a `Throwable` is thrown.
+
+##### Platform Compatibility
+
+The `ContactsDataCollector` is designed to be cross-platform and can be seamlessly integrated into Web, Android, and iOS platforms in Kotlin Multiplatform Mobile (KMM) projects. It offers a consistent way to manage contact data across different platforms while maintaining platform-specific functionality.
+
 
 ## Contributing
 
