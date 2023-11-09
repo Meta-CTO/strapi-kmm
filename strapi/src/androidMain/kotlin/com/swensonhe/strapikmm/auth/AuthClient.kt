@@ -21,7 +21,7 @@ import dev.gitlive.firebase.auth.AuthCredential
 actual class AuthOptions(
     val activity: Activity,
     val launcher: ActivityResultLauncher<Intent>,
-    val onCanceled: () -> Unit = {}
+    val onCancelled: () -> Unit = {}
 ) {
     /**
      * A lambda function to handle the result of the authentication process.
@@ -64,7 +64,7 @@ actual class AuthClient  : AuthProvider {
         options.onResult = {
             if (it.resultCode == Activity.RESULT_CANCELED) {
                 // Invoke the onCanceled handler
-                options.onCanceled.invoke()
+                options.onCancelled.invoke()
             } else {
                 // Handle the result
                 setActivityResult(it)
