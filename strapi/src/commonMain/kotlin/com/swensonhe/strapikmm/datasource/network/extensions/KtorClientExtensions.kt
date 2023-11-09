@@ -19,6 +19,12 @@ import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
 
+/**
+ * Handles response validation for HTTP calls. This function validates the HTTP response status code and
+ * throws appropriate exceptions for different HTTP status code ranges.
+ *
+ * @receiver The configuration for HTTP call validation.
+ */
 fun HttpCallValidator.Config.handleResponseValidation() {
     validateResponse { response: HttpResponse ->
         val statusCode = response.status.value
@@ -34,6 +40,12 @@ fun HttpCallValidator.Config.handleResponseValidation() {
     }
 }
 
+/**
+ * Handles response error handling for HTTP calls. This function processes response exceptions, extracts
+ * error information, and throws a mapped network error.
+ *
+ * @receiver The configuration for HTTP call validation.
+ */
 fun HttpCallValidator.Config.handleResponseError() {
     handleResponseExceptionWithRequest { cause, _ ->
         val responseException =
@@ -54,16 +66,26 @@ fun HttpCallValidator.Config.handleResponseError() {
     }
 }
 
+/**
+ * Handles adding the authentication header to an HTTP request based on the access token stored in preferences.
+ * The access token is retrieved from the preferences and added to the request header as an "Authorization" header
+ * with the Bearer token type.
+ *
+ * @receiver The builder for configuring an HTTP request.
+ * @param preference The preference instance used for retrieving the access token.
+ */
 fun DefaultRequest.DefaultRequestBuilder.handleAuthenticationHeader(preference: KmmPreference) {
     val token = preference.getSecureString(SharedConstants.ACCESS_TOKEN)
-    if (token.isNullOrEmpty()
-            .not() && (headers[KmmBaseService.IS_AUTHENTICATED] ?: true.toString()).toBooleanStrict()
+    // Check if a valid token is available and the request should be authenticated.
+    if (token.isNullOrEmpty().not() && (headers[KmmBaseService.IS_AUTHENTICATED]
+            ?: true.toString()).toBooleanStrict()
     ) {
+        headers.remove(KmmBaseService.IS_AUTHENTICATED)
+
+        // Append the access token with the "Bearer" prefix to the request's authorization header.
         headers.append(
             SharedConstants.AUTHORIZATION_HEADER,
             "${SharedConstants.BEARER} $token"
         )
     }
-
-    headers.remove(KmmBaseService.IS_AUTHENTICATED)
 }
