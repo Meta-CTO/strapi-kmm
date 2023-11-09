@@ -1,11 +1,11 @@
 Pod::Spec.new do |spec|
     spec.name                     = 'strapi'
     spec.version                  = '1.0.0'
-    spec.homepage                 = 'Link to the Shared Module homepage'
+    spec.homepage                 = 'https://github.com/swensonhe/kmm-internal'
     spec.source                   = { :http=> ''}
     spec.authors                  = ''
     spec.license                  = ''
-    spec.summary                  = 'Some description for the Shared Module'
+    spec.summary                  = 'Shared Module for Strapi KMM'
     spec.vendored_frameworks      = 'build/cocoapods/framework/strapiKMMpods.framework'
     spec.libraries                = 'c++'
     spec.ios.deployment_target = '14.1'

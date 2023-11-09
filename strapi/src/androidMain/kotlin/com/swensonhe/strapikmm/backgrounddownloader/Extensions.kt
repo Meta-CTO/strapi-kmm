@@ -9,6 +9,11 @@ import com.tonyodev.fetch2.Download
 import com.tonyodev.fetch2.Status
 import java.io.File
 
+/**
+ * Converts a [Download] object into a [DownloadInfo] for easy retrieval of download information.
+ *
+ * @return A [DownloadInfo] object containing download details.
+ */
 internal fun Download.toDownloadInfo() = DownloadInfo(
     id = id.toString(),
     url = url,
@@ -18,6 +23,11 @@ internal fun Download.toDownloadInfo() = DownloadInfo(
     progress = progress
 )
 
+/**
+ * Checks if the app has the required notifications permission in the current context.
+ *
+ * @return `true` if the app has the notifications permission, `false` otherwise.
+ */
 internal fun Context.checkNotificationsPermission(): Boolean {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
@@ -26,6 +36,11 @@ internal fun Context.checkNotificationsPermission(): Boolean {
     }
 }
 
+/**
+ * Checks if a given path is writable.
+ *
+ * @return `true` if the path is writable, `false` otherwise.
+ */
 internal fun String.canWriteToIt(): Boolean {
     return try {
         File(this).canWrite()
@@ -34,6 +49,11 @@ internal fun String.canWriteToIt(): Boolean {
     }
 }
 
+/**
+ * Checks if a download is in a resumable state.
+ *
+ * @return `true` if the download is in a resumable state, `false` otherwise.
+ */
 internal fun Download.isResumable(): Boolean {
     return status == Status.NONE
             || status == Status.QUEUED

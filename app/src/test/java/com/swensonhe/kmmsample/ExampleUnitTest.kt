@@ -1,4 +1,4 @@
-package com.kommu.mylibrary
+package com.swensonhe.kmmsample
 
 import org.junit.Test
 

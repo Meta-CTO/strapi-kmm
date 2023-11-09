@@ -11,6 +11,10 @@ import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.*
 
+/**
+ * Android platform-specific implementation of a contacts data collector that retrieves contacts information
+ * from the device's address book on iOS.
+ */
 actual class ContactsDataCollector {
     private lateinit var options: ContactsDataCollectorOptions
     private var requestAccessCont: CancellableContinuation<Boolean>? = null
@@ -82,7 +86,9 @@ actual class ContactsDataCollector {
     }
 
     companion object {
+        // Constants permissions
         private const val CONTACTS_PERMISSION = Manifest.permission.READ_CONTACTS
+        // Constants columns to fetch
         private val CONTACT_COLUMNS = listOf(
             ContactColumn.Events,
             ContactColumn.Phones,

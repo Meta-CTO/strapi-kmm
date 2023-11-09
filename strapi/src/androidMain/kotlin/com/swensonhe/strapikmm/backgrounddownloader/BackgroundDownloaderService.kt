@@ -9,12 +9,13 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.tonyodev.fetch2.R
 
+/* A service that keeps the app alive while downloading in the background. */
 class BackgroundDownloaderService : Service() {
+    // The notification manager to use for the on going notification
     private lateinit var notificationManager: NotificationManager
 
     override fun onCreate() {
         super.onCreate()
-
         // Init notification manager
         notificationManager = getSystemService(NotificationManager::class.java)
     }
@@ -61,6 +62,7 @@ class BackgroundDownloaderService : Service() {
     }
 
     override fun onDestroy() {
+        // Cancel the on going notification
         notificationManager.cancel(NOTIFICATION_ID)
         super.onDestroy()
     }

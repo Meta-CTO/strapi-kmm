@@ -1,5 +1,13 @@
 package com.swensonhe.strapikmm.util
 
+/**
+ * Provides information about the build configuration.
+ */
 actual class BuildConfig {
-    actual fun isAndroid() = true
+    /**
+     * Checks if the application is running on an Android platform.
+     *
+     * @return `true` if the application is running on an Android platform, `false` otherwise.
+     */
+    actual fun isAndroid() = true // true for Android
 }

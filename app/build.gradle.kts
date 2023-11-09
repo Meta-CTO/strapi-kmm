@@ -1,11 +1,11 @@
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
-    kotlin(KotlinPlugins.serialization) version Kotlin.version
+    id(Plugins.Android.ANDROID_LIBRARY)
+    id(Plugins.Android.MULTIPLATFORM_ANDROID)
+    kotlin(Plugins.Kotlin.SERIALIZATION) version StrapiLibraryVersions.Kotlin.VERSION
 }
 
 android {
-    namespace = "com.kommu.mylibrary"
+    namespace = "com.swensonhe.kmmsample"
     compileSdk = 33
 
     defaultConfig {

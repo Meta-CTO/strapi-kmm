@@ -2,6 +2,12 @@ package com.swensonhe.strapikmm.sharedpreference
 
 import com.russhwolf.settings.Settings
 
+/**
+ * This class is used to store and retrieve data from the shared preferences.
+ *
+ * @param preferences The [Settings] instance for storing and retrieving the data.
+ * @param encryptedPreferences The [Settings] instance for storing and retrieving the data securely.
+ */
 actual class KmmPreference actual constructor(
     private val preferences: Settings?,
     private val encryptedPreferences: Settings?

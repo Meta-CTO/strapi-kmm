@@ -9,6 +9,14 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
 import kotlin.js.JsExport
 
+/**
+ * Represents the uploaded file with its attributes.
+ *
+ * @param id The unique identifier of the file.
+ * @param fileUrl The URL of the file.
+ * @param fileName The name of the file.
+ * @param mime The MIME type of the file.
+ */
 @Serializable
 @JsExport
 data class File(
@@ -22,6 +30,15 @@ data class File(
     val mime: String? = null
 )
 
+/**
+ * Represents a request to upload a file with its attributes.
+ *
+ * @param name The name of the file.
+ * @param mime The MIME type of the file.
+ * @param ext The file extension.
+ * @param size The size of the file.
+ * @param url The URL of the file.
+ */
 @Serializable
 data class UploadFileRequest(
     @EncodeDefault(EncodeDefault.Mode.NEVER)
@@ -41,6 +58,12 @@ data class UploadFileRequest(
     val url: String? = null,
 )
 
+
+/**
+ * Represents a collection of files to be uploaded.
+ *
+ * @param data The list of [UploadFileRequest] objects representing the files to be uploaded.
+ */
 @Serializable
 @Suppress()
 data class UploadFiles(

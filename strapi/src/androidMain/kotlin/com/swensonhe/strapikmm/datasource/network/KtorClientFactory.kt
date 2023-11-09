@@ -1,39 +1,24 @@
 package com.swensonhe.strapikmm.datasource.network
 
-import com.swensonhe.strapikmm.datasource.network.extensions.handleAuthenticationHeader
-import com.swensonhe.strapikmm.datasource.network.extensions.handleResponseError
-import com.swensonhe.strapikmm.datasource.network.extensions.handleResponseValidation
+import com.swensonhe.strapikmm.datasource.network.extensions.createHttpClient
 import com.swensonhe.strapikmm.sharedpreference.KmmPreference
-import com.swensonhe.strapikmm.util.strapiNetworkLogLevel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
-import io.ktor.client.plugins.DefaultRequest
-import io.ktor.client.plugins.HttpResponseValidator
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.serialization.kotlinx.json.json
 
-actual class KtorClientFactory actual constructor(networkLogLevel: NetworkLogLevel, private val preference: KmmPreference) {
-
-    init {
-        strapiNetworkLogLevel = networkLogLevel
-    }
-
-    actual fun build(): HttpClient {
-        return HttpClient(Android) {
-            expectSuccess = true
-            install(ContentNegotiation) {
-                json()
-            }
-
-            install(DefaultRequest) {
-                handleAuthenticationHeader(preference)
-            }
-
-            HttpResponseValidator {
-                handleResponseValidation()
-                handleResponseError()
-            }
-        }
-    }
+/**
+ * Factory class for creating an instance of Ktor's [HttpClient].
+ *
+ * @param networkLogLevel The desired network log level for debugging network requests and responses.
+ * @param preference An instance of [KmmPreference] used for handling authentication headers.
+ */
+actual class KtorClientFactory actual constructor(
+    private val networkLogLevel: NetworkLogLevel, private val preference: KmmPreference
+) {
+    /**
+     * Builds and configures a Ktor [HttpClient] instance for making HTTP requests.
+     *
+     * @return An instance of [HttpClient] with the specified configurations.
+     */
+    actual fun build(): HttpClient = createHttpClient(networkLogLevel, preference, Android)
 }
 

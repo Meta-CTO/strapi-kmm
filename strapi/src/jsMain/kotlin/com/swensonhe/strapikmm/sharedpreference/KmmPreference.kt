@@ -3,6 +3,13 @@
 package com.swensonhe.strapikmm.sharedpreference
 import com.russhwolf.settings.Settings
 
+/**
+ * A class for handling shared preferences.
+ *
+ * @param preferences An instance of [Settings] used for storing user preferences.
+ * @param encryptedPreferences An instance of [Settings] used for storing sensitive user preferences.
+ * **Note: in Android we are not using [EncryptedPreferences] and we saving everything in default preferences**.
+ */
 @JsExport
 actual class KmmPreference actual constructor(
     private val preferences: Settings?,

@@ -2,20 +2,31 @@ package com.swensonhe.strapikmm.datasource.network.extensions
 
 import com.swensonhe.strapikmm.constants.SharedConstants
 import com.swensonhe.strapikmm.datasource.network.KmmBaseService
+import com.swensonhe.strapikmm.datasource.network.KtorClientFactory
+import com.swensonhe.strapikmm.datasource.network.NetworkLogLevel
 import com.swensonhe.strapikmm.datasource.network.services.strapi.JsonFlatter
 import com.swensonhe.strapikmm.datasource.network.services.strapi.JsonWithIgnoredUnknownKeys
 import com.swensonhe.strapikmm.errorhandling.NetworkError
 import com.swensonhe.strapikmm.errorhandling.NetworkErrorMapper
 import com.swensonhe.strapikmm.sharedpreference.KmmPreference
+import com.swensonhe.strapikmm.util.CustomTokenHandler
+import com.swensonhe.strapikmm.util.Logger
+import com.swensonhe.strapikmm.util.strapiNetworkLogLevel
+import io.ktor.client.HttpClient
+import io.ktor.client.HttpClientConfig
 import io.ktor.client.call.body
+import io.ktor.client.engine.HttpClientEngineFactory
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpCallValidator
+import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.RedirectResponseException
 import io.ktor.client.plugins.ResponseException
 import io.ktor.client.plugins.ServerResponseException
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
 
@@ -75,9 +86,23 @@ fun HttpCallValidator.Config.handleResponseError() {
  * @param preference The preference instance used for retrieving the access token.
  */
 fun DefaultRequest.DefaultRequestBuilder.handleAuthenticationHeader(preference: KmmPreference) {
-    val token = preference.getSecureString(SharedConstants.ACCESS_TOKEN)
+    val sharedToken = preference.getSecureString(SharedConstants.ACCESS_TOKEN)
+    val customToken = CustomTokenHandler.getToken()
+
+    val finalToken = if (customToken.isNotEmpty()) {
+        customToken
+    } else if (sharedToken.isNullOrEmpty().not()) {
+        sharedToken
+    } else {
+        null
+    }
+
+    if(strapiNetworkLogLevel != NetworkLogLevel.NONE) {
+        Logger("Request: ").log("token: $finalToken")
+    }
+
     // Check if a valid token is available and the request should be authenticated.
-    if (token.isNullOrEmpty().not() && (headers[KmmBaseService.IS_AUTHENTICATED]
+    if (finalToken.isNullOrEmpty().not() && (headers[KmmBaseService.IS_AUTHENTICATED]
             ?: true.toString()).toBooleanStrict()
     ) {
         headers.remove(KmmBaseService.IS_AUTHENTICATED)
@@ -85,7 +110,40 @@ fun DefaultRequest.DefaultRequestBuilder.handleAuthenticationHeader(preference: 
         // Append the access token with the "Bearer" prefix to the request's authorization header.
         headers.append(
             SharedConstants.AUTHORIZATION_HEADER,
-            "${SharedConstants.BEARER} $token"
+            "${SharedConstants.BEARER} $finalToken"
         )
+    }
+}
+
+
+/**
+ * Builds and configures a Ktor [HttpClient] instance for making HTTP requests.
+ *
+ * @return An instance of [HttpClient] with the specified configurations.
+ */
+
+fun KtorClientFactory.createHttpClient(
+    networkLogLevel: NetworkLogLevel,
+    preference: KmmPreference,
+    platform: HttpClientEngineFactory<*>
+): HttpClient {
+    strapiNetworkLogLevel = networkLogLevel
+
+    return HttpClient(platform) {
+        expectSuccess = true
+        install(ContentNegotiation) {
+            json()
+        }
+
+        // Install a custom DefaultRequest feature for handling authentication headers.
+        install(DefaultRequest) {
+            handleAuthenticationHeader(preference)
+        }
+
+        // Install response validation and error handling.
+        HttpResponseValidator {
+            handleResponseValidation()
+            handleResponseError()
+        }
     }
 }

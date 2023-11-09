@@ -5,12 +5,12 @@ import org.jetbrains.kotlin.konan.properties.Properties
 import java.io.FileInputStream
 
 plugins {
-    id(Plugins.androidLibrary)
-    kotlin(KotlinPlugins.multiplatform)
-    kotlin(KotlinPlugins.serialization) version Kotlin.version
-    kotlin(Plugins.cocoapods)
-    id(Plugins.mavenPublish)
-    id(Plugins.signing)
+    id(Plugins.Android.ANDROID_LIBRARY)
+    kotlin(Plugins.Kotlin.MULTIPLATFORM)
+    kotlin(Plugins.Kotlin.SERIALIZATION) version StrapiLibraryVersions.Kotlin.VERSION
+    kotlin(Plugins.COCOAPODS)
+    id(Plugins.MAVEN_PUBLISH)
+    id(Plugins.SIGNING)
     id(Plugins.SQL_DELIGHT)
     id(Plugins.SWIFT_KLIB) version Plugins.Version.SWIFT_KLIB
 }
@@ -36,21 +36,21 @@ kotlin {
 
     cocoapods {
         version = "1.0.0"
-        summary = "Some description for the Shared Module"
-        homepage = "Link to the Shared Module homepage"
+        summary = "Shared Module for Strapi KMM"
+        homepage = "https://github.com/swensonhe/kmm-internal"
         ios.deploymentTarget = "14.1"
         podfile = project.file("../iosApp/Podfile")
 
-        pod("FirebaseAuth", linkOnly = true)
-        pod("GoogleSignIn")
-        pod("FirebaseDynamicLinks")
-        pod("Amplitude")
-        pod("CleverTap-iOS-SDK") {
-            moduleName = "CleverTapSDK"
+        pod(StrapiLibraryDependencies.iOS.Firebase.AUTH, linkOnly = true)
+        pod(StrapiLibraryDependencies.iOS.Firebase.DYNAMIC_LINKS)
+        pod(StrapiLibraryDependencies.iOS.Google.SIGN_IN)
+        pod(StrapiLibraryDependencies.iOS.Amplitude.SDK)
+        pod(StrapiLibraryDependencies.iOS.CleverTap.SDK) {
+            moduleName = StrapiLibraryDependencies.iOS.CleverTap.MODULE
         }
 
         framework {
-            baseName = libName + "pods" // DON'T CHANGE THIS LINE, there is a bug in the plugin that requires unique names for each framework
+            baseName = libName + "pods" // To differentiate from the XCFramework name
             isStatic = true
         }
     }
@@ -105,37 +105,33 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(Ktor.core)
-                api(Ktor.clientSerialization)
-                api(Ktor.ktorKotlinSerialization)
-                api(Ktor.contentNegotiation)
-                api(Ktor.logback)
-                api(Ktor.logging)
-                api(ProjectDependencies.sharedPreferencesMultiplatformSettings)
-                api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
-                api("dev.gitlive:firebase-auth:1.8.2-swensonhe")
+                api(StrapiLibraryDependencies.Ktor.CORE)
+                api(StrapiLibraryDependencies.Ktor.CLIENT_SERALIZATION)
+                api(StrapiLibraryDependencies.Ktor.SERIALIZATION)
+                api(StrapiLibraryDependencies.Ktor.CONTENT_NEGOTIATION)
+                api(StrapiLibraryDependencies.Ktor.LOGBACK)
+                api(StrapiLibraryDependencies.Ktor.LOGGING)
+                api(StrapiLibraryDependencies.SharedPreferences.SETTINGS)
+                api(StrapiLibraryDependencies.DateTime.LIB)
+                api(StrapiLibraryDependencies.Firebase.LIB)
             }
         }
         val androidMain by getting {
-            val contactsVersion = "1.4.0"
-            val fetchVersion = "3.1.6"
-
             dependencies {
-                implementation("androidx.security:security-crypto:1.0.0")
-                api(Ktor.android)
-                api(ProjectDependencies.SqlDelight.ANDROID_DRIVER)
-                implementation("androidx.activity:activity-ktx:1.7.2")
-                implementation("com.google.android.gms:play-services-auth:20.7.0")
-                implementation(platform("com.google.firebase:firebase-bom:32.1.1"))
-                implementation("com.google.firebase:firebase-dynamic-links-ktx")
-                api("com.amplitude:android-sdk:2.39.8")
-                api("com.clevertap.android:clevertap-android-sdk:5.2.0")
-                api("com.android.installreferrer:installreferrer:2.2")
+                api(StrapiLibraryDependencies.Ktor.ANDROID)
+                api(StrapiLibraryDependencies.SqlDelight.ANDROID_DRIVER)
+                implementation(StrapiLibraryDependencies.Android.Crypto.LIB)
+                implementation(StrapiLibraryDependencies.Android.Activity.KTX)
+                implementation(StrapiLibraryDependencies.Android.Google.PlayServices.AUTH)
 
-                implementation("com.alexstyl:contactstore:$contactsVersion")
-                implementation("com.alexstyl:contactstore-coroutines:$contactsVersion")
-
-                implementation("androidx.tonyodev.fetch2:xfetch2:$fetchVersion")
+                implementation(StrapiLibraryDependencies.Android.Firebase.BOM)
+                implementation(StrapiLibraryDependencies.Android.Firebase.DYNAMIC_LINKS)
+                implementation(StrapiLibraryDependencies.Android.InstallReferrer.LIB)
+                implementation(StrapiLibraryDependencies.Android.CleverTap.SDK)
+                implementation(StrapiLibraryDependencies.Android.Amplitude.SDK)
+                implementation(StrapiLibraryDependencies.Android.Contacts.SDK)
+                implementation(StrapiLibraryDependencies.Android.Contacts.COROUTINES)
+                implementation(StrapiLibraryDependencies.Android.FetchDownloader.SDK)
             }
         }
 
@@ -145,8 +141,8 @@ kotlin {
         val iosMain by getting {
             dependsOn(commonMain)
             dependencies {
-                api(Ktor.ios)
-                api(ProjectDependencies.SqlDelight.NATIVE_DRIVER)
+                api(StrapiLibraryDependencies.Ktor.IOS)
+                api(StrapiLibraryDependencies.SqlDelight.NATIVE_DRIVER)
             }
 
             iosX64Main.dependsOn(this)
@@ -157,11 +153,11 @@ kotlin {
         val jsMain by getting {
             dependsOn(commonMain)
             dependencies {
-                api(Ktor.js)
-                api(Ktor.jsSeralization)
-                api(ProjectDependencies.SqlDelight.JS_DRIVER)
-                api(npm(ProjectDependencies.SqlDelight.SQL_JS, ProjectDependencies.SQL_JS))
-                api(devNpm(ProjectDependencies.SqlDelight.COPY_WEBPACK_PLUGIN, ProjectDependencies.COPY_WEBPACK_PLUGIN))
+                api(StrapiLibraryDependencies.Ktor.JS)
+                api(StrapiLibraryDependencies.Ktor.JS_SERIALIZATION)
+                api(StrapiLibraryDependencies.SqlDelight.JS_DRIVER)
+                api(npm(StrapiLibraryDependencies.SqlDelight.SQL_JS, StrapiLibraryVersions.SqlDelight.SQL_JS))
+                api(devNpm(StrapiLibraryDependencies.SqlDelight.COPY_WEBPACK_PLUGIN, StrapiLibraryVersions.SqlDelight.COPY_WEBPACK_PLUGIN))
             }
         }
     }
@@ -171,33 +167,10 @@ kotlin {
             jvmTarget = "17"
         }
     }
-
-    // DON'T REMOVE OR UNCOMMENT THIS
-//    afterEvaluate {
-//        publishing {
-//            publications {
-//                create<MavenPublication>("release") {
-//                    groupId = publishGroupId
-//                    artifactId = libName.toLowerCase()
-//                    version = currentVersion
-//
-//                    from(components.getByName("release"))
-//                }
-//                create<MavenPublication>("debug") {
-//                    groupId = publishGroupId
-//                    artifactId = "${libName.toLowerCase()}-debug"
-//                    version = currentVersion
-//
-//                    from(components.getByName("debug"))
-//                }
-//            }
-//        }
-//    }
 }
 
 sqldelight {
     databases {
-//        linkSqlite.set(false)
         create("AppDatabase") {
             packageName.set("com.swensonhe.caching.datasource.database")
             generateAsync.set(true)
@@ -207,11 +180,11 @@ sqldelight {
 
 android {
     namespace = "com.swensonhe.strapiKMM"
-    compileSdk = Application.compileSdk
+    compileSdk = AndroidVersions.COMPILE_SDK
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
-        minSdk = Application.minSdk
-        targetSdk = Application.targetSdk
+        minSdk = AndroidVersions.MIN_SDK
+        targetSdk = AndroidVersions.TARGET_SDK
         consumerProguardFiles("consumer-rules.pro")
     }
     compileOptions {
@@ -232,23 +205,6 @@ afterEvaluate {
 
 publishing {
     repositories {
-        // DON'T REMOVE OR UNCOMMENT THIS TILL WE REMOVE sonatype FROM PROJECT
-//        maven {
-//            name = "oss"
-//            setUrl("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-//            val releasesRepoUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-//            val snapshotsRepoUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-//            url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
-//
-//            credentials {
-//                username = publishUsername
-//                password = publishPassword
-//            }
-//        }
-
-        println("PUBLISH_REPO_USER: ${gradleLocalProperties(rootDir).getProperty("PUBLISH_REPO_USER")}")
-        println("PUBLISH_REPO_TOKEN: ${gradleLocalProperties(rootDir).getProperty("PUBLISH_REPO_TOKEN")}")
-
         repositories {
             maven("https://maven.pkg.github.com/swensonhe/strapi-kmm") {
                 name = "Github"
@@ -291,18 +247,3 @@ publishing {
         }
     }
 }
-
-// DON'T REMOVE SIGNING FOR NOW
-//signing {
-//    useInMemoryPgpKeys(publishKey,publishSecret, publishUsername)
-//    sign(publishing.publications)
-//}
-
-//afterEvaluate {
-//    val compilation = kotlin.targets["metadata"].compilations["iosMain"]
-//    compilation.compileKotlinTask.doFirst {
-//        compilation.compileDependencyFiles = files(
-//            compilation.compileDependencyFiles.filterNot { it.absolutePath.endsWith("klib/common/stdlib") }
-//        )
-//    }
-//}

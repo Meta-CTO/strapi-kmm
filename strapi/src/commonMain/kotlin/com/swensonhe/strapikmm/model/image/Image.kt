@@ -7,6 +7,15 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
 import kotlin.js.JsExport
 
+/**
+ * Represents the strapi image with its attributes.
+ *
+ * @param id The unique identifier of the image.
+ * @param name The name of the image.
+ * @param mime The MIME type of the image.
+ * @param url The URL of the image.
+ * @param largeUrl The URL of the image in a large format, if available.
+ */
 @Serializable
 @JsExport
 data class Image(

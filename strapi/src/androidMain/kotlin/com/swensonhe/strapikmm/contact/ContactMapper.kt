@@ -15,6 +15,13 @@ import java.util.Calendar
 import com.alexstyl.contactstore.Contact as StoreContact
 import com.swensonhe.strapikmm.model.contact.Contact as KmmContact
 
+/**
+ * Converts a list of [StoreContact] objects to a list of KMM (Kotlin Multiplatform Mobile) contacts.
+ * This function maps and transforms properties from [StoreContact] objects to properties of [KmmContact] objects.
+ *
+ * @param context The Android [Context] to access the resources.
+ * @return A list of KMM contacts.
+ */
 internal fun List<StoreContact>.toKmmContactsList(context: Context) = map { contact ->
     // Find and format the birthday
     val birthday = contact.events
@@ -105,6 +112,13 @@ internal fun List<StoreContact>.toKmmContactsList(context: Context) = map { cont
     )
 }
 
+/**
+ * Reads the content of a [Uri] and returns it as a byte array. This function uses the [contentResolver] of the provided [context]
+ * to open an input stream for the given Uri, and then reads the content into a byte array.
+ *
+ * @param context The Android [Context] to access the [contentResolver].
+ * @return A byte array containing the content of the Uri, or `null` if an error occurs during reading.
+ */
 fun Uri.getBytes(context: Context): ByteArray? {
     return try {
         context.contentResolver.openInputStream(this)?.use { it.buffered().readBytes() }

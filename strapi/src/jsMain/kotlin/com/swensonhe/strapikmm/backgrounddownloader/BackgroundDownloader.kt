@@ -1,5 +1,10 @@
 package com.swensonhe.strapikmm.backgrounddownloader
 
+/**
+ *  Provide download Service for web
+ * We didn't implement any logic for Web (For now), so we just return a no-op implementation here.
+ * ** Any PRs to implement it for Web are welcome! **
+ */
 actual class BackgroundDownloader(
     actual val maximumNumberOfConcurrentDownloads: Int,
     actual val allowsCellularDownloads: Boolean,

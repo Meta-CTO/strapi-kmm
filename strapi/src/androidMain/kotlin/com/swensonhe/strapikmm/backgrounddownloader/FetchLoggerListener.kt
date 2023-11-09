@@ -6,9 +6,17 @@ import com.tonyodev.fetch2.Error
 import com.tonyodev.fetch2.FetchListener
 import com.tonyodev.fetch2core.DownloadBlock
 
+/**
+ * An internal class that logs download events and status changes for debugging and monitoring purposes.
+ *
+ * @param logTag The tag to use for logging.
+ */
 internal class FetchLoggerListener(logTag: String) : FetchListener {
     private val logger = Logger(logTag)
 
+    /**
+     * Called when a download task is added to the queue.
+     */
     override fun onAdded(download: Download) {
         val msg = buildString {
             append("onAdded:--------------------------------\n")
@@ -19,6 +27,9 @@ internal class FetchLoggerListener(logTag: String) : FetchListener {
         logger.log(msg)
     }
 
+    /**
+     * Called when a download task is cancelled.
+     */
     override fun onCancelled(download: Download) {
         val msg = buildString {
             append("onCancelled:----------------------------\n")
@@ -28,6 +39,9 @@ internal class FetchLoggerListener(logTag: String) : FetchListener {
         logger.log(msg)
     }
 
+    /**
+     * Called when a download task is completed.
+     */
     override fun onCompleted(download: Download) {
         val msg = buildString {
             append("onCompleted:----------------------------\n")
@@ -37,6 +51,9 @@ internal class FetchLoggerListener(logTag: String) : FetchListener {
         logger.log(msg)
     }
 
+    /**
+     * Called when a download task is deleted.
+     */
     override fun onDeleted(download: Download) {
         val msg = buildString {
             append("onDeleted:------------------------------\n")
@@ -46,6 +63,9 @@ internal class FetchLoggerListener(logTag: String) : FetchListener {
         logger.log(msg)
     }
 
+    /**
+     * Called when an error occurs during the download task.
+     */
     override fun onError(download: Download, error: Error, throwable: Throwable?) {
         val msg = buildString {
             append("onError:-----------------\n")
@@ -57,6 +77,9 @@ internal class FetchLoggerListener(logTag: String) : FetchListener {
         logger.log(msg)
     }
 
+    /**
+     * Called when a download task is paused.
+     */
     override fun onPaused(download: Download) {
         val msg = buildString {
             append("onPaused:-----------------\n")
@@ -68,6 +91,9 @@ internal class FetchLoggerListener(logTag: String) : FetchListener {
         logger.log(msg)
     }
 
+    /**
+     * Called to report download progress.
+     */
     override fun onProgress(
         download: Download,
         etaInMilliSeconds: Long,
@@ -83,6 +109,9 @@ internal class FetchLoggerListener(logTag: String) : FetchListener {
         logger.log(msg)
     }
 
+    /**
+     * Called when a download task is queued.
+     */
     override fun onQueued(download: Download, waitingOnNetwork: Boolean) {
         val msg = buildString {
             append("onQueued:-----------------\n")
@@ -93,6 +122,9 @@ internal class FetchLoggerListener(logTag: String) : FetchListener {
         logger.log(msg)
     }
 
+    /**
+     * Called when a download task is removed.
+     */
     override fun onRemoved(download: Download) {
         val msg = buildString {
             append("onRemoved:-----------------\n")
@@ -102,6 +134,9 @@ internal class FetchLoggerListener(logTag: String) : FetchListener {
         logger.log(msg)
     }
 
+    /**
+     * Called when a download task is resumed.
+     */
     override fun onResumed(download: Download) {
         val msg = buildString {
             append("onResumed:-----------------\n")
@@ -113,6 +148,9 @@ internal class FetchLoggerListener(logTag: String) : FetchListener {
         logger.log(msg)
     }
 
+    /**
+     * Called when a download task is started with details about download blocks.
+     */
     override fun onStarted(
         download: Download,
         downloadBlocks: List<DownloadBlock>,
@@ -126,6 +164,9 @@ internal class FetchLoggerListener(logTag: String) : FetchListener {
         logger.log(msg)
     }
 
+    /**
+     * Called when a download task is waiting for network connectivity.
+     */
     override fun onWaitingNetwork(download: Download) {
         val msg = buildString {
             append("onWaitingNetwork:-----------------\n")
@@ -135,6 +176,9 @@ internal class FetchLoggerListener(logTag: String) : FetchListener {
         logger.log(msg)
     }
 
+    /**
+     * Called when a download block is updated.
+     */
     override fun onDownloadBlockUpdated(
         download: Download,
         downloadBlock: DownloadBlock,

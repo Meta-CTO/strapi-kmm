@@ -6,6 +6,12 @@ import kotlinx.serialization.Serializable
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
 
+/**
+ * Represents a paging response containing a list of data and metadata.
+ *
+ * @param data The list of data items.
+ * @param meta The metadata for paging information.
+ */
 @Serializable
 class PagingResponse<T>(
     @SerialName("data")
@@ -14,6 +20,11 @@ class PagingResponse<T>(
     val meta: MetaResponse?,
 )
 
+/**
+ * Wraps a single data item.
+ *
+ * @param data The wrapped data item.
+ */
 @Serializable
 @JsExport
 class DataWrapper<T>(
@@ -21,6 +32,11 @@ class DataWrapper<T>(
     val data: T,
 )
 
+/**
+ * Represents metadata information for paging.
+ *
+ * @param pagination The pagination details.
+ */
 @Serializable
 @JsExport
 class MetaResponse(
@@ -28,6 +44,14 @@ class MetaResponse(
     val pagination: Paging?
 )
 
+/**
+ * Represents details about paging information.
+ *
+ * @param page The current page number.
+ * @param pageSize The number of items per page.
+ * @param pageCount The total number of pages.
+ * @param total The total number of items.
+ */
 @Serializable
 @JsExport
 class Paging(

@@ -1,5 +1,10 @@
 package com.swensonhe.strapikmm.analytics
 
+/**
+ *  Provide CleverTap Analytics Service for web
+ * We didn't implement any analytics service for Web (For now), so we just return a no-op implementation here.
+ * ** Any PRs to implement it for Web are welcome! **
+ */
 actual class CleverTapAnalyticsService actual constructor(
     context: Any?
 ) : AnalyticsService {
