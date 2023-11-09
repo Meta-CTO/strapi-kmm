@@ -14,7 +14,8 @@ import dev.gitlive.firebase.auth.AuthCredential
 
 actual class AuthOptions(
     val activity: Activity,
-    val launcher: ActivityResultLauncher<Intent>
+    val launcher: ActivityResultLauncher<Intent>,
+    val onCanceled: () -> Unit = {}
 ) {
     var onResult: (ActivityResult) -> Unit = {}
 }
@@ -35,7 +36,11 @@ actual class AuthClient  : AuthProvider {
         gClient = GoogleSignIn.getClient(options.activity, gso)
 
         options.onResult = {
-            setActivityResult(it)
+            if (it.resultCode == Activity.RESULT_CANCELED) {
+                options.onCanceled.invoke()
+            } else {
+                setActivityResult(it)
+            }
         }
     }
 
