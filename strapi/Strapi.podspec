@@ -1,7 +1,7 @@
 Pod::Spec.new do |spec|
     spec.name                     = 'strapi'
     spec.version                  = '1.0.0'
-    spec.homepage                 = 'https://github.com/swensonhe/kmm-internal'
+    spec.homepage                 = 'https://github.com/swensonhe/strapi-kmm'
     spec.source                   = { :http=> ''}
     spec.authors                  = ''
     spec.license                  = ''

@@ -10,14 +10,13 @@ object Plugins {
         const val MULTIPLATFORM = "multiplatform"
         const val SERIALIZATION = "plugin.serialization"
         const val ANDROID = "android"
+        const val GRADLE = "org.jetbrains.kotlin:kotlin-gradle-plugin:${StrapiLibraryVersions.Kotlin.VERSION}"
     }
 
     object Android {
         const val ANDROID_LIBRARY = "com.android.library"
         const val MULTIPLATFORM_ANDROID = "org.jetbrains.kotlin.android"
         const val BUILD_TOOLS = "com.android.tools.build:gradle:${AndroidVersions.BUILD_TOOLS}"
-        const val kotlinGradlePlugin =
-            "org.jetbrains.kotlin:kotlin-gradle-plugin:${StrapiLibraryVersions.Kotlin.VERSION}"
     }
 
     object Version {

@@ -1,4 +1,11 @@
+import org.gradle.api.JavaVersion
+
 object StrapiLibraryVersions {
+    object Java {
+        val VERSION = JavaVersion.VERSION_17
+    }
+
+
     object SqlDelight {
         const val VERSION = "2.0.0-rc01"
         const val COPY_WEBPACK_PLUGIN = "9.1.0"

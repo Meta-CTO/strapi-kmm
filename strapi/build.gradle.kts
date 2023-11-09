@@ -15,10 +15,10 @@ plugins {
     id(Plugins.SWIFT_KLIB) version Plugins.Version.SWIFT_KLIB
 }
 
-val publishGroupId: String = project.property("publishGroupId") as String
-val publishEmail: String = project.property("publishEmail") as String
-val publishRepository: String = project.property("publishRepository") as String
-val publishDeveloper: String = project.property("publishDeveloper") as String
+val publishGroupId: String = gradleLocalProperties(rootDir).getProperty("publishGroupId") as String
+val publishEmail: String = gradleLocalProperties(rootDir).getProperty("publishEmail") as String
+val publishRepository: String = gradleLocalProperties(rootDir).getProperty("publishRepository") as String
+val publishDeveloper: String = gradleLocalProperties(rootDir).getProperty("publishDeveloper") as String
 
 val versionProperties = Properties().apply {
     load(FileInputStream(File(rootProject.rootDir, "versions.properties")))
@@ -33,11 +33,10 @@ version = currentVersion
 kotlin {
     targetHierarchy.default()
 
-
     cocoapods {
         version = "1.0.0"
         summary = "Shared Module for Strapi KMM"
-        homepage = "https://github.com/swensonhe/kmm-internal"
+        homepage = "https://github.com/swensonhe/strapi-kmm"
         ios.deploymentTarget = "14.1"
         podfile = project.file("../iosApp/Podfile")
 
@@ -164,7 +163,7 @@ kotlin {
 
     tasks.withType<KotlinCompile> {
         kotlinOptions {
-            jvmTarget = "17"
+            jvmTarget = StrapiLibraryVersions.Java.VERSION.toString()
         }
     }
 }
@@ -188,8 +187,8 @@ android {
         consumerProguardFiles("consumer-rules.pro")
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = StrapiLibraryVersions.Java.VERSION
+        targetCompatibility = StrapiLibraryVersions.Java.VERSION
     }
 }
 
