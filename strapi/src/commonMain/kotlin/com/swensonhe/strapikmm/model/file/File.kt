@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalSerializationApi::class, ExperimentalSerializationApi::class)
+@file:OptIn(ExperimentalSerializationApi::class)
 
 package com.swensonhe.strapikmm.model.file
 
