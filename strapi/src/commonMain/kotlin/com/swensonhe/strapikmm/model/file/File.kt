@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalSerializationApi::class)
+@file:OptIn(ExperimentalSerializationApi::class, ExperimentalSerializationApi::class)
 
 package com.swensonhe.strapikmm.model.file
 
@@ -30,6 +30,14 @@ data class UploadFileRequest(
     @EncodeDefault(EncodeDefault.Mode.NEVER)
     @SerialName("mime")
     val mime: String? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER)
+    @SerialName("width")
+    val width: Int? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER)
+    @SerialName("height")
+    val height: Int? = null,
+    @SerialName("preview_url")
+    val previewUrl: String = "",
     @EncodeDefault(EncodeDefault.Mode.NEVER)
     @SerialName("ext")
     val ext: String? = null,
