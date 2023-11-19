@@ -3,7 +3,7 @@ object ProjectDependencies {
     private const val sharedPreferencesMultiplatformSettingsVersion = "1.0.0"
     const val sharedPreferencesMultiplatformSettings = "com.russhwolf:multiplatform-settings:${sharedPreferencesMultiplatformSettingsVersion}"
 
-    const val SQL_DELIGHT = "2.0.0-rc01"
+    const val SQL_DELIGHT = "2.0.0-rc02"
     const val COPY_WEBPACK_PLUGIN = "9.1.0"
     const val SQL_JS = "1.6.2"
 

@@ -200,11 +200,11 @@ kotlin {
 
 sqldelight {
     databases {
-//        linkSqlite.set(false)
         create("AppDatabase") {
             packageName.set("com.swensonhe.caching.datasource.database")
             generateAsync.set(true)
         }
+        linkSqlite.set(true)
     }
 }
 
