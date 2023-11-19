@@ -48,7 +48,7 @@ kotlin {
         pod("CleverTap-iOS-SDK") {
             moduleName = "CleverTapSDK"
         }
-        pod("AWSS3")
+//        pod("AWSS3")
 
         framework {
             baseName = libName + "pods" // DON'T CHANGE THIS LINE, there is a bug in the plugin that requires unique names for each framework

@@ -7,6 +7,6 @@ object Plugins {
     const val SWIFT_KLIB = "io.github.ttypic.swiftklib"
 
     object Version {
-        const val SWIFT_KLIB = "0.3.0"
+        const val SWIFT_KLIB = "0.4.0"
     }
 }
