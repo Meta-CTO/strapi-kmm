@@ -48,6 +48,7 @@ kotlin {
         pod("CleverTap-iOS-SDK") {
             moduleName = "CleverTapSDK"
         }
+//        pod("AWSS3")
 
         framework {
             baseName = libName + "pods" // DON'T CHANGE THIS LINE, there is a bug in the plugin that requires unique names for each framework
@@ -119,6 +120,7 @@ kotlin {
         val androidMain by getting {
             val contactsVersion = "1.4.0"
             val fetchVersion = "3.1.6"
+            val awsS3Version = "2.73.0"
 
             dependencies {
                 implementation("androidx.security:security-crypto:1.0.0")
@@ -136,6 +138,7 @@ kotlin {
                 implementation("com.alexstyl:contactstore-coroutines:$contactsVersion")
 
                 implementation("androidx.tonyodev.fetch2:xfetch2:$fetchVersion")
+                api("com.amazonaws:aws-android-sdk-s3:$awsS3Version")
             }
         }
 
@@ -197,11 +200,11 @@ kotlin {
 
 sqldelight {
     databases {
-//        linkSqlite.set(false)
         create("AppDatabase") {
             packageName.set("com.swensonhe.caching.datasource.database")
             generateAsync.set(true)
         }
+        linkSqlite.set(true)
     }
 }
 
