@@ -19,7 +19,9 @@ data class File(
     @JsonNames("attributes.name", "name")
     val fileName: String? = null,
     @JsonNames("attributes.mime", "mime")
-    val mime: String? = null
+    val mime: String? = null,
+    @JsonNames("attributes.previewUrl", "previewUrl")
+    val previewUrl: String? = null
 )
 
 @Serializable
