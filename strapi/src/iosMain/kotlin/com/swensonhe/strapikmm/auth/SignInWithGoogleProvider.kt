@@ -9,7 +9,7 @@ import platform.UIKit.UIWindow
 import platform.UIKit.UIWindowScene
 
 class SignInWithGoogleProvider(
-    val onSuccess: (String) -> Unit,
+    val onSuccess: (String, ProfileMetadata) -> Unit,
     val onFailure: (Throwable) -> Unit
 ) {
     @Throws(Throwable::class)
@@ -32,7 +32,15 @@ class SignInWithGoogleProvider(
                 }
 
                 result?.user?.idToken?.tokenString?.let { idToken ->
-                    onSuccess(idToken)
+                    val profile = ProfileMetadata(
+                        firstName = result.user.profile?.givenName,
+                        lastName = result.user.profile?.familyName,
+                        email = result.user.profile?.email,
+                        phoneNumber = null,
+                        pictureUrl = result.user.profile?.imageURLWithDimension(1080u)?.absoluteString
+                    )
+
+                    onSuccess(idToken, profile)
                 }
             }
         )
