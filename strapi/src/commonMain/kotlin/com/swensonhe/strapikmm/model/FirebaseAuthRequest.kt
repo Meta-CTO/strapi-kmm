@@ -8,6 +8,6 @@ import kotlinx.serialization.Serializable
 class FirebaseAuthRequest(
     @SerialName("idToken")
     val idToken: String?,
-    @SerialName("profile")
+    @SerialName("profileMetaData")
     val profile: ProfileMetadata?
 )
