@@ -90,7 +90,7 @@ private enum DataSize {
 
     }
 
-    @objc public func gunzip(input: String, wBits: Int32 = MAX_WBITS + 32) throws -> String {
+    @objc(gunzipString:wBits:error:) public func gunzip(input: String, wBits: Int32) throws -> String {
             guard let compressed = Data(base64Encoded: input) else {
                 throw GzipError(code: -1001, msg: "Unable to decode base64 encoded string")
             }
@@ -121,18 +121,32 @@ private enum DataSize {
                     let inputCount = compressed.count
                     let outputCount = data.count
                     
-                    compressed.withUnsafeBytes { (inputPointer: UnsafeRawBufferPointer) in
+                    compressed.withUnsafeBytes { inputPointer in
                         let inputStartPosition = totalIn + stream.total_in
-                        stream.next_in = UnsafeMutablePointer<Bytef>(mutating: inputPointer.bindMemory(to: Bytef.self).baseAddress!).advanced(by: Int(inputStartPosition))
+
+                        guard
+                            let baseAddress = inputPointer.bindMemory(to: Bytef.self).baseAddress
+                        else {
+                            assertionFailure("Base address for inputPointer not found")
+                            return
+                        }
+
+                        stream.next_in = UnsafeMutablePointer(mutating: baseAddress).advanced(by: Int(inputStartPosition))
                         stream.avail_in = uInt(inputCount) - uInt(inputStartPosition)
                         
-                        data.withUnsafeMutableBytes { (outputPointer: UnsafeMutableRawBufferPointer) in
+                        data.withUnsafeMutableBytes { outputPointer in
                             let outputStartPosition = totalOut + stream.total_out
-                            stream.next_out = outputPointer.bindMemory(to: Bytef.self).baseAddress!.advanced(by: Int(outputStartPosition))
+
+                            guard
+                                let baseAddress = outputPointer.bindMemory(to: Bytef.self).baseAddress
+                            else {
+                                assertionFailure("Base address for outputPointer not found")
+                                return
+                            }
+
+                            stream.next_out = baseAddress.advanced(by: Int(outputStartPosition))
                             stream.avail_out = uInt(outputCount) - uInt(outputStartPosition)
-                            
                             status = inflate(&stream, Z_SYNC_FLUSH)
-                            
                             stream.next_out = nil
                         }
                         
