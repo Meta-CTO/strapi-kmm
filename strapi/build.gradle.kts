@@ -77,6 +77,7 @@ kotlin {
                 cinterops {
                     create("ContactsDataCollector")
                     create("BackgroundDownloader")
+                    create("GZipDecompressor")
                 }
             }
         }
@@ -90,6 +91,10 @@ kotlin {
         create("BackgroundDownloader") {
             path = file("src/iosMain/native/backgrounddownloader")
             packageName("com.swensonhe.strapikmm.common.downloader.backgrounddownloader")
+        }
+        create("GZipDecompressor") {
+            path = file("src/iosMain/native/gzipdecompressor")
+            packageName("swensonhe.strapikmm.common.gzip.decompressor")
         }
     }
 

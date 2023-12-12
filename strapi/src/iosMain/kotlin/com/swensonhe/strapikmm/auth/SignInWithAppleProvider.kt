@@ -53,7 +53,7 @@ class SignInWithAppleProvider(
         onFailure(Throwable(didCompleteWithError.localizedDescription))
     }
 
-    override fun presentationAnchorForAuthorizationController(controller: ASAuthorizationController): ASPresentationAnchor? {
+    override fun presentationAnchorForAuthorizationController(controller: ASAuthorizationController): ASPresentationAnchor {
         return ASPresentationAnchor()
     }
 }
