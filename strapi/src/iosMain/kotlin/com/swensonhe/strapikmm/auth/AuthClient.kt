@@ -2,10 +2,14 @@ package com.swensonhe.strapikmm.auth
 
 import cocoapods.FirebaseAuth.FIROAuthProvider
 import dev.gitlive.firebase.auth.AuthCredential
+import platform.UIKit.UIViewController
 
-actual class AuthOptions
+actual class AuthOptions(
+    val presentingViewController: UIViewController
+)
 
 actual class AuthClient : AuthProvider {
+    private lateinit var authOptions: AuthOptions
     private lateinit var onResult: (AuthCredential, ProfileMetadata) -> Unit
     private lateinit var onError: (Throwable) -> Unit
 
@@ -28,6 +32,7 @@ actual class AuthClient : AuthProvider {
     )
 
     private val signInWithGoogleProvider = SignInWithGoogleProvider(
+        presentingViewController = authOptions.presentingViewController,
         onSuccess = { token, profileMetadata ->
             val credential = FIROAuthProvider.credentialWithProviderID(
                 providerID = "google.com",
@@ -62,6 +67,9 @@ actual class AuthClient : AuthProvider {
     }
 
     actual fun setAuthOptions(options: AuthOptions?) {
+        options?.let {
+            authOptions = it
+        }
     }
 }
 

@@ -55,6 +55,15 @@ fun LocalDateTime?.isBefore1DayFromNow(): Boolean {
         true
 }
 
+fun LocalDateTime?.minutesFromNow(): Long {
+    return if (this != null) {
+        return toInstant(TimeZone.currentSystemDefault())
+            .until(Clock.System.now(), DateTimeUnit.MINUTE, TimeZone.currentSystemDefault())
+    } else {
+        0
+    }
+}
+
 fun LocalDate?.isBefore1DayFromNow(): Boolean {
     return if (this != null) {
         val localTimeDate = LocalDateTime(year, monthNumber, dayOfMonth, 0, 0, 0)

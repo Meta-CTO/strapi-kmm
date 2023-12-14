@@ -4,23 +4,17 @@ import cocoapods.FirebaseCore.FIRApp
 import cocoapods.GoogleSignIn.GIDConfiguration
 import cocoapods.GoogleSignIn.GIDSignIn
 
-import platform.UIKit.UIApplication
-import platform.UIKit.UIWindow
-import platform.UIKit.UIWindowScene
+import platform.UIKit.UIViewController
 
 class SignInWithGoogleProvider(
+    private val presentingViewController: UIViewController,
     val onSuccess: (String, ProfileMetadata) -> Unit,
     val onFailure: (Throwable) -> Unit
 ) {
     @Throws(Throwable::class)
     fun start() {
-        val clientId =
-            FIRApp.defaultApp()?.options?.clientID ?: throw Throwable("clientId cannot be null")
-        val windowScene =
-            UIApplication.sharedApplication.connectedScenes().firstOrNull() as? UIWindowScene
-        val window = windowScene?.windows?.firstOrNull() as? UIWindow
-        val presentingViewController =
-            window?.rootViewController ?: throw Throwable("presentingViewController cannot be null")
+        val clientId = FIRApp.defaultApp()?.options?.clientID
+            ?: throw Throwable("clientId cannot be null")
 
         GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientId)
 

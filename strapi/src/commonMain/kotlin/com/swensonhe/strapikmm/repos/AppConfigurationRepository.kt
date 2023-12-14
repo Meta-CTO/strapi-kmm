@@ -7,13 +7,15 @@ import com.swensonhe.strapikmm.model.DataWrapper
 import com.swensonhe.strapikmm.sharedpreference.KmmPreference
 import com.swensonhe.strapikmm.util.DatetimeUtil
 import com.swensonhe.strapikmm.util.isBefore1DayFromNow
+import com.swensonhe.strapikmm.util.minutesFromNow
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class AppConfigurationRepository(
     val appConfigurationService: StrapiService,
-    val sharedPreference: KmmPreference
+    val sharedPreference: KmmPreference,
+    val appConfigurationExpirationInMinutes: Long,
 ) {
 
     @Throws(Throwable::class)
@@ -45,7 +47,7 @@ class AppConfigurationRepository(
 
         if (cachedAppConfiguration.isNullOrEmpty().not() &&
             cachedAppConfigurationDate.isNullOrEmpty().not() &&
-            LocalDateTime.parse(cachedAppConfigurationDate!!).isBefore1DayFromNow().not() &&
+            LocalDateTime.parse(cachedAppConfigurationDate!!).minutesFromNow() >= appConfigurationExpirationInMinutes &&
             cachedAppConfigurationVersion == currentAppConfigurationVersion
         ) {
             return try {
