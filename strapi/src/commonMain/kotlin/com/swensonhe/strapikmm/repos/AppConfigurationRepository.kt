@@ -45,15 +45,20 @@ class AppConfigurationRepository(
             newAppConfiguration
         }
 
-        if (cachedAppConfiguration.isNullOrEmpty().not() &&
-            cachedAppConfigurationDate.isNullOrEmpty().not() &&
-            LocalDateTime.parse(cachedAppConfigurationDate!!).minutesFromNow() >= appConfigurationExpirationInMinutes &&
-            cachedAppConfigurationVersion == currentAppConfigurationVersion
-        ) {
-            return try {
-                Json.decodeFromString(cachedAppConfiguration!!)
-            } catch (exception: Exception) {
-                loadAppConfiguration()
+        if (cachedAppConfiguration != null && cachedAppConfigurationDate != null) {
+            val minutesSinceCacheDate = LocalDateTime.parse(cachedAppConfigurationDate).minutesFromNow()
+
+            if (
+                cachedAppConfiguration.isNotEmpty() &&
+                cachedAppConfigurationDate.isNotEmpty() &&
+                minutesSinceCacheDate < appConfigurationExpirationInMinutes &&
+                cachedAppConfigurationVersion == currentAppConfigurationVersion
+            ) {
+                return try {
+                    Json.decodeFromString(cachedAppConfiguration)
+                } catch (exception: Exception) {
+                    loadAppConfiguration()
+                }
             }
         }
 
