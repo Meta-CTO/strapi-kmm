@@ -9,44 +9,48 @@ actual class AuthOptions(
 )
 
 actual class AuthClient : AuthProvider {
-    private lateinit var authOptions: AuthOptions
     private lateinit var onResult: (AuthCredential, ProfileMetadata) -> Unit
     private lateinit var onError: (Throwable) -> Unit
+    private lateinit var options: AuthOptions
 
     actual fun init() {}
 
-    private val signInWithAppleProvider = SignInWithAppleProvider(
-        onSuccess = { token, profileMetadata ->
-            val credential = FIROAuthProvider.credentialWithProviderID(
-                providerID = "apple.com",
-                IDToken = token,
-                rawNonce = "",
-                accessToken = null
-            )
+    private val signInWithAppleProvider by lazy {
+        SignInWithAppleProvider(
+            onSuccess = { token, profileMetadata ->
+                val credential = FIROAuthProvider.credentialWithProviderID(
+                    providerID = "apple.com",
+                    IDToken = token,
+                    rawNonce = "",
+                    accessToken = null
+                )
 
-            onResult.invoke(AuthCredential(credential), profileMetadata)
-        },
-        onFailure = {
-            onError.invoke(it)
-        }
-    )
+                onResult.invoke(AuthCredential(credential), profileMetadata)
+            },
+            onFailure = {
+                onError.invoke(it)
+            }
+        )
+    }
 
-    private val signInWithGoogleProvider = SignInWithGoogleProvider(
-        presentingViewController = authOptions.presentingViewController,
-        onSuccess = { token, profileMetadata ->
-            val credential = FIROAuthProvider.credentialWithProviderID(
-                providerID = "google.com",
-                IDToken = token,
-                rawNonce = "",
-                accessToken = null
-            )
+    private val signInWithGoogleProvider by lazy {
+        SignInWithGoogleProvider(
+            presentingViewController = options.presentingViewController,
+            onSuccess = { token, profileMetadata ->
+                val credential = FIROAuthProvider.credentialWithProviderID(
+                    providerID = "google.com",
+                    IDToken = token,
+                    rawNonce = "",
+                    accessToken = null
+                )
 
-            onResult.invoke(AuthCredential(credential), profileMetadata)
-        },
-        onFailure = {
-            onError.invoke(it)
-        }
-    )
+                onResult.invoke(AuthCredential(credential), profileMetadata)
+            },
+            onFailure = {
+                onError.invoke(it)
+            }
+        )
+    }
 
     override fun signInWithGoogle(
         onSuccess: (AuthCredential, ProfileMetadata) -> Unit,
@@ -67,9 +71,8 @@ actual class AuthClient : AuthProvider {
     }
 
     actual fun setAuthOptions(options: AuthOptions?) {
-        options?.let {
-            authOptions = it
-        }
+        if (options == null) throw IllegalArgumentException("options cannot be null")
+        this.options = options
     }
 }
 
