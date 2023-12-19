@@ -484,6 +484,7 @@ val JsonWithIgnoredUnknownKeys = Json {
     useAlternativeNames = true
     encodeDefaults = false
     explicitNulls = false
+    coerceInputValues = true
 }
 
 @Throws(Throwable::class)
