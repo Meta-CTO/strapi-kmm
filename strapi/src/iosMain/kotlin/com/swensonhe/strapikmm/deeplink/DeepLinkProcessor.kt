@@ -6,6 +6,7 @@ import platform.Foundation.NSURL
 import kotlin.coroutines.resumeWithException
 
 actual object DeepLinkProcessor {
+    @Throws(Throwable::class)
     actual suspend fun process(url: String) = suspendCancellableCoroutine { cont ->
         FIRDynamicLinks.dynamicLinks()
             .handleUniversalLink(NSURL(string = url), completion = { dynamicLink, error ->

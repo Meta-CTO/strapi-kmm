@@ -7,6 +7,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resumeWithException
 
 actual object DeepLinkProcessor {
+    @Throws(Throwable::class)
     actual suspend fun process(url: String) = suspendCancellableCoroutine { cont ->
         Firebase.dynamicLinks.getDynamicLink(Uri.parse(url))
             .addOnSuccessListener {

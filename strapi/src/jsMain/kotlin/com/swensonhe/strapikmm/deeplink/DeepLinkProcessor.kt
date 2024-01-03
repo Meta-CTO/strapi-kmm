@@ -3,6 +3,7 @@ package com.swensonhe.strapikmm.deeplink
 import kotlinx.coroutines.suspendCancellableCoroutine
 
 actual object DeepLinkProcessor {
+    @Throws(Throwable::class)
     actual suspend fun process(url: String) = suspendCancellableCoroutine<String> {
         // There is no deep link processing on web
         // So we just pass the url to the callback
