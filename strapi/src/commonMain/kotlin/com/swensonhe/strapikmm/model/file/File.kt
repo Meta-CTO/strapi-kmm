@@ -21,7 +21,15 @@ data class File(
     @JsonNames("attributes.mime", "mime")
     val mime: String? = null,
     @JsonNames("attributes.previewUrl", "previewUrl")
-    val previewUrl: String? = null
+    val previewUrl: String? = null,
+    @JsonNames("attributes.width", "width")
+    val width: Int? = null,
+    @JsonNames("attributes.height", "height")
+    val height: Int? = null,
+    @JsonNames("attributes.ext", "ext")
+    val ext: String? = null,
+    @JsonNames("attributes.size", "size")
+    val size: String? = null
 )
 
 @Serializable
