@@ -29,7 +29,7 @@ data class File(
     @JsonNames("attributes.ext", "ext")
     val ext: String? = null,
     @JsonNames("attributes.size", "size")
-    val size: String? = null
+    val size: Double? = null
 )
 
 @Serializable
