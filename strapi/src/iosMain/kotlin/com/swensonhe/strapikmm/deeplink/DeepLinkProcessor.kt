@@ -5,6 +5,9 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.Foundation.NSURL
 import kotlin.coroutines.resumeWithException
 
+import kotlinx.cinterop.ExperimentalForeignApi
+
+@OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 actual object DeepLinkProcessor {
     @Throws(Throwable::class)
     actual suspend fun process(url: String): String {

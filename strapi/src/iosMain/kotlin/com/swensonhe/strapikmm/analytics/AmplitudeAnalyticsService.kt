@@ -2,6 +2,9 @@ package com.swensonhe.strapikmm.analytics
 
 import cocoapods.Amplitude.Amplitude
 
+import kotlinx.cinterop.ExperimentalForeignApi
+
+@OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 actual class AmplitudeAnalyticsService actual constructor(
     private val context: Any?,
     private val apiKey: String

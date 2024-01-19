@@ -15,6 +15,17 @@ Pod::Spec.new do |spec|
     spec.dependency 'FirebaseDynamicLinks'
     spec.dependency 'GoogleSignIn'
                 
+    if !Dir.exist?('build/cocoapods/framework/strapiKMMpods.framework') || Dir.empty?('build/cocoapods/framework/strapiKMMpods.framework')
+        raise "
+
+        Kotlin framework 'strapiKMMpods' doesn't exist yet, so a proper Xcode project can't be generated.
+        'pod install' should be executed after running ':generateDummyFramework' Gradle task:
+
+            ./gradlew :strapi:generateDummyFramework
+
+        Alternatively, proper pod installation is performed during Gradle sync in the IDE (if Podfile location is set)"
+    end
+                
     spec.pod_target_xcconfig = {
         'KOTLIN_PROJECT_PATH' => ':strapi',
         'PRODUCT_MODULE_NAME' => 'strapiKMMpods',

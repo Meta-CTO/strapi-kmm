@@ -7,6 +7,9 @@ import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.create
 import platform.darwin.NSObject
 
+import kotlinx.cinterop.ExperimentalForeignApi
+
+@OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 class SignInWithAppleProvider(
     val onSuccess: (String, ProfileMetadata) -> Unit,
     val onFailure: (Throwable) -> Unit

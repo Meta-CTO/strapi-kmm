@@ -2,6 +2,9 @@ package com.swensonhe.strapikmm.analytics
 
 import cocoapods.CleverTap_iOS_SDK.CleverTap
 
+import kotlinx.cinterop.ExperimentalForeignApi
+
+@OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 actual class CleverTapAnalyticsService actual constructor(
     private val context: Any?
 ) : AnalyticsService {

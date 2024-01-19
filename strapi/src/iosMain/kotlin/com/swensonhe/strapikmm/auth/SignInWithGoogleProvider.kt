@@ -6,6 +6,9 @@ import cocoapods.GoogleSignIn.GIDSignIn
 
 import platform.UIKit.UIViewController
 
+import kotlinx.cinterop.ExperimentalForeignApi
+
+@OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 class SignInWithGoogleProvider(
     private val presentingViewController: UIViewController,
     val onSuccess: (String, ProfileMetadata) -> Unit,
