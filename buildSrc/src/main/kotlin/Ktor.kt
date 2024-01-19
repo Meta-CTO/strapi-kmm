@@ -1,10 +1,9 @@
 object Ktor {
-    private const val ktorVersion = "2.3.2"
-    private const val logBackVersion = "1.2.10"
+    private const val ktorVersion = "2.3.7"
+    private const val logBackVersion = "1.4.14"
     private const val kotlinXSerializationVersion = "1.3.2"
     const val core = "io.ktor:ktor-client-core:${ktorVersion}"
     const val clientSerialization = "io.ktor:ktor-client-serialization:${ktorVersion}"
-//    const val kotlinXSerialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:${kotlinXSerializationVersion}"
     const val contentNegotiation = "io.ktor:ktor-client-content-negotiation:${ktorVersion}"
     const val ktorKotlinSerialization = "io.ktor:ktor-serialization-kotlinx-json:${ktorVersion}"
     const val logging = "io.ktor:ktor-client-logging:${ktorVersion}"
