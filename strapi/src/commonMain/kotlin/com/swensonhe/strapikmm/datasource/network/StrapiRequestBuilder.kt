@@ -99,6 +99,8 @@ class StrapiRequestBuilder {
 class StrapiQueryBuilder {
 
     var filters: MutableMap<String, MutableList<String>> = mutableMapOf()
+    var sortFilters: MutableMap<String, String> = mutableMapOf()
+    var groupByFilters: MutableMap<String, String> = mutableMapOf()
     var pagingData: PagingData? = null
     private var currentFilterIndex = 0
 
@@ -176,7 +178,7 @@ class StrapiQueryBuilder {
     }
 
     fun groupBy(key: String) = apply {
-        put("groupBy", key)
+        groupByFilters[key] = key
     }
 
     fun equalTo(
@@ -617,7 +619,7 @@ class StrapiQueryBuilder {
     fun sortBy(field: String, type: StrapiSortType) {
         val splitField = field.split(".")
         val updatedField = splitField.joinToString("") { "[$it]" }
-        put("sort$updatedField", type.type)
+        sortFilters[updatedField] = type.type
     }
 
     fun paging(page: Int, pageSize: Int) {
@@ -665,9 +667,19 @@ sealed class RequestContent {
 }
 
 fun StrapiQueryBuilder.extractQueries(): List<RequestContent.Query> {
-    return this.filters.map { entry ->
+    val queries = this.filters.map { entry ->
         return@map entry.value.map { entryValue ->
             RequestContent.Query(entry.key, entryValue)
         }
-    }.flatten()
+    }.flatten().toMutableList()
+
+    this.sortFilters.onEachIndexed { index, entry ->
+        queries.add(RequestContent.Query("sort[$index]${entry.key}", entry.value))
+    }
+
+    this.groupByFilters.onEachIndexed { index, entry ->
+        queries.add(RequestContent.Query("groupBy[$index]", entry.value))
+    }
+
+    return queries
 }
