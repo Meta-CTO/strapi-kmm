@@ -2,6 +2,7 @@ package com.swensonhe.strapikmm.repos
 
 import com.swensonhe.strapikmm.constants.SharedConstants
 import com.swensonhe.strapikmm.datasource.network.StrapiQueryBuilder
+import com.swensonhe.strapikmm.datasource.network.services.strapi.JsonWithIgnoredUnknownKeys
 import com.swensonhe.strapikmm.datasource.network.services.strapi.StrapiService
 import com.swensonhe.strapikmm.model.UpdateTimeZoneRequest
 import com.swensonhe.strapikmm.sharedpreference.KmmPreference
@@ -14,8 +15,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-
 
 class UserRepository(
     val userService: StrapiService,
@@ -41,7 +40,7 @@ class UserRepository(
             saveUserData(user)
             user
         } else {
-            Json.decodeFromString(cachedUser)
+            JsonWithIgnoredUnknownKeys.decodeFromString(cachedUser)
         }
     }
 
@@ -75,7 +74,7 @@ class UserRepository(
             body(data)
         }
 
-        val userString = Json.encodeToString(updatedUser)
+        val userString = JsonWithIgnoredUnknownKeys.encodeToString(updatedUser)
         sharedPreference.putString(SharedConstants.CACHED_USER_DATA, userString)
 
         // Broadcast user changes
@@ -85,7 +84,7 @@ class UserRepository(
     }
 
     inline fun <reified T> saveUserData(user: T) {
-        val userString = Json.encodeToString(user)
+        val userString = JsonWithIgnoredUnknownKeys.encodeToString(user)
         sharedPreference.putString(SharedConstants.CACHED_USER_DATA, userString)
     }
 
@@ -98,7 +97,7 @@ class UserRepository(
         return if (cachedData.isNullOrEmpty()) {
             null
         } else {
-            Json.decodeFromString(cachedData)
+            JsonWithIgnoredUnknownKeys.decodeFromString(cachedData)
         }
     }
 }
