@@ -10,6 +10,7 @@ Pod::Spec.new do |spec|
     spec.libraries                = 'c++'
     spec.ios.deployment_target = '14.1'
     spec.dependency 'Amplitude'
+    spec.dependency 'AppsFlyerFramework', '6.11.2'
     spec.dependency 'CleverTap-iOS-SDK'
     spec.dependency 'FirebaseAuth'
     spec.dependency 'FirebaseDynamicLinks'

@@ -48,6 +48,12 @@ kotlin {
         pod("CleverTap-iOS-SDK") {
             moduleName = "CleverTapSDK"
         }
+
+        pod("AppsFlyerFramework") {
+            version = "6.11.2"
+            moduleName = "AppsFlyerLib"
+        }
+
 //        pod("AWSS3")
 
         framework {
@@ -144,6 +150,9 @@ kotlin {
 
                 implementation("androidx.tonyodev.fetch2:xfetch2:$fetchVersion")
                 api("com.amazonaws:aws-android-sdk-s3:$awsS3Version")
+
+                api("com.appsflyer:af-android-sdk:6.+")
+                api("com.android.installreferrer:installreferrer:2.2")
             }
         }
 
