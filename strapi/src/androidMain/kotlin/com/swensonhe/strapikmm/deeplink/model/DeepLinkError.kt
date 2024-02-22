@@ -1,11 +1,8 @@
 package com.swensonhe.strapikmm.deeplink.model
 
 import com.appsflyer.deeplink.DeepLinkResult
-import com.swensonhe.andrew_kmm.utilities.CommonParcelable
-import com.swensonhe.andrew_kmm.utilities.CommonParcelize
 
-@CommonParcelize
-actual open class DeepLinkError: CommonParcelable {
+actual open class DeepLinkError {
     data object Timeout : DeepLinkError()
     data object Network : DeepLinkError()
     data object HttpStatusCode : DeepLinkError()

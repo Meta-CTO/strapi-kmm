@@ -1,8 +1,11 @@
+@file:OptIn(ExperimentalForeignApi::class)
+
 package com.swensonhe.strapikmm.deeplink
 
 import cocoapods.AppsFlyerFramework.AppsFlyerLinkGenerator
 import cocoapods.AppsFlyerFramework.AppsFlyerShareInviteHelper
 import com.swensonhe.strapikmm.deeplink.model.BaseUrl
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 

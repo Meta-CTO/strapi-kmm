@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalForeignApi::class)
+
 package com.swensonhe.strapikmm.deeplink
 
 import cocoapods.AppsFlyerFramework.AFSDKDeepLinkResultStatus
@@ -9,6 +11,7 @@ import com.swensonhe.strapikmm.deeplink.model.DeepLinkError
 import com.swensonhe.strapikmm.deeplink.model.DeepLinkResult
 import com.swensonhe.strapikmm.deeplink.util.AppsFlyerConstants
 import com.swensonhe.strapikmm.deeplink.util.getAppAttributionResult
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.convert
 import platform.Foundation.NSError
 import platform.darwin.NSObject
@@ -18,7 +21,7 @@ actual class AppsFlyerOneLinkService(
 {
     actual fun initialize() {
         AppsFlyerLib.shared().apply {
-            options.devAppKey?.let {
+            options.devAppKey.let {
                 setAppsFlyerDevKey(options.devAppKey)
             }
 
