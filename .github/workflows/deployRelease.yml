@@ -58,3 +58,4 @@ jobs:
 
       - name: Publish to GitHub Packages
         run: ./gradlew publishAllPublicationsToGithubRepository
+
