@@ -6,6 +6,7 @@ on:
       - 'release'
       - 'develop'
       - 'auth_kmm'
+      - 'migration'
       - 'v*'
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -39,7 +40,7 @@ jobs:
 
       - name: Update library version
         env:
-          PUBLISH_VERSION: 8.2.${{ github.run_number }}
+          PUBLISH_VERSION: 9.0.${{ github.run_number }}
         run: echo PUBLISH_VERSION=$PUBLISH_VERSION > ./versions.properties
 
       - name: Update local properties

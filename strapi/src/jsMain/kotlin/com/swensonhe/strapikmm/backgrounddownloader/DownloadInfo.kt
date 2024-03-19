@@ -1,3 +1,0 @@
-package com.swensonhe.strapikmm.backgrounddownloader
-
-actual class DownloadInfo

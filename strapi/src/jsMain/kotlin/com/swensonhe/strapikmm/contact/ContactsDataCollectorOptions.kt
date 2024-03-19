@@ -1,3 +1,0 @@
-package com.swensonhe.strapikmm.contact
-
-actual class ContactsDataCollectorOptions
