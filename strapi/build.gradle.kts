@@ -48,6 +48,12 @@ kotlin {
         pod("CleverTap-iOS-SDK") {
             moduleName = "CleverTapSDK"
         }
+
+        pod("AppsFlyerFramework") {
+            version = "6.11.2"
+            moduleName = "AppsFlyerLib"
+        }
+
 //        pod("AWSS3")
 
         framework {
@@ -86,15 +92,15 @@ kotlin {
     swiftklib {
         create("ContactsDataCollector") {
             path = file("src/iosMain/native/contactsdatacollector")
-            packageName("com.swensonhe.strapikmm.common.contacts.contactsdatacollector")
+            packageName("com.metaCTO.strapikmm.common.contacts.contactsdatacollector")
         }
         create("BackgroundDownloader") {
             path = file("src/iosMain/native/backgrounddownloader")
-            packageName("com.swensonhe.strapikmm.common.downloader.backgrounddownloader")
+            packageName("com.metaCTO.strapikmm.common.downloader.backgrounddownloader")
         }
         create("GZipDecompressor") {
             path = file("src/iosMain/native/gzipdecompressor")
-            packageName("swensonhe.strapikmm.common.gzip.decompressor")
+            packageName("com.metaCTO.strapikmm.common.gzip.decompressor")
         }
     }
 
@@ -144,6 +150,9 @@ kotlin {
 
                 implementation("androidx.tonyodev.fetch2:xfetch2:$fetchVersion")
                 api("com.amazonaws:aws-android-sdk-s3:$awsS3Version")
+
+                api("com.appsflyer:af-android-sdk:6.+")
+                api("com.android.installreferrer:installreferrer:2.2")
             }
         }
 
@@ -206,7 +215,7 @@ kotlin {
 sqldelight {
     databases {
         create("AppDatabase") {
-            packageName.set("com.swensonhe.caching.datasource.database")
+            packageName.set("com.metaCTO.caching.datasource.database")
             generateAsync.set(true)
         }
         linkSqlite.set(true)
@@ -214,7 +223,7 @@ sqldelight {
 }
 
 android {
-    namespace = "com.swensonhe.strapiKMM"
+    namespace = "com.metaCTO.strapiKMM"
     compileSdk = Application.compileSdk
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
@@ -258,7 +267,7 @@ publishing {
         println("PUBLISH_REPO_TOKEN: ${gradleLocalProperties(rootDir).getProperty("PUBLISH_REPO_TOKEN")}")
 
         repositories {
-            maven("https://maven.pkg.github.com/swensonhe/strapi-kmm") {
+            maven("https://maven.pkg.github.com/Meta-CTO/strapi-kmm") {
                 name = "Github"
                 credentials {
                     username = gradleLocalProperties(rootDir).getProperty("PUBLISH_REPO_USER") as String

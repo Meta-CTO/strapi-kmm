@@ -1,12 +1,12 @@
 package com.kommu.mylibrary
 
 import android.util.Log
-import com.swensonhe.strapikmm.datasource.network.KmmBaseService
-import com.swensonhe.strapikmm.datasource.network.StrapiRequestBuilder
-import com.swensonhe.strapikmm.datasource.network.StrapiSortType
-import com.swensonhe.strapikmm.datasource.network.services.strapi.JsonFlatter
-import com.swensonhe.strapikmm.datasource.network.services.strapi.convert
-import com.swensonhe.strapikmm.sharedpreference.KmmPreference
+import com.metaCTO.strapikmm.datasource.network.KmmBaseService
+import com.metaCTO.strapikmm.datasource.network.StrapiRequestBuilder
+import com.metaCTO.strapikmm.datasource.network.StrapiSortType
+import com.metaCTO.strapikmm.datasource.network.services.strapi.JsonFlatter
+import com.metaCTO.strapikmm.datasource.network.services.strapi.convert
+import com.metaCTO.strapikmm.sharedpreference.KmmPreference
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
