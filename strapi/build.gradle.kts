@@ -92,15 +92,15 @@ kotlin {
     swiftklib {
         create("ContactsDataCollector") {
             path = file("src/iosMain/native/contactsdatacollector")
-            packageName("com.metaCTO.strapikmm.common.contacts.contactsdatacollector")
+            packageName("com.metacto.strapikmm.common.contacts.contactsdatacollector")
         }
         create("BackgroundDownloader") {
             path = file("src/iosMain/native/backgrounddownloader")
-            packageName("com.metaCTO.strapikmm.common.downloader.backgrounddownloader")
+            packageName("com.metacto.strapikmm.common.downloader.backgrounddownloader")
         }
         create("GZipDecompressor") {
             path = file("src/iosMain/native/gzipdecompressor")
-            packageName("com.metaCTO.strapikmm.common.gzip.decompressor")
+            packageName("com.metacto.strapikmm.common.gzip.decompressor")
         }
     }
 
@@ -215,7 +215,7 @@ kotlin {
 sqldelight {
     databases {
         create("AppDatabase") {
-            packageName.set("com.metaCTO.caching.datasource.database")
+            packageName.set("com.metacto.caching.datasource.database")
             generateAsync.set(true)
         }
         linkSqlite.set(true)
@@ -223,7 +223,7 @@ sqldelight {
 }
 
 android {
-    namespace = "com.metaCTO.strapiKMM"
+    namespace = "com.metacto.strapiKMM"
     compileSdk = Application.compileSdk
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {

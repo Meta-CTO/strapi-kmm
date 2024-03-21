@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application>
-        <service android:name="com.metaCTO.strapikmm.backgrounddownloader.BackgroundDownloaderService" />
+        <service android:name="com.metacto.strapikmm.backgrounddownloader.BackgroundDownloaderService" />
     </application>
 
 </manifest>

@@ -1,3 +1,0 @@
-package com.metaCTO.strapikmm.contact
-
-actual class ContactsDataCollectorOptions
