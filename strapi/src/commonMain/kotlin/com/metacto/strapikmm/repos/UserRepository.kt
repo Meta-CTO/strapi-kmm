@@ -49,6 +49,7 @@ class UserRepository(
             try {
                 getCurrentUser(true)
             } catch (_: Throwable) {
+
             }
         }
     }
@@ -59,9 +60,12 @@ class UserRepository(
     }
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T> updateTimZone(timezone: String): T =
-        updateUserData(UpdateTimeZoneRequest(timezone))
-
+    suspend inline fun <reified T> updateTimZone(
+        timezone: String,
+        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {}
+    ): T {
+        return updateUserData(UpdateTimeZoneRequest(timezone), userQueryBuilder)
+    }
 
     @OptIn(ObsoleteCoroutinesApi::class, DelicateCoroutinesApi::class)
     suspend inline fun <reified T, reified D> updateUserData(

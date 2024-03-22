@@ -4,6 +4,7 @@ import com.metacto.strapikmm.auth.AuthClient
 import com.metacto.strapikmm.auth.AuthOptions
 import com.metacto.strapikmm.auth.ProfileMetadata
 import com.metacto.strapikmm.constants.SharedConstants
+import com.metacto.strapikmm.datasource.network.StrapiQueryBuilder
 import com.metacto.strapikmm.datasource.network.services.strapi.StrapiService
 import com.metacto.strapikmm.model.AuthResponse
 import com.metacto.strapikmm.model.FirebaseAuthRequest
@@ -29,13 +30,18 @@ class AuthRepository(
     val authClient by lazy { AuthClient() }
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T> signInWithCurrentIdToken(): T {
+    suspend inline fun <reified T> signInWithCurrentIdToken(
+        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {}
+    ): T {
         val token = Firebase.auth.currentUser?.getIdTokenResult(forceRefresh = true)?.token
-        return exchangeFirebaseToken(token.orEmpty())
+        return exchangeFirebaseToken(token.orEmpty(), null, userQueryBuilder)
     }
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T> signInWithGoogle(authOptions: AuthOptions?): T {
+    suspend inline fun <reified T> signInWithGoogle(
+        authOptions: AuthOptions?,
+        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {}
+    ): T {
         authClient.setAuthOptions(authOptions)
         authClient.init()
         val result = suspendCancellableCoroutine { cont ->
@@ -46,11 +52,13 @@ class AuthRepository(
             })
         }
 
-        return signInWithCredentials(result.first, result.second)
+        return signInWithCredentials(result.first, result.second, userQueryBuilder)
     }
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T> signInWithApple(): T {
+    suspend inline fun <reified T> signInWithApple(
+        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {}
+    ): T {
         val result = suspendCancellableCoroutine { cont ->
             authClient.signInWithApple({ credentials, profileMetadata ->
                 cont.resumeWith(Result.success(Pair(credentials, profileMetadata)))
@@ -59,7 +67,7 @@ class AuthRepository(
             })
         }
 
-        return signInWithCredentials(result.first, result.second)
+        return signInWithCredentials(result.first, result.second, userQueryBuilder)
     }
 
     @Throws(Throwable::class)
@@ -76,17 +84,21 @@ class AuthRepository(
     }
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T> signInWithEmailLink(emailLink: String): T {
+    suspend inline fun <reified T> signInWithEmailLink(
+        emailLink: String,
+        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {}
+    ): T {
         val email = sharedPreference.getSecureString(SharedConstants.SIGN_IN_EMAIL_LINK_EMAIL)
         if (email.isNullOrEmpty()) throw Throwable("Email is null or empty, please try again.")
         val token = Firebase.auth.signInWithEmailLink(email, emailLink).user?.getIdToken(true)
-        return exchangeFirebaseToken(token.orEmpty())
+        return exchangeFirebaseToken(token.orEmpty(), null, userQueryBuilder)
     }
 
     @Throws(Throwable::class)
     suspend inline fun <reified T> exchangeFirebaseToken(
         idToken: String,
-        profileMetadata: ProfileMetadata? = null
+        profileMetadata: ProfileMetadata? = null,
+        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {}
     ): T {
         val response = authService.post<AuthResponse<T>> {
             endpoint("/firebase-auth")
@@ -95,7 +107,8 @@ class AuthRepository(
         }
 
         saveUserToken(response.jwt.orEmpty())
-        val updatedUser = userRepository.updateTimZone(TimeZone.currentSystemDefault().id) as T
+        val updatedUser =
+            userRepository.updateTimZone(TimeZone.currentSystemDefault().id, userQueryBuilder) as T
 
         clearCachedCredentialsData()
         return updatedUser
@@ -104,10 +117,11 @@ class AuthRepository(
     @Throws(Throwable::class)
     suspend inline fun <reified T> signInWithCredentials(
         credentials: AuthCredential,
-        profileMetadata: ProfileMetadata? = null
+        profileMetadata: ProfileMetadata? = null,
+        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {}
     ): T {
         val token = Firebase.auth.signInWithCredential(credentials).user?.getIdToken(true)
-        return exchangeFirebaseToken(token.orEmpty(), profileMetadata)
+        return exchangeFirebaseToken(token.orEmpty(), profileMetadata, userQueryBuilder)
     }
 
     @Throws(Throwable::class)
@@ -120,10 +134,12 @@ class AuthRepository(
             SharedConstants.VERIFICATION_PHONE_NUMBER_VERIFICATION_ID,
             metadata.verificationId
         )
+
         sharedPreference.putSecureString(
             SharedConstants.VERIFICATION_PHONE_NUMBER,
             metadata.phoneNumber
         )
+
         return metadata
     }
 
@@ -136,12 +152,15 @@ class AuthRepository(
     }
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T> verifyPhoneNumber(otp: String): T {
+    suspend inline fun <reified T> verifyPhoneNumber(
+        otp: String,
+        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {}
+    ): T {
         val verificationId =
             sharedPreference.getSecureString(SharedConstants.VERIFICATION_PHONE_NUMBER_VERIFICATION_ID)
         if (verificationId.isNullOrEmpty()) throw Throwable("Unable to verify phone number")
         val credentials = PhoneAuthProvider().credential(verificationId, otp)
-        return signInWithCredentials(credentials)
+        return signInWithCredentials(credentials, null, userQueryBuilder)
     }
 
     fun saveUserToken(token: String) {
