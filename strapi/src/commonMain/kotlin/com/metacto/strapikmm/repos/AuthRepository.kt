@@ -31,16 +31,18 @@ class AuthRepository(
 
     @Throws(Throwable::class)
     suspend inline fun <reified T> signInWithCurrentIdToken(
-        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {}
+        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
+        shouldUpdateTimeZone: Boolean = true
     ): T {
         val token = Firebase.auth.currentUser?.getIdTokenResult(forceRefresh = true)?.token
-        return exchangeFirebaseToken(token.orEmpty(), null, userQueryBuilder)
+        return exchangeFirebaseToken(token.orEmpty(), null, userQueryBuilder, shouldUpdateTimeZone)
     }
 
     @Throws(Throwable::class)
     suspend inline fun <reified T> signInWithGoogle(
         authOptions: AuthOptions?,
-        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {}
+        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
+        shouldUpdateTimeZone: Boolean = true
     ): T {
         authClient.setAuthOptions(authOptions)
         authClient.init()
@@ -52,12 +54,13 @@ class AuthRepository(
             })
         }
 
-        return signInWithCredentials(result.first, result.second, userQueryBuilder)
+        return signInWithCredentials(result.first, result.second, userQueryBuilder, shouldUpdateTimeZone)
     }
 
     @Throws(Throwable::class)
     suspend inline fun <reified T> signInWithApple(
-        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {}
+        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
+        shouldUpdateTimeZone: Boolean = true
     ): T {
         val result = suspendCancellableCoroutine { cont ->
             authClient.signInWithApple({ credentials, profileMetadata ->
@@ -67,7 +70,7 @@ class AuthRepository(
             })
         }
 
-        return signInWithCredentials(result.first, result.second, userQueryBuilder)
+        return signInWithCredentials(result.first, result.second, userQueryBuilder, shouldUpdateTimeZone)
     }
 
     @Throws(Throwable::class)
@@ -86,19 +89,21 @@ class AuthRepository(
     @Throws(Throwable::class)
     suspend inline fun <reified T> signInWithEmailLink(
         emailLink: String,
-        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {}
+        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
+        shouldUpdateTimeZone: Boolean = true
     ): T {
         val email = sharedPreference.getSecureString(SharedConstants.SIGN_IN_EMAIL_LINK_EMAIL)
         if (email.isNullOrEmpty()) throw Throwable("Email is null or empty, please try again.")
         val token = Firebase.auth.signInWithEmailLink(email, emailLink).user?.getIdToken(true)
-        return exchangeFirebaseToken(token.orEmpty(), null, userQueryBuilder)
+        return exchangeFirebaseToken(token.orEmpty(), null, userQueryBuilder, shouldUpdateTimeZone)
     }
 
     @Throws(Throwable::class)
     suspend inline fun <reified T> exchangeFirebaseToken(
         idToken: String,
         profileMetadata: ProfileMetadata? = null,
-        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {}
+        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
+        shouldUpdateTimeZone: Boolean = true
     ): T {
         val response = authService.post<AuthResponse<T>> {
             endpoint("/firebase-auth")
@@ -107,8 +112,11 @@ class AuthRepository(
         }
 
         saveUserToken(response.jwt.orEmpty())
-        val updatedUser =
+        val updatedUser = if (shouldUpdateTimeZone) {
             userRepository.updateTimZone(TimeZone.currentSystemDefault().id, userQueryBuilder) as T
+        } else {
+            userRepository.getCurrentUser(forceUpdate = true, userQueryBuilder = userQueryBuilder)
+        }
 
         clearCachedCredentialsData()
         return updatedUser
@@ -118,10 +126,11 @@ class AuthRepository(
     suspend inline fun <reified T> signInWithCredentials(
         credentials: AuthCredential,
         profileMetadata: ProfileMetadata? = null,
-        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {}
+        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
+        shouldUpdateTimeZone: Boolean = true
     ): T {
         val token = Firebase.auth.signInWithCredential(credentials).user?.getIdToken(true)
-        return exchangeFirebaseToken(token.orEmpty(), profileMetadata, userQueryBuilder)
+        return exchangeFirebaseToken(token.orEmpty(), profileMetadata, userQueryBuilder, shouldUpdateTimeZone)
     }
 
     @Throws(Throwable::class)
@@ -154,13 +163,14 @@ class AuthRepository(
     @Throws(Throwable::class)
     suspend inline fun <reified T> verifyPhoneNumber(
         otp: String,
-        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {}
+        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
+        shouldUpdateTimeZone: Boolean = true
     ): T {
         val verificationId =
             sharedPreference.getSecureString(SharedConstants.VERIFICATION_PHONE_NUMBER_VERIFICATION_ID)
         if (verificationId.isNullOrEmpty()) throw Throwable("Unable to verify phone number")
         val credentials = PhoneAuthProvider().credential(verificationId, otp)
-        return signInWithCredentials(credentials, null, userQueryBuilder)
+        return signInWithCredentials(credentials, null, userQueryBuilder, shouldUpdateTimeZone)
     }
 
     fun saveUserToken(token: String) {
