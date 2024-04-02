@@ -6,19 +6,19 @@ buildscript {
         maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 
         maven {
-            url = uri("https://maven.pkg.github.com/swensonhe/firebase-kotlin-sdk")
+            url = uri("https://maven.pkg.github.com/Meta-CTO/firebase-kotlin-sdk")
             credentials {
-                // TODO: Remove this before publishing to our repo
-                username = "developer-swensonhe"
-                password = "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"
+                username = "metactoengineer"
+                password = "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"
             }
         }
+
         jcenter()
         mavenLocal()
         maven(url = "https://jitpack.io")
     }
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.21")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.23")
         classpath("com.android.tools.build:gradle:8.0.2")
         classpath(ProjectDependencies.SqlDelight.PLUGIN)
     }
@@ -29,14 +29,12 @@ allprojects {
         google()
         mavenCentral()
         maven {
-            url = uri("https://maven.pkg.github.com/swensonhe/firebase-kotlin-sdk")
+            url = uri("https://maven.pkg.github.com/Meta-CTO/firebase-kotlin-sdk")
             credentials {
-                // TODO: Remove this before publishing to our repo
-                username = "developer-swensonhe"
-                password = "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"
+                username = "metactoengineer"
+                password = "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"
             }
         }
-
         maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
         jcenter()
         mavenLocal()
