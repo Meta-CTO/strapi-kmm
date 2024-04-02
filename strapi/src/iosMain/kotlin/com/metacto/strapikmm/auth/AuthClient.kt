@@ -1,7 +1,10 @@
+@file:OptIn(ExperimentalForeignApi::class)
+
 package com.metacto.strapikmm.auth
 
 import cocoapods.FirebaseAuth.FIROAuthProvider
 import dev.gitlive.firebase.auth.AuthCredential
+import kotlinx.cinterop.ExperimentalForeignApi
 import platform.UIKit.UIViewController
 
 actual class AuthOptions(
