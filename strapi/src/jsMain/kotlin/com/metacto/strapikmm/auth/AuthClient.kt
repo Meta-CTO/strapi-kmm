@@ -3,7 +3,10 @@ package com.metacto.strapikmm.auth
 import dev.gitlive.firebase.auth.AuthCredential
 import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.firebase
+import dev.gitlive.firebase.auth.externals.GoogleAuthProvider
+import dev.gitlive.firebase.auth.externals.OAuthProvider
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 actual class AuthClient : AuthProvider {
 
@@ -12,38 +15,45 @@ actual class AuthClient : AuthProvider {
     override fun signInWithApple(
         onSuccess: (AuthCredential, ProfileMetadata) -> Unit, onFail: (Throwable) -> Unit
     ) {
-        Firebase.auth.js.signInWithPopup(
-            firebase.auth.OAuthProvider("apple.com")
-        ).then {
-            val profile = ProfileMetadata(
-                firstName = it.user?.displayName,
-                lastName = null,
-                email = it.user?.email,
-                phoneNumber = it.user?.phoneNumber,
-                pictureUrl = it.user?.photoURL
-            )
-            onSuccess.invoke(AuthCredential(it.credential!!), profile)
-        }.catch {
-            onFail.invoke(it)
+        GlobalScope.launch {
+            try {
+                val result = Firebase.auth.signInWithPopup(
+                    OAuthProvider("apple.com")
+                )
+                val profile = ProfileMetadata(
+                    firstName = result.user?.displayName,
+                    lastName = null,
+                    email = result.user?.email,
+                    phoneNumber = result.user?.phoneNumber,
+                    pictureUrl = result.user?.photoURL
+                )
+
+                onSuccess.invoke(AuthCredential(result.js.credential!!), profile)
+            } catch (e: Throwable) {
+                onFail.invoke(e)
+            }
         }
     }
 
     override fun signInWithGoogle(
         onSuccess: (AuthCredential, ProfileMetadata) -> Unit, onFail: (Throwable) -> Unit
     ) {
-        Firebase.auth.js.signInWithPopup(
-            firebase.auth.GoogleAuthProvider()
-        ).then {
-            val profile = ProfileMetadata(
-                firstName = it.user?.displayName,
-                lastName = null,
-                email = it.user?.email,
-                phoneNumber = it.user?.phoneNumber,
-                pictureUrl = it.user?.photoURL
-            )
-            onSuccess.invoke(AuthCredential(it.credential!!), profile)
-        }.catch {
-            onFail.invoke(it)
+        GlobalScope.launch {
+            try {
+                val result = Firebase.auth.signInWithPopup(
+                    GoogleAuthProvider()
+                )
+                val profile = ProfileMetadata(
+                    firstName = result.user?.displayName,
+                    lastName = null,
+                    email = result.user?.email,
+                    phoneNumber = result.user?.phoneNumber,
+                    pictureUrl = result.user?.photoURL
+                )
+                onSuccess.invoke(AuthCredential(result.js.credential!!), profile)
+            } catch (e: Throwable) {
+                onFail.invoke(e)
+            }
         }
     }
 
