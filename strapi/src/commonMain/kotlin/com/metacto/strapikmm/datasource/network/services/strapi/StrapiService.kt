@@ -13,6 +13,9 @@ import com.metacto.strapikmm.model.PagingResponse
 import com.metacto.strapikmm.sharedpreference.KmmPreference
 import com.metacto.strapikmm.annotations.getModelVersion
 import com.metacto.strapikmm.database.DatabaseDriverFactory
+import com.metacto.strapikmm.errorhandling.NetworkErrorMapper
+import com.metacto.strapikmm.errorhandling.createErrorJsonResponse
+import com.metacto.strapikmm.errorhandling.errortype.isNetworkException
 import com.metacto.strapikmm.util.nullIfEmpty
 import com.metacto.strapikmm.util.strapiNetworkLogLevel
 import io.ktor.client.*
@@ -41,12 +44,25 @@ class StrapiService(
     suspend inline fun <reified T> get(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
     ): T {
-        val builder = StrapiRequestBuilder()
-        builder.requestBuilder()
+        try {
+            val builder = StrapiRequestBuilder()
+            builder.requestBuilder()
 
-        val request = buildRequest(builder, HttpMethod.Get.value)
-        val json = httpClient.get(request).body<JsonElement>()
-        return JsonFlatter.flat<T>(json).convert<T>()
+            val request = buildRequest(builder, HttpMethod.Get.value)
+            val json = httpClient.get(request).body<JsonElement>()
+            return JsonFlatter.flat<T>(json).convert<T>()
+        } catch (throwable: Throwable) {
+            if (throwable.isNetworkException()) {
+                throw Throwable(
+                    message = createErrorJsonResponse(
+                        "Network error, please check your internet connection",
+                        NetworkErrorMapper.NO_INTERNET_CONNECTION
+                    )
+                )
+            } else {
+                throw throwable
+            }
+        }
     }
 
     @Throws(Throwable::class)
