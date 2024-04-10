@@ -43,26 +43,13 @@ class StrapiService(
     @Throws(Throwable::class)
     suspend inline fun <reified T> get(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
-    ): T {
-        try {
-            val builder = StrapiRequestBuilder()
-            builder.requestBuilder()
+    ): T = executeRequestWithNetworkHandling {
+        val builder = StrapiRequestBuilder()
+        builder.requestBuilder()
 
-            val request = buildRequest(builder, HttpMethod.Get.value)
-            val json = httpClient.get(request).body<JsonElement>()
-            return JsonFlatter.flat<T>(json).convert<T>()
-        } catch (throwable: Throwable) {
-            if (throwable.isNetworkException()) {
-                throw Throwable(
-                    message = createErrorJsonResponse(
-                        "Network error, please check your internet connection",
-                        NetworkErrorMapper.NO_INTERNET_CONNECTION
-                    )
-                )
-            } else {
-                throw throwable
-            }
-        }
+        val request = buildRequest(builder, HttpMethod.Get.value)
+        val json = httpClient.get(request).body<JsonElement>()
+        return@executeRequestWithNetworkHandling JsonFlatter.flat<T>(json).convert<T>()
     }
 
     @Throws(Throwable::class)
@@ -116,7 +103,10 @@ class StrapiService(
         }
 
         // get data from remote
-        val json = httpClient.get(request).body<JsonElement>()
+        val json = executeRequestWithNetworkHandling {
+             httpClient.get(request).body<JsonElement>()
+        }
+
         val response = JsonFlatter.flat<T>(json).convert<T>()
         // save data to cache
         if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE) {
@@ -195,7 +185,11 @@ class StrapiService(
 
         // get data from api
         //////
-        val json = httpClient.get(request).body<JsonElement>()
+
+        val json = executeRequestWithNetworkHandling {
+            httpClient.get(request).body<JsonElement>()
+        }
+
         val flatResponse = JsonFlatter.flat<T>(json)
         val response = flatResponse.convert<T>()
         /////
@@ -312,7 +306,10 @@ class StrapiService(
 
             // get data from api
             //////
-            val json = httpClient.get(request).body<JsonElement>()
+            val json = executeRequestWithNetworkHandling {
+                httpClient.get(request).body<JsonElement>()
+            }
+
             val response = JsonFlatter.flat<T>(json).convert<T>()
             /////
 
@@ -336,12 +333,12 @@ class StrapiService(
     @Throws(Throwable::class)
     suspend inline fun <reified T> post(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
-    ): T {
+    ): T = executeRequestWithNetworkHandling {
         val builder = StrapiRequestBuilder()
         builder.requestBuilder()
         val json =
             httpClient.post(buildRequest(builder, HttpMethod.Post.value)).body<JsonElement>()
-        return if (T::class.simpleName == Unit::class.simpleName) {
+        return@executeRequestWithNetworkHandling if (T::class.simpleName == Unit::class.simpleName) {
             Unit as T
         } else {
             JsonFlatter.flat<T>(json).convert()
@@ -351,13 +348,13 @@ class StrapiService(
     @Throws(Throwable::class)
     suspend inline fun <reified T> patch(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
-    ): T {
+    ): T = executeRequestWithNetworkHandling {
         val builder = StrapiRequestBuilder()
         builder.requestBuilder()
         val request = buildRequest(builder, HttpMethod.Patch.value)
         val json = httpClient.patch(request).body<JsonElement>()
 
-        return if (T::class.simpleName == Unit::class.simpleName) {
+        return@executeRequestWithNetworkHandling if (T::class.simpleName == Unit::class.simpleName) {
             Unit as T
         } else {
             handleUpdateItem(json, request, builder)
@@ -367,18 +364,19 @@ class StrapiService(
     @Throws(Throwable::class)
     suspend inline fun <reified T> put(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
-    ): T {
+    ): T = executeRequestWithNetworkHandling {
         val builder = StrapiRequestBuilder()
         builder.requestBuilder()
         val request = buildRequest(builder, HttpMethod.Put.value)
         val json =
             httpClient.put(request).body<JsonElement>()
 
-        return if (T::class.simpleName == Unit::class.simpleName) {
+        return@executeRequestWithNetworkHandling if (T::class.simpleName == Unit::class.simpleName) {
             Unit as T
         } else {
             handleUpdateItem(json, request, builder)
         }
+
     }
 
     /**
@@ -436,7 +434,7 @@ class StrapiService(
     @Throws(Throwable::class)
     suspend inline fun <reified T> delete(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
-    ): T {
+    ): T = executeRequestWithNetworkHandling{
         val builder = StrapiRequestBuilder()
         builder.requestBuilder()
         val request = buildRequest(builder, HttpMethod.Delete.value)
@@ -462,8 +460,9 @@ class StrapiService(
             modelVersion,
             requestClassName
         )
-        return response
+        return@executeRequestWithNetworkHandling response
     }
+
 
     @Throws(Throwable::class)
     suspend fun deleteCachedItem(
@@ -489,9 +488,9 @@ class StrapiService(
     }
 
     @Throws(Throwable::class)
-    suspend fun getBytesFromUrl(url: String): ByteArray {
+    suspend fun getBytesFromUrl(url: String): ByteArray = executeRequestWithNetworkHandling{
         val httpResponse = httpClient.get(url)
-        return httpResponse.body()
+        return@executeRequestWithNetworkHandling httpResponse.body()
     }
 }
 
@@ -512,6 +511,22 @@ inline fun <reified T> JsonElement.convert(): T {
             throw Throwable("Something went wrong, please try again later")
         } else {
             throw throwable
+        }
+    }
+}
+
+suspend fun <T> executeRequestWithNetworkHandling(block: suspend () -> T): T {
+    try {
+        return block()
+    } catch (throwable: Throwable) {
+        when {
+            throwable.isNetworkException() -> throw Throwable(
+                message = createErrorJsonResponse(
+                    NetworkErrorMapper.NO_INTERNET_CONNECTION_MESSAGE,
+                    NetworkErrorMapper.NO_INTERNET_CONNECTION
+                )
+            )
+            else -> throw throwable
         }
     }
 }
