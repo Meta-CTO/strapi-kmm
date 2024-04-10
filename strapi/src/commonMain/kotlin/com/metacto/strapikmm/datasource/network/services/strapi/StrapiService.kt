@@ -13,6 +13,7 @@ import com.metacto.strapikmm.model.PagingResponse
 import com.metacto.strapikmm.sharedpreference.KmmPreference
 import com.metacto.strapikmm.annotations.getModelVersion
 import com.metacto.strapikmm.database.DatabaseDriverFactory
+import com.metacto.strapikmm.errorhandling.AppException
 import com.metacto.strapikmm.errorhandling.NetworkErrorMapper
 import com.metacto.strapikmm.errorhandling.createErrorJsonResponse
 import com.metacto.strapikmm.errorhandling.errortype.isNetworkException
@@ -520,8 +521,9 @@ suspend fun <T> executeRequestWithNetworkHandling(block: suspend () -> T): T {
         return block()
     } catch (throwable: Throwable) {
         when {
-            throwable.isNetworkException() -> throw Throwable(
-                message = createErrorJsonResponse(
+            throwable.isNetworkException() -> throw AppException(
+                errorCode = NetworkErrorMapper.NO_INTERNET_CONNECTION,
+                errorMessage =  createErrorJsonResponse(
                     NetworkErrorMapper.NO_INTERNET_CONNECTION_MESSAGE,
                     NetworkErrorMapper.NO_INTERNET_CONNECTION
                 )
