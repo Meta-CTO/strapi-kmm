@@ -164,7 +164,6 @@ kotlin {
             dependencies {
                 api(Ktor.ios)
                 api(ProjectDependencies.SqlDelight.NATIVE_DRIVER)
-                api("com.rickclephas.kmp:nserror-kt:0.2.0")
             }
 
             iosX64Main.dependsOn(this)
