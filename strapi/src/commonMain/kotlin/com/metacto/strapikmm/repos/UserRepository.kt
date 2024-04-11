@@ -32,7 +32,7 @@ class UserRepository(
         noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {}
     ): T {
         val cachedUser = sharedPreference.getString(SharedConstants.CACHED_USER_DATA)
-        return if (cachedUser.isNullOrEmpty() || forceUpdate) {
+        return if (cachedUser.isNullOrEmpty() || forceUpdate || cachedUser.trim() == "{}") {
             val user = userService.get<T> {
                 endpoint("/users/me")
                 strapiQueryBuilder(userQueryBuilder)

@@ -13,6 +13,10 @@ import com.metacto.strapikmm.model.PagingResponse
 import com.metacto.strapikmm.sharedpreference.KmmPreference
 import com.metacto.strapikmm.annotations.getModelVersion
 import com.metacto.strapikmm.database.DatabaseDriverFactory
+import com.metacto.strapikmm.errorhandling.AppException
+import com.metacto.strapikmm.errorhandling.NetworkErrorMapper
+import com.metacto.strapikmm.errorhandling.createErrorJsonResponse
+import com.metacto.strapikmm.errorhandling.errortype.isNetworkException
 import com.metacto.strapikmm.util.nullIfEmpty
 import com.metacto.strapikmm.util.strapiNetworkLogLevel
 import io.ktor.client.*
@@ -40,13 +44,13 @@ class StrapiService(
     @Throws(Throwable::class)
     suspend inline fun <reified T> get(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
-    ): T {
+    ): T = executeRequestWithNetworkHandling {
         val builder = StrapiRequestBuilder()
         builder.requestBuilder()
 
         val request = buildRequest(builder, HttpMethod.Get.value)
         val json = httpClient.get(request).body<JsonElement>()
-        return JsonFlatter.flat<T>(json).convert<T>()
+        return@executeRequestWithNetworkHandling JsonFlatter.flat<T>(json).convert<T>()
     }
 
     @Throws(Throwable::class)
@@ -100,7 +104,10 @@ class StrapiService(
         }
 
         // get data from remote
-        val json = httpClient.get(request).body<JsonElement>()
+        val json = executeRequestWithNetworkHandling {
+             httpClient.get(request).body<JsonElement>()
+        }
+
         val response = JsonFlatter.flat<T>(json).convert<T>()
         // save data to cache
         if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE) {
@@ -179,7 +186,11 @@ class StrapiService(
 
         // get data from api
         //////
-        val json = httpClient.get(request).body<JsonElement>()
+
+        val json = executeRequestWithNetworkHandling {
+            httpClient.get(request).body<JsonElement>()
+        }
+
         val flatResponse = JsonFlatter.flat<T>(json)
         val response = flatResponse.convert<T>()
         /////
@@ -296,7 +307,10 @@ class StrapiService(
 
             // get data from api
             //////
-            val json = httpClient.get(request).body<JsonElement>()
+            val json = executeRequestWithNetworkHandling {
+                httpClient.get(request).body<JsonElement>()
+            }
+
             val response = JsonFlatter.flat<T>(json).convert<T>()
             /////
 
@@ -320,12 +334,12 @@ class StrapiService(
     @Throws(Throwable::class)
     suspend inline fun <reified T> post(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
-    ): T {
+    ): T = executeRequestWithNetworkHandling {
         val builder = StrapiRequestBuilder()
         builder.requestBuilder()
         val json =
             httpClient.post(buildRequest(builder, HttpMethod.Post.value)).body<JsonElement>()
-        return if (T::class.simpleName == Unit::class.simpleName) {
+        return@executeRequestWithNetworkHandling if (T::class.simpleName == Unit::class.simpleName) {
             Unit as T
         } else {
             JsonFlatter.flat<T>(json).convert()
@@ -335,13 +349,13 @@ class StrapiService(
     @Throws(Throwable::class)
     suspend inline fun <reified T> patch(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
-    ): T {
+    ): T = executeRequestWithNetworkHandling {
         val builder = StrapiRequestBuilder()
         builder.requestBuilder()
         val request = buildRequest(builder, HttpMethod.Patch.value)
         val json = httpClient.patch(request).body<JsonElement>()
 
-        return if (T::class.simpleName == Unit::class.simpleName) {
+        return@executeRequestWithNetworkHandling if (T::class.simpleName == Unit::class.simpleName) {
             Unit as T
         } else {
             handleUpdateItem(json, request, builder)
@@ -351,18 +365,19 @@ class StrapiService(
     @Throws(Throwable::class)
     suspend inline fun <reified T> put(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
-    ): T {
+    ): T = executeRequestWithNetworkHandling {
         val builder = StrapiRequestBuilder()
         builder.requestBuilder()
         val request = buildRequest(builder, HttpMethod.Put.value)
         val json =
             httpClient.put(request).body<JsonElement>()
 
-        return if (T::class.simpleName == Unit::class.simpleName) {
+        return@executeRequestWithNetworkHandling if (T::class.simpleName == Unit::class.simpleName) {
             Unit as T
         } else {
             handleUpdateItem(json, request, builder)
         }
+
     }
 
     /**
@@ -420,7 +435,7 @@ class StrapiService(
     @Throws(Throwable::class)
     suspend inline fun <reified T> delete(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
-    ): T {
+    ): T = executeRequestWithNetworkHandling{
         val builder = StrapiRequestBuilder()
         builder.requestBuilder()
         val request = buildRequest(builder, HttpMethod.Delete.value)
@@ -446,8 +461,9 @@ class StrapiService(
             modelVersion,
             requestClassName
         )
-        return response
+        return@executeRequestWithNetworkHandling response
     }
+
 
     @Throws(Throwable::class)
     suspend fun deleteCachedItem(
@@ -473,9 +489,9 @@ class StrapiService(
     }
 
     @Throws(Throwable::class)
-    suspend fun getBytesFromUrl(url: String): ByteArray {
+    suspend fun getBytesFromUrl(url: String): ByteArray = executeRequestWithNetworkHandling{
         val httpResponse = httpClient.get(url)
-        return httpResponse.body()
+        return@executeRequestWithNetworkHandling httpResponse.body()
     }
 }
 
@@ -496,6 +512,23 @@ inline fun <reified T> JsonElement.convert(): T {
             throw Throwable("Something went wrong, please try again later")
         } else {
             throw throwable
+        }
+    }
+}
+
+suspend fun <T> executeRequestWithNetworkHandling(block: suspend () -> T): T {
+    try {
+        return block()
+    } catch (throwable: Throwable) {
+        when {
+            throwable.isNetworkException() -> throw AppException(
+                errorCode = NetworkErrorMapper.NO_INTERNET_CONNECTION,
+                errorMessage =  createErrorJsonResponse(
+                    NetworkErrorMapper.NO_INTERNET_CONNECTION_MESSAGE,
+                    NetworkErrorMapper.NO_INTERNET_CONNECTION
+                )
+            )
+            else -> throw throwable
         }
     }
 }

@@ -47,10 +47,13 @@ class NetworkErrorMapper {
     companion object {
         private const val UNEXPECTED = -102
         private const val UNAUTHORIZED = 401
+        const val NO_INTERNET_CONNECTION = 4232
+        const val NO_INTERNET_CONNECTION_MESSAGE = "Hmm, there seems to be a problem with your internet connection."
+
     }
 }
 
-private fun createErrorJsonResponse(message: String, code: Int) = JsonObject(
+fun createErrorJsonResponse(message: String, code: Int) = JsonObject(
     mapOf(
         "message" to JsonPrimitive(message),
         "code" to JsonPrimitive(code)
