@@ -528,7 +528,14 @@ suspend fun <T> executeRequestWithNetworkHandling(block: suspend () -> T): T {
                     NetworkErrorMapper.NO_INTERNET_CONNECTION
                 )
             )
-            else -> throw throwable
+            strapiNetworkLogLevel != NetworkLogLevel.NONE -> throw throwable
+            else -> throw AppException(
+                errorCode = NetworkErrorMapper.SOMETHING_WRONG,
+                errorMessage = createErrorJsonResponse(
+                    NetworkErrorMapper.SOMETHING_WRONG_MESSAGE,
+                    NetworkErrorMapper.SOMETHING_WRONG
+                )
+            )
         }
     }
 }

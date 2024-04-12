@@ -48,8 +48,9 @@ class NetworkErrorMapper {
         private const val UNEXPECTED = -102
         private const val UNAUTHORIZED = 401
         const val NO_INTERNET_CONNECTION = 4232
+        const val SOMETHING_WRONG = 4222
         const val NO_INTERNET_CONNECTION_MESSAGE = "Hmm, there seems to be a problem with your internet connection."
-
+        const val SOMETHING_WRONG_MESSAGE = "Oops, something went wrong. Please try again later."
     }
 }
 
