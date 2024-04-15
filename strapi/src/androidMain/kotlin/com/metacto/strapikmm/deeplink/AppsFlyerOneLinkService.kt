@@ -8,14 +8,24 @@ import com.appsflyer.deeplink.DeepLinkResult
 import com.metacto.strapikmm.deeplink.util.getAppAttributionResult
 import com.metacto.strapikmm.deeplink.model.toError
 
-actual class AppsFlyerOneLinkService(
+actual class AppsFlyerOneLinkService actual constructor(
     val options: AppsFlyerOneLinkOptions
 ) {
+    init {
+        if (options.context == null || options.context !is Context) {
+            throw IllegalArgumentException("Context must be provided and must be an instance of android.content.Context")
+        }
+    }
+
+
     private val conversionListener = object : AppsFlyerConversionListener {
         override fun onConversionDataSuccess(p0: MutableMap<String, Any>?) {
             if (p0 != null) {
                 val appConversionResult = p0.getAppAttributionResult()
-                options.listener.onAppAttribution(appConversionResult.isOrganic, appConversionResult.extras)
+                options.listener.onAppAttribution(
+                    appConversionResult.isOrganic,
+                    appConversionResult.extras
+                )
             }
         }
 
@@ -26,7 +36,10 @@ actual class AppsFlyerOneLinkService(
         override fun onAppOpenAttribution(p0: MutableMap<String, String>?) {
             if (p0 != null) {
                 val appConversionResult = p0.getAppAttributionResult()
-                options.listener.onAppAttribution(appConversionResult.isOrganic, appConversionResult.extras)
+                options.listener.onAppAttribution(
+                    appConversionResult.isOrganic,
+                    appConversionResult.extras
+                )
             }
         }
 
@@ -61,11 +74,12 @@ actual class AppsFlyerOneLinkService(
             }
         }
     }
+
     actual fun initialize() {
         AppsFlyerLib.getInstance().apply {
             options.enableDebugLog?.let { setDebugLog(it) }
             options.minTimeBetweenSessions?.let { setMinTimeBetweenSessions(it) }
-            init(options.devAppKey, conversionListener, options.context)
+            init(options.devAppKey, conversionListener, options.context as Context)
             subscribeForDeepLink(deepLinkListener)
             if (options.appInviteOneLinkTemplateId != null) {
                 //set the OneLink template id for share invite links
@@ -74,12 +88,3 @@ actual class AppsFlyerOneLinkService(
         }
     }
 }
-
-actual data class AppsFlyerOneLinkOptions(
-    val context: Context,
-    val devAppKey: String,
-    val enableDebugLog: Boolean? = null,
-    val minTimeBetweenSessions: Int? = null,
-    val appInviteOneLinkTemplateId: String? = null,
-    val listener: AppsFlyerOneLinkListener
-)

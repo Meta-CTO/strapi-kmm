@@ -14,17 +14,23 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.convert
 import platform.Foundation.NSError
 import platform.darwin.NSObject
-actual class AppsFlyerOneLinkService(
-    private val options: AppsFlyerOneLinkOptions
+actual class AppsFlyerOneLinkService actual constructor(
+    val options: AppsFlyerOneLinkOptions
 ) : NSObject(), AppsFlyerDeepLinkDelegateProtocol,  AppsFlyerLibDelegateProtocol
 {
+    init {
+        if (options.appleAppId.isNullOrEmpty()) {
+            throw IllegalArgumentException("Apple App ID must be provided for iOS platform")
+        }
+    }
+
     actual fun initialize() {
         AppsFlyerLib.shared().apply {
             options.devAppKey.let {
                 setAppsFlyerDevKey(options.devAppKey)
             }
 
-            setAppleAppID(options.appleAppId)
+            setAppleAppID(options.appleAppId!!)
 
             options.enableDebugLog?.let {
                 setIsDebug(it)
@@ -78,12 +84,3 @@ actual class AppsFlyerOneLinkService(
         options.listener.onAppAttribution(appConversionResult.isOrganic, appConversionResult.extras)
     }
 }
-
-actual data class AppsFlyerOneLinkOptions(
-    val appleAppId: String,
-    val devAppKey: String,
-    val enableDebugLog: Boolean? = null,
-    val minTimeBetweenSessions: Int? = null,
-    val appInviteOneLinkTemplateId: String? = null,
-    val listener: AppsFlyerOneLinkListener
-)
