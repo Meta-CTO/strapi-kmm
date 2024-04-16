@@ -4,6 +4,12 @@ expect class AppsFlyerOneLinkService(
     options: AppsFlyerOneLinkOptions
 ) {
     fun initialize()
+
+    fun start(onSuccess: () -> Unit, onError: (Throwable) -> Unit)
+    fun start()
+    fun stop(isStopped: Boolean)
+
+    fun setCustomerUserId(userId: String)
 }
 
 class AppsFlyerOneLinkOptions(

@@ -3,10 +3,11 @@ package com.metacto.strapikmm.deeplink
 import android.content.Context
 import com.appsflyer.AppsFlyerConversionListener
 import com.appsflyer.AppsFlyerLib
+import com.appsflyer.attribution.AppsFlyerRequestListener
 import com.appsflyer.deeplink.DeepLinkListener
 import com.appsflyer.deeplink.DeepLinkResult
-import com.metacto.strapikmm.deeplink.util.getAppAttributionResult
 import com.metacto.strapikmm.deeplink.model.toError
+import com.metacto.strapikmm.deeplink.util.getAppAttributionResult
 
 actual class AppsFlyerOneLinkService actual constructor(
     val options: AppsFlyerOneLinkOptions
@@ -86,5 +87,35 @@ actual class AppsFlyerOneLinkService actual constructor(
                 setAppInviteOneLink(options.appInviteOneLinkTemplateId)
             }
         }
+    }
+
+    actual fun setCustomerUserId(userId: String) {
+        AppsFlyerLib.getInstance().setCustomerUserId(userId)
+    }
+
+    actual fun stop(isStopped: Boolean) {
+        AppsFlyerLib.getInstance().stop(isStopped, options.context as Context)
+    }
+
+    actual fun start(onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
+        AppsFlyerLib.getInstance().start(options.context as Context,
+            options.devAppKey,
+            object : AppsFlyerRequestListener {
+                override fun onSuccess() {
+                    onSuccess.invoke()
+                }
+
+                override fun onError(p0: Int, p1: String) {
+                    onError.invoke(
+                        Throwable(
+                            "Error code: $p0, Error message: $p1"
+                        )
+                    )
+                }
+            })
+    }
+
+    actual fun start() {
+        AppsFlyerLib.getInstance().start(options.context as Context, options.devAppKey)
     }
 }
