@@ -4,17 +4,16 @@ import com.metacto.strapikmm.datasource.network.NetworkLogLevel
 
 var strapiNetworkLogLevel =  NetworkLogLevel.NONE
 
-expect class Logger(
-    className: String,
-) {
+interface LogInterceptor {
+    fun intercept(message: String)
+}
+
+expect class Logger(className: String) {
     fun log(msg: String)
-}
 
-fun printLogD(className: String?, message: String ) {
-    println("$className: $message")
-}
-
-fun printLogD(message: String ) {
-    println(message)
+    companion object {
+        val interceptors: ArrayList<LogInterceptor>
+        fun setInterceptors(interceptors: List<LogInterceptor>)
+    }
 }
 
