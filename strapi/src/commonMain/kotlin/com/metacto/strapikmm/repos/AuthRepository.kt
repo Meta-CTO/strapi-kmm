@@ -1,5 +1,6 @@
 package com.metacto.strapikmm.repos
 
+import com.metacto.strapikmm.analytics.enableAnalyticsTracking
 import com.metacto.strapikmm.auth.AuthClient
 import com.metacto.strapikmm.auth.AuthOptions
 import com.metacto.strapikmm.auth.ProfileMetadata
@@ -8,6 +9,7 @@ import com.metacto.strapikmm.datasource.network.StrapiQueryBuilder
 import com.metacto.strapikmm.datasource.network.services.strapi.StrapiService
 import com.metacto.strapikmm.model.AuthResponse
 import com.metacto.strapikmm.model.FirebaseAuthRequest
+import com.metacto.strapikmm.model.OverrideUserRequest
 import com.metacto.strapikmm.sharedpreference.KmmPreference
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.ActionCodeSettings
@@ -54,7 +56,12 @@ class AuthRepository(
             })
         }
 
-        return signInWithCredentials(result.first, result.second, userQueryBuilder, shouldUpdateTimeZone)
+        return signInWithCredentials(
+            result.first,
+            result.second,
+            userQueryBuilder,
+            shouldUpdateTimeZone
+        )
     }
 
     @Throws(Throwable::class)
@@ -70,7 +77,12 @@ class AuthRepository(
             })
         }
 
-        return signInWithCredentials(result.first, result.second, userQueryBuilder, shouldUpdateTimeZone)
+        return signInWithCredentials(
+            result.first,
+            result.second,
+            userQueryBuilder,
+            shouldUpdateTimeZone
+        )
     }
 
     @Throws(Throwable::class)
@@ -130,7 +142,12 @@ class AuthRepository(
         shouldUpdateTimeZone: Boolean = true
     ): T {
         val token = Firebase.auth.signInWithCredential(credentials).user?.getIdToken(true)
-        return exchangeFirebaseToken(token.orEmpty(), profileMetadata, userQueryBuilder, shouldUpdateTimeZone)
+        return exchangeFirebaseToken(
+            token.orEmpty(),
+            profileMetadata,
+            userQueryBuilder,
+            shouldUpdateTimeZone
+        )
     }
 
     @Throws(Throwable::class)
@@ -191,5 +208,39 @@ class AuthRepository(
         sharedPreference.clearSecureValue(SharedConstants.SIGN_IN_EMAIL_LINK_EMAIL)
         sharedPreference.clearSecureValue(SharedConstants.VERIFICATION_PHONE_NUMBER)
         sharedPreference.clearSecureValue(SharedConstants.VERIFICATION_PHONE_NUMBER_VERIFICATION_ID)
+    }
+
+    @Throws(Throwable::class)
+    suspend inline fun <reified T> overrideCurrentUser(
+        userId: Int,
+        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
+    ): T {
+        val response = authService.post<AuthResponse<T>> {
+            endpoint("/backdoor")
+            authenticated(false)
+            body(OverrideUserRequest(userId))
+        }
+
+        saveUserToken(response.jwt.orEmpty())
+
+        val updatedUser = userRepository.getCurrentUser<T>(
+            forceUpdate = true,
+            userQueryBuilder = userQueryBuilder
+        )
+
+        // Disable analytics tracking for override user to avoid tracking the override user
+        enableAnalyticsTracking = false
+
+        return updatedUser
+    }
+
+    @Throws(Throwable::class)
+    suspend inline fun <reified T> clearOverrideUserAndResetCurrentUser(
+        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
+    ): T {
+        val user: T = signInWithCurrentIdToken(userQueryBuilder)
+        // Enable analytics tracking after resetting the user
+        enableAnalyticsTracking = true
+        return user
     }
 }

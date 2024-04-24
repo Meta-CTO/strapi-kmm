@@ -1,5 +1,7 @@
 package com.metacto.strapikmm.analytics
 
+var enableAnalyticsTracking = true
+
 class AnalyticsManager private constructor(
     private val services: MutableList<AnalyticsService> = mutableListOf()
 ) {
@@ -9,6 +11,7 @@ class AnalyticsManager private constructor(
         phone: String?,
         extraProperties: Map<String, Any>
     ) {
+        if (!enableAnalyticsTracking) return
         services.forEach {
             it.identifyUser(id, email, phone, extraProperties)
         }
@@ -38,6 +41,8 @@ class AnalyticsManager private constructor(
     }
 
     fun trackEvent(event: TrackingEvent) {
+        if (!enableAnalyticsTracking) return
+
         val eventProperties = event.properties.toMutableMap()
         val platforms = event.platforms
         val matchingServices = services.filter { platforms.contains(it.platform) }
