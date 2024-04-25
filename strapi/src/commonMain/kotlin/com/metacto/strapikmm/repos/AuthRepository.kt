@@ -130,6 +130,7 @@ class AuthRepository(
             userRepository.getCurrentUser(forceUpdate = true, userQueryBuilder = userQueryBuilder)
         }
 
+        enableAnalyticsTracking = true
         clearCachedCredentialsData()
         return updatedUser
     }
