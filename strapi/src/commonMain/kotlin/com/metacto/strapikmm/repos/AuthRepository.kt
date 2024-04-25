@@ -1,6 +1,5 @@
 package com.metacto.strapikmm.repos
 
-import com.metacto.strapikmm.analytics.enableAnalyticsTracking
 import com.metacto.strapikmm.auth.AuthClient
 import com.metacto.strapikmm.auth.AuthOptions
 import com.metacto.strapikmm.auth.ProfileMetadata
@@ -130,7 +129,7 @@ class AuthRepository(
             userRepository.getCurrentUser(forceUpdate = true, userQueryBuilder = userQueryBuilder)
         }
 
-        enableAnalyticsTracking = true
+        sharedPreference.putBool(SharedConstants.ENABLE_ANALYTICS_TRACKING, true)
         clearCachedCredentialsData()
         return updatedUser
     }
@@ -230,7 +229,7 @@ class AuthRepository(
         )
 
         // Disable analytics tracking for override user to avoid tracking the override user
-        enableAnalyticsTracking = false
+        sharedPreference.putBool(SharedConstants.ENABLE_ANALYTICS_TRACKING, false)
 
         return updatedUser
     }
@@ -241,7 +240,7 @@ class AuthRepository(
     ): T {
         val user: T = signInWithCurrentIdToken(userQueryBuilder)
         // Enable analytics tracking after resetting the user
-        enableAnalyticsTracking = true
+        sharedPreference.putBool(SharedConstants.ENABLE_ANALYTICS_TRACKING, true)
         return user
     }
 }

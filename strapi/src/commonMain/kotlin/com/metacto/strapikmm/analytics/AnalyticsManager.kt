@@ -1,16 +1,20 @@
 package com.metacto.strapikmm.analytics
 
-var enableAnalyticsTracking = true
+import com.metacto.strapikmm.constants.SharedConstants
+import com.metacto.strapikmm.sharedpreference.KmmPreference
 
 class AnalyticsManager private constructor(
-    private val services: MutableList<AnalyticsService> = mutableListOf()
+    private val services: MutableList<AnalyticsService> = mutableListOf(),
+    val sharedPreference: KmmPreference
 ) {
+
     fun setUserProperties(
         id: String,
         email: String?,
         phone: String?,
         extraProperties: Map<String, Any>
     ) {
+        val enableAnalyticsTracking = sharedPreference.getBool(SharedConstants.ENABLE_ANALYTICS_TRACKING, true)
         if (!enableAnalyticsTracking) return
         services.forEach {
             it.identifyUser(id, email, phone, extraProperties)
@@ -41,6 +45,7 @@ class AnalyticsManager private constructor(
     }
 
     fun trackEvent(event: TrackingEvent) {
+        val enableAnalyticsTracking = sharedPreference.getBool(SharedConstants.ENABLE_ANALYTICS_TRACKING, true)
         if (!enableAnalyticsTracking) return
 
         val eventProperties = event.properties.toMutableMap()
@@ -55,7 +60,7 @@ class AnalyticsManager private constructor(
         services.add(service)
     }
 
-    class Builder(private val context: Any?) {
+    class Builder(private val context: Any?, private val sharedPreference: KmmPreference) {
         private var amplitudeService: AnalyticsService? = null
         private var cleverTapAnalyticsService: AnalyticsService? = null
 
@@ -70,7 +75,7 @@ class AnalyticsManager private constructor(
         }
 
         fun build(): AnalyticsManager {
-            val analyticsManager = AnalyticsManager()
+            val analyticsManager = AnalyticsManager(sharedPreference = sharedPreference)
 
             amplitudeService?.let {
                 analyticsManager.registerService(it)
