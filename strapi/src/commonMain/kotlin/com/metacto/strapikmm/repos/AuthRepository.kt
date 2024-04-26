@@ -201,6 +201,7 @@ class AuthRepository(
     suspend fun signOut() {
         sharedPreference.clearValue(SharedConstants.CACHED_USER_DATA)
         sharedPreference.clearSecureValue(SharedConstants.ACCESS_TOKEN)
+        sharedPreference.putBool(SharedConstants.ENABLE_ANALYTICS_TRACKING, true)
         Firebase.auth.signOut()
     }
 
