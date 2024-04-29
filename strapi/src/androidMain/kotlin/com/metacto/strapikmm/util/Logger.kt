@@ -1,12 +1,13 @@
 package com.metacto.strapikmm.util
 
+import com.metacto.strapikmm.datasource.network.NetworkLogConfiguration
 import com.metacto.strapikmm.datasource.network.NetworkLogLevel
 
 actual class Logger actual constructor(
     private val className: String
 ) {
     actual fun log(msg: String) {
-        if (strapiNetworkLogLevel == NetworkLogLevel.NONE) return
+        if (NetworkLogConfiguration.logLevel == NetworkLogLevel.NONE) return
 
         val message = if(className.isEmpty()) msg else "$className: $msg"
         println(message)

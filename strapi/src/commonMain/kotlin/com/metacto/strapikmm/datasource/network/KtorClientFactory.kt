@@ -12,14 +12,12 @@ import io.ktor.util.*
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
 
-@JsExport
-enum class NetworkLogLevel {
-    NONE,
-    REQUEST,
-    ALL
-}
 
-expect class KtorClientFactory(networkLogLevel: NetworkLogLevel, preference: KmmPreference) {
+expect class KtorClientFactory(
+    networkLogLevel: NetworkLogLevel,
+    shouldShowActualErrorMessages: Boolean,
+    preference: KmmPreference
+) {
     fun build(): HttpClient
 }
 

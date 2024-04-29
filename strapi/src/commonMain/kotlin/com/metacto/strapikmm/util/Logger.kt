@@ -1,9 +1,5 @@
 package com.metacto.strapikmm.util
 
-import com.metacto.strapikmm.datasource.network.NetworkLogLevel
-
-var strapiNetworkLogLevel =  NetworkLogLevel.NONE
-
 interface LogInterceptor {
     fun intercept(message: String)
 }

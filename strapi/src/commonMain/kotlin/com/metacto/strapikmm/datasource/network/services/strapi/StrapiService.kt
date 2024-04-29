@@ -13,12 +13,12 @@ import com.metacto.strapikmm.model.PagingResponse
 import com.metacto.strapikmm.sharedpreference.KmmPreference
 import com.metacto.strapikmm.annotations.getModelVersion
 import com.metacto.strapikmm.database.DatabaseDriverFactory
+import com.metacto.strapikmm.datasource.network.NetworkLogConfiguration
 import com.metacto.strapikmm.errorhandling.AppException
 import com.metacto.strapikmm.errorhandling.NetworkErrorMapper
 import com.metacto.strapikmm.errorhandling.createErrorJsonResponse
 import com.metacto.strapikmm.errorhandling.errortype.isNetworkException
 import com.metacto.strapikmm.util.nullIfEmpty
-import com.metacto.strapikmm.util.strapiNetworkLogLevel
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -508,7 +508,7 @@ inline fun <reified T> JsonElement.convert(): T {
     try {
         return JsonWithIgnoredUnknownKeys.decodeFromString(this.toString())
     } catch (throwable: Throwable) {
-        if (throwable is kotlinx.serialization.SerializationException && strapiNetworkLogLevel == NetworkLogLevel.NONE) {
+        if (throwable is kotlinx.serialization.SerializationException && NetworkLogConfiguration.logLevel == NetworkLogLevel.NONE) {
             throw Throwable("Something went wrong, please try again later")
         } else {
             throw throwable
@@ -528,7 +528,7 @@ suspend fun <T> executeRequestWithNetworkHandling(block: suspend () -> T): T {
                     NetworkErrorMapper.NO_INTERNET_CONNECTION
                 )
             )
-            strapiNetworkLogLevel != NetworkLogLevel.NONE -> throw throwable
+            NetworkLogConfiguration.shouldShowActualErrorMessages || NetworkLogConfiguration.logLevel != NetworkLogLevel.NONE -> throw throwable
             else -> throw AppException(
                 errorCode = NetworkErrorMapper.SOMETHING_WRONG,
                 errorMessage = createErrorJsonResponse(
