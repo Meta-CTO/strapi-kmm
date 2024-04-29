@@ -1,7 +1,6 @@
 package com.metacto.strapikmm.datasource.network
 
 import com.metacto.strapikmm.sharedpreference.KmmPreference
-import com.metacto.strapikmm.util.strapiNetworkLogLevel
 import io.ktor.client.request.*
 
 open class KmmBaseService(private val baseUrl: String, private val kmmPreference: KmmPreference) {
@@ -45,7 +44,7 @@ open class KmmBaseService(private val baseUrl: String, private val kmmPreference
             }
         }
 
-        if (strapiNetworkLogLevel != NetworkLogLevel.NONE) {
+        if (NetworkLogConfiguration.logLevel != NetworkLogLevel.NONE) {
             builder.printCURLDescription(bodyString, method, kmmPreference)
         }
         return builder

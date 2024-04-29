@@ -1,8 +1,8 @@
 package com.metacto.strapikmm.datasource.network.services.strapi
 
+import com.metacto.strapikmm.datasource.network.NetworkLogConfiguration
 import com.metacto.strapikmm.datasource.network.NetworkLogLevel
 import com.metacto.strapikmm.util.Logger
-import com.metacto.strapikmm.util.strapiNetworkLogLevel
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.descriptors.PolymorphicKind
@@ -17,7 +17,7 @@ object JsonFlatter {
 
     @OptIn(ExperimentalSerializationApi::class)
     inline fun <reified T> flat(jsonElement: JsonElement): JsonElement {
-        if (strapiNetworkLogLevel == NetworkLogLevel.ALL) {
+        if (NetworkLogConfiguration.logLevel == NetworkLogLevel.ALL) {
             Logger("").log(jsonElement.toString())
         }
 

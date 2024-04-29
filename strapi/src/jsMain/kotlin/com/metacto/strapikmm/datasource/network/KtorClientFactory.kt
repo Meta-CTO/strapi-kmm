@@ -7,7 +7,6 @@ import com.metacto.strapikmm.errorhandling.NetworkError
 import com.metacto.strapikmm.errorhandling.NetworkErrorMapper
 import com.metacto.strapikmm.sharedpreference.KmmPreference
 import com.metacto.strapikmm.sharedpreference.TokenHandler
-import com.metacto.strapikmm.util.strapiNetworkLogLevel
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.js.*
@@ -20,11 +19,13 @@ import kotlinx.serialization.json.decodeFromJsonElement
 
 actual class KtorClientFactory actual constructor(
     networkLogLevel: NetworkLogLevel,
+    shouldShowActualErrorMessages: Boolean,
     private val preference: KmmPreference
 ) {
 
     init {
-        strapiNetworkLogLevel = networkLogLevel
+        NetworkLogConfiguration.logLevel = networkLogLevel
+        NetworkLogConfiguration.shouldShowActualErrorMessages = shouldShowActualErrorMessages
     }
 
     actual fun build(): HttpClient {
@@ -47,7 +48,7 @@ actual class KtorClientFactory actual constructor(
                     null
                 }
 
-                if(strapiNetworkLogLevel != NetworkLogLevel.NONE) {
+                if(NetworkLogConfiguration.logLevel != NetworkLogLevel.NONE) {
                     console.log("finalToken: $finalToken")
                 }
 
