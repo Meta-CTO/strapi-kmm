@@ -13,6 +13,7 @@ import io.ktor.client.*
 import io.ktor.client.call.body
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.bodyAsText
 import io.ktor.util.*
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
@@ -80,23 +81,46 @@ fun DefaultRequest.DefaultRequestBuilder.handleAuthenticationHeader(preference: 
 
 
 suspend fun Throwable.handleNetworkException() {
-    val responseException =
-        cause as? ResponseException ?: return
-    val response = responseException.response
-    val bytes = response.body<JsonElement>()
-    val errorData =
-        JsonFlatter.flat<NetworkError>(JsonWithIgnoredUnknownKeys.decodeFromJsonElement(bytes))
-    val errorResponse =
-        JsonWithIgnoredUnknownKeys.decodeFromJsonElement<NetworkError>(errorData)
+    val isResponseException = (cause as? ResponseException) != null
+    if (isResponseException) {
+        val responseException = cause as ResponseException
+        val response = responseException.response
+        val bytes = response.body<JsonElement>()
+        val errorData =
+            JsonFlatter.flat<NetworkError>(JsonWithIgnoredUnknownKeys.decodeFromJsonElement(bytes))
+        val errorResponse =
+            JsonWithIgnoredUnknownKeys.decodeFromJsonElement<NetworkError>(errorData)
 
-    val error = NetworkErrorMapper().mapServerError(
-        httpErrorCode = errorResponse.httpStatusCode,
-        errorCode = errorResponse.errorCode,
-        errorMessage = errorResponse.message,
-        throwable = responseException
-    )
+        val error = NetworkErrorMapper().mapServerError(
+            httpErrorCode = errorResponse.httpStatusCode,
+            errorCode = errorResponse.errorCode,
+            errorMessage = errorResponse.message,
+            throwable = responseException
+        )
 
-    Logger("").log("Error: $error")
+        Logger("").log("Error: $error")
 
-    throw error
+        throw error
+    } else {
+        when (this) {
+            is ServerResponseException -> {
+                val bodyString = response.bodyAsText()
+                Logger("").log("Error: $bodyString")
+            }
+
+            is ClientRequestException -> {
+                val bodyString = response.bodyAsText()
+                Logger("").log("Error: $bodyString")
+            }
+
+            is RedirectResponseException -> {
+                val bodyString = response.bodyAsText()
+                Logger("").log("Error: $bodyString")
+            }
+
+            else -> {
+                Logger("").log("Error: $this")
+            }
+        }
+    }
 }
