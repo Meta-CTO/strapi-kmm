@@ -54,21 +54,7 @@ actual class KtorClientFactory actual constructor(
                 }
 
                 handleResponseExceptionWithRequest { cause, _ ->
-                    val responseException =
-                        cause as? ResponseException ?: return@handleResponseExceptionWithRequest
-                    val response = responseException.response
-                    val bytes = response.body<JsonElement>()
-                    val errorData =
-                        JsonFlatter.flat<NetworkError>(JsonWithIgnoredUnknownKeys.decodeFromJsonElement(bytes))
-                    val errorResponse =
-                        JsonWithIgnoredUnknownKeys.decodeFromJsonElement<NetworkError>(errorData)
-                    val error = NetworkErrorMapper().mapServerError(
-                        httpErrorCode = errorResponse.httpStatusCode,
-                        errorCode = errorResponse.errorCode,
-                        errorMessage = errorResponse.message,
-                        throwable = responseException
-                    )
-                    throw error
+                    cause.handleNetworkException()
                 }
             }
         }

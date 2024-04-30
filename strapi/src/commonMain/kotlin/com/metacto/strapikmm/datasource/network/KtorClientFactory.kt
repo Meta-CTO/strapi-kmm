@@ -3,12 +3,19 @@
 package com.metacto.strapikmm.datasource.network
 
 import com.metacto.strapikmm.constants.SharedConstants
+import com.metacto.strapikmm.datasource.network.services.strapi.JsonFlatter
+import com.metacto.strapikmm.datasource.network.services.strapi.JsonWithIgnoredUnknownKeys
+import com.metacto.strapikmm.errorhandling.NetworkError
+import com.metacto.strapikmm.errorhandling.NetworkErrorMapper
 import com.metacto.strapikmm.sharedpreference.KmmPreference
 import com.metacto.strapikmm.util.Logger
 import io.ktor.client.*
+import io.ktor.client.call.body
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.util.*
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.decodeFromJsonElement
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
 
@@ -69,4 +76,27 @@ fun DefaultRequest.DefaultRequestBuilder.handleAuthenticationHeader(preference: 
     }
 
     headers.remove(KmmBaseService.IS_AUTHENTICATED)
+}
+
+
+suspend fun Throwable.handleNetworkException() {
+    val responseException =
+        cause as? ResponseException ?: return
+    val response = responseException.response
+    val bytes = response.body<JsonElement>()
+    val errorData =
+        JsonFlatter.flat<NetworkError>(JsonWithIgnoredUnknownKeys.decodeFromJsonElement(bytes))
+    val errorResponse =
+        JsonWithIgnoredUnknownKeys.decodeFromJsonElement<NetworkError>(errorData)
+
+    val error = NetworkErrorMapper().mapServerError(
+        httpErrorCode = errorResponse.httpStatusCode,
+        errorCode = errorResponse.errorCode,
+        errorMessage = errorResponse.message,
+        throwable = responseException
+    )
+
+    Logger("").log("Error: $error")
+
+    throw error
 }
