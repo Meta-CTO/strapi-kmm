@@ -1,7 +1,11 @@
 package com.kommu.mylibrary
 
 import android.util.Log
+import com.metacto.strapikmm.datasource.network.FilterType
+import com.metacto.strapikmm.datasource.network.GroupedFilter
 import com.metacto.strapikmm.datasource.network.KmmBaseService
+import com.metacto.strapikmm.datasource.network.StrapiFilterType
+import com.metacto.strapikmm.datasource.network.StrapiQueryBuilder
 import com.metacto.strapikmm.datasource.network.StrapiRequestBuilder
 import com.metacto.strapikmm.datasource.network.StrapiSortType
 import com.metacto.strapikmm.datasource.network.services.strapi.JsonFlatter
@@ -15,286 +19,34 @@ class TesterClass {
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-            // Questions
-            try {
-                val json = Json.parseToJsonElement(
-                    "{\n" +
-                            "    \"data\": {\n" +
-                            "        \"id\": 1,\n" +
-                            "        \"attributes\": {\n" +
-                            "            \"createdAt\": \"2022-06-14T17:46:48.114Z\",\n" +
-                            "            \"updatedAt\": \"2023-04-28T07:30:01.542Z\",\n" +
-                            "            \"waitlistSignUpRedirectURL\": \"https://www.thevellaapp.com/tester-confirmation/\",\n" +
-                            "            \"privacyPolicy\": \"https://www.thevellaapp.com/privacy/\",\n" +
-                            "            \"termsOfService\": \"https://www.thevellaapp.com/privacy/\",\n" +
-                            "            \"defaultExperienceRangeInMiles\": null,\n" +
-                            "            \"onboarding_personality\": {\n" +
-                            "                \"data\": {\n" +
-                            "                    \"id\": 2,\n" +
-                            "                    \"attributes\": {\n" +
-                            "                        \"title\": \"Extraversion\",\n" +
-                            "                        \"description\": \"The age old question of \\\"Are you an Extrovert or Introvert\\\" is one that gets volleyed around rather frequently. We all have an idea of what the two labels mean, but we never really give the concept credit for being so complex and multilayered. \\n\\nExtraversion isn't just about how social you are. Think about it. Being social involves a whole host of layers: how motivated you are to be social, your specialized way of being social, how often you're social... you get the picture.\\n\\nExtraversion as a trait describes how often and with what quality you interact with external activities. Extraversion isn't meant to be a measure of how \\\"prosocial\\\" you are, or a way to describe whether or not you like people, so people who score lower on this trait shouldn't be seen as being \\\"asocial\\\" or \\\"antisocial\\\" at all. \\n\\nLow scorers of the extraversion trait may be called \\\"introverts\\\" and all that means is that they need less external stimulation, value the time they're able to have on their own, and may choose more inward-facing activities for self-care. \\n\\nHigh scorers in the extraversion trait may be seen as being more easily excitable, adventurous, pleasure-seeking and will likely prefer activities that provide high stimulation. \\n\\nPeople who fall in the middle will likely enjoy times that provide them with sufficient stimulation but know where their boundaries are, as well as when and how \\\"recharging\\\" is needed. \",\n" +
-                            "                        \"high_value_title\": \"Extravert\",\n" +
-                            "                        \"low_value_title\": \"Introvert\",\n" +
-                            "                        \"createdAt\": \"2022-06-13T19:51:15.763Z\",\n" +
-                            "                        \"updatedAt\": \"2022-12-13T16:11:50.097Z\",\n" +
-                            "                        \"color_aarrggbb\": \"FFEC875E\",\n" +
-                            "                        \"medium_value_title\": \"Ambivert\",\n" +
-                            "                        \"test\": null,\n" +
-                            "                        \"low_value_description\": null,\n" +
-                            "                        \"medium_value_description\": null,\n" +
-                            "                        \"high_value_description\": null,\n" +
-                            "                        \"order\": 3\n" +
-                            "                    }\n" +
-                            "                }\n" +
-                            "            },\n" +
-                            "            \"permissions\": [\n" +
-                            "                {\n" +
-                            "                    \"id\": 1,\n" +
-                            "                    \"title\": \"Bluetooth\",\n" +
-                            "                    \"justification\": \"Please Grant Bluetooth Permission.\",\n" +
-                            "                    \"type\": \"bluetooth\"\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 2,\n" +
-                            "                    \"title\": \"Calendar\",\n" +
-                            "                    \"justification\": \"The way you manage your calendar can tell us a lot about who you are. \\n\\nThat is why we will only look at things like:\\n\\n- How many events you have on your calendar\\n- How many events you have responded to\\n- The date and time of events\\n\\nWe do not look at or save your event details, attendee information etc.\",\n" +
-                            "                    \"type\": \"calendar\"\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 3,\n" +
-                            "                    \"title\": \"Contacts\",\n" +
-                            "                    \"justification\": \"The way you organize your contact list can tell us a lot about who you are. \\n\\nThat is why we will only look at things like:\\n\\n- How you enter their information (first and last name filled in, first name only etc.)\\n- If you have profile pictures\\n- If you have addresses entered\\n\\nWe do not look at or save your contacts actual information.\",\n" +
-                            "                    \"type\": \"contacts\"\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 4,\n" +
-                            "                    \"title\": \"Spotify\",\n" +
-                            "                    \"justification\": \"Music has very strong links to personality and mood. What we listen to, when and how often we listen to it are strong indicators.\\n\\nWe will look at things like\\n\\n- How long you listen to music\\n- When you listen (time of day)\\n- What kind of music (genre, artist, etc.)\\n\\nWe do not look at or save any Spotify account information.\",\n" +
-                            "                    \"type\": \"spotify\"\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 5,\n" +
-                            "                    \"title\": \"Gmail\",\n" +
-                            "                    \"justification\": \"The way you manage your inbox can tell us a lot about who you are. \\n\\nThat is why we will only look at things like:\\n\\n- How many email you receive/send\\n- How long email are (character count)\\n- How many unread emails you have\\n- When you check your emails\\n\\nWe do not look at or save any of the email/senders information.\",\n" +
-                            "                    \"type\": \"gmail\"\n" +
-                            "                }\n" +
-                            "            ],\n" +
-                            "            \"personality_ranges\": [\n" +
-                            "                {\n" +
-                            "                    \"id\": 1,\n" +
-                            "                    \"key\": \"low\",\n" +
-                            "                    \"min_value\": 0.1,\n" +
-                            "                    \"max_value\": 2.2\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 2,\n" +
-                            "                    \"key\": \"medium\",\n" +
-                            "                    \"min_value\": 2.2,\n" +
-                            "                    \"max_value\": 3.2\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 3,\n" +
-                            "                    \"key\": \"high\",\n" +
-                            "                    \"min_value\": 3.2,\n" +
-                            "                    \"max_value\": 5\n" +
-                            "                }\n" +
-                            "            ],\n" +
-                            "            \"educational_levels\": [\n" +
-                            "                {\n" +
-                            "                    \"id\": 1,\n" +
-                            "                    \"title\": \"Middle school\\t\",\n" +
-                            "                    \"key\": \"middle_school\"\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 3,\n" +
-                            "                    \"title\": \"High school diploma or GED\",\n" +
-                            "                    \"key\": \"high_school\"\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 4,\n" +
-                            "                    \"title\": \"Some college or 2-year degree\",\n" +
-                            "                    \"key\": \"associates_degree\"\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 6,\n" +
-                            "                    \"title\": \"4-year college graduate\",\n" +
-                            "                    \"key\": \"bachelors_degree\"\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 5,\n" +
-                            "                    \"title\": \"Graduate or professional degree\",\n" +
-                            "                    \"key\": \"masters_degree\"\n" +
-                            "                }\n" +
-                            "            ],\n" +
-                            "            \"activityPercentiles\": [\n" +
-                            "                {\n" +
-                            "                    \"id\": 64912,\n" +
-                            "                    \"numberOfActivities\": 1,\n" +
-                            "                    \"percentage\": 0\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 64914,\n" +
-                            "                    \"numberOfActivities\": 1,\n" +
-                            "                    \"percentage\": 5\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 64913,\n" +
-                            "                    \"numberOfActivities\": 1,\n" +
-                            "                    \"percentage\": 10\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 64915,\n" +
-                            "                    \"numberOfActivities\": 1,\n" +
-                            "                    \"percentage\": 15\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 64916,\n" +
-                            "                    \"numberOfActivities\": 2,\n" +
-                            "                    \"percentage\": 20\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 64917,\n" +
-                            "                    \"numberOfActivities\": 2,\n" +
-                            "                    \"percentage\": 25\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 64918,\n" +
-                            "                    \"numberOfActivities\": 2,\n" +
-                            "                    \"percentage\": 30\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 64919,\n" +
-                            "                    \"numberOfActivities\": 2,\n" +
-                            "                    \"percentage\": 35\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 64921,\n" +
-                            "                    \"numberOfActivities\": 3,\n" +
-                            "                    \"percentage\": 40\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 64920,\n" +
-                            "                    \"numberOfActivities\": 3,\n" +
-                            "                    \"percentage\": 45\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 64922,\n" +
-                            "                    \"numberOfActivities\": 4,\n" +
-                            "                    \"percentage\": 50\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 64923,\n" +
-                            "                    \"numberOfActivities\": 5,\n" +
-                            "                    \"percentage\": 55\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 64924,\n" +
-                            "                    \"numberOfActivities\": 5,\n" +
-                            "                    \"percentage\": 60\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 64925,\n" +
-                            "                    \"numberOfActivities\": 6,\n" +
-                            "                    \"percentage\": 65\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 64926,\n" +
-                            "                    \"numberOfActivities\": 6,\n" +
-                            "                    \"percentage\": 70\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 64927,\n" +
-                            "                    \"numberOfActivities\": 9,\n" +
-                            "                    \"percentage\": 75\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 64928,\n" +
-                            "                    \"numberOfActivities\": 11,\n" +
-                            "                    \"percentage\": 80\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 64929,\n" +
-                            "                    \"numberOfActivities\": 12,\n" +
-                            "                    \"percentage\": 85\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 64930,\n" +
-                            "                    \"numberOfActivities\": 14,\n" +
-                            "                    \"percentage\": 90\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 64931,\n" +
-                            "                    \"numberOfActivities\": 19,\n" +
-                            "                    \"percentage\": 95\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 64932,\n" +
-                            "                    \"numberOfActivities\": 98,\n" +
-                            "                    \"percentage\": 100\n" +
-                            "                }\n" +
-                            "            ],\n" +
-                            "            \"personalityQuestionsMinimumCount\": [\n" +
-                            "                {\n" +
-                            "                    \"id\": 1,\n" +
-                            "                    \"count\": 10\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 2,\n" +
-                            "                    \"count\": 10\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 3,\n" +
-                            "                    \"count\": 10\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 4,\n" +
-                            "                    \"count\": 10\n" +
-                            "                },\n" +
-                            "                {\n" +
-                            "                    \"id\": 5,\n" +
-                            "                    \"count\": 10\n" +
-                            "                }\n" +
-                            "            ],\n" +
-                            "            \"journeyAssets\": []\n" +
-                            "        }\n" +
-                            "    },\n" +
-                            "    \"meta\": {}\n" +
-                            "}"
+            val strapiQueryBuilder = StrapiQueryBuilder().apply {
+                groupedFilters(
+                    listOf(
+                        GroupedFilter(key = "type", value = "roundInvite", type = FilterType.EQUALS),
+                        GroupedFilter(key = "endDate", value = "2024-04-23", type = FilterType.LESS_THAN),
+                        GroupedFilter(key = "hasRound", value = "true", type = FilterType.EQUALS)
+                    ),
+                    StrapiFilterType.OR
                 )
-                val flatee = JsonFlatter.flat<AppConfiguration>(json)
-                println(flatee)
-                val flat = flatee.convert<AppConfiguration>()
 
-                val first = flat.educationLevels.orEmpty().first()
-                val last = flat.educationLevels?.last()
-
-                val strapiRequestBuilder = StrapiRequestBuilder()
-                strapiRequestBuilder.endpoint("/missions")
-                strapiRequestBuilder.strapiQueryBuilder {
-                    sortBy("orderIndex", StrapiSortType.ASC)
-                    sortBy("data", StrapiSortType.ASC)
-                    sortBy("sdsddsw", StrapiSortType.DESC)
-                    sortBy("sdfds", StrapiSortType.ASC)
-                    groupBy("age")
-                    groupBy("ds")
-                    groupBy("ds")
-                }
-
-                val baseService = KmmBaseService(
-                    "https://www.thevellaapp.com",
-                    KmmPreference()
+                groupedFilters(
+                    listOf(
+                        GroupedFilter(key = "type", value = "socialEvent", type = FilterType.EQUALS),
+                        GroupedFilter(key = "endDate", value = "2024-04-23", type = FilterType.LESS_THAN),
+                    ),
+                    StrapiFilterType.OR
                 )
-                val httpRequest = baseService.buildRequest(strapiRequestBuilder, "GET")
-                println(httpRequest)
-                println(httpRequest.url)
-                println(httpRequest.headers)
-                println(httpRequest.body)
-                println(httpRequest.method)
-            } catch (throwable: Throwable) {
-                Log.e("Error", throwable.message.orEmpty())
+
+                equalTo("type", "roundInvite")
+                lessThan("endDate", "2024-04-23")
+                equalTo("hasRound", "true")
+                equalTo("type", "socialEvent")
+                lessThan("endDate", "2024-04-23")
+
             }
 
+            val filters = strapiQueryBuilder.filters
+            val first = filters.size
         }
     }
 }

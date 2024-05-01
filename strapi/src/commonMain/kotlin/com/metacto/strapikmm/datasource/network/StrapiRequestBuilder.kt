@@ -196,7 +196,25 @@ class StrapiQueryBuilder {
                 currentFilterIndex++
                 filter
             }
-            put("filters${filterType.type}$filterIndex${updatedField}[\$eq]", value)
+            put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.EQUALS.value}]", value)
+        }
+    }
+    fun equalToCaseInsensitive(
+        field: String,
+        values: List<String>,
+        filterType: StrapiFilterType = StrapiFilterType.NONE
+    ) = apply {
+        val splitField = field.split(".")
+        val updatedField = splitField.joinToString("") { "[$it]" }
+        values.forEach { value ->
+            val filterIndex = if (filterType == StrapiFilterType.NONE) {
+                ""
+            } else {
+                val filter = "[$currentFilterIndex]"
+                currentFilterIndex++
+                filter
+            }
+            put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.EQUALS_CASE_INSENSITIVE.value}]", value)
         }
     }
 
@@ -214,7 +232,23 @@ class StrapiQueryBuilder {
             currentFilterIndex++
             filter
         }
-        put("filters${filterType.type}$filterIndex${updatedField}[\$eq]", value)
+        put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.EQUALS.value}]", value)
+    }
+    fun equalToCaseInsensitive(
+        field: String,
+        value: String,
+        filterType: StrapiFilterType = StrapiFilterType.NONE
+    ) = apply {
+        val splitField = field.split(".")
+        val updatedField = splitField.joinToString("") { "[$it]" }
+        val filterIndex = if (filterType == StrapiFilterType.NONE) {
+            ""
+        } else {
+            val filter = "[$currentFilterIndex]"
+            currentFilterIndex++
+            filter
+        }
+        put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.EQUALS_CASE_INSENSITIVE.value}]", value)
     }
 
     fun notEqualTo(
@@ -230,7 +264,22 @@ class StrapiQueryBuilder {
             currentFilterIndex++
             filter
         }
-        put("filters${filterType.type}$filterIndex${updatedField}[\$ne]", value)
+        put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.NOT_EQUALS.value}]", value)
+    }
+    fun notEqualToCaseInsensitive(
+        field: String, value: String,
+        filterType: StrapiFilterType = StrapiFilterType.NONE
+    ) = apply {
+        val splitField = field.split(".")
+        val updatedField = splitField.joinToString("") { "[$it]" }
+        val filterIndex = if (filterType == StrapiFilterType.NONE) {
+            ""
+        } else {
+            val filter = "[$currentFilterIndex]"
+            currentFilterIndex++
+            filter
+        }
+        put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.NOT_EQUALS_CASE_INSENSITIVE.value}]", value)
     }
 
     fun notEqualTo(
@@ -248,7 +297,25 @@ class StrapiQueryBuilder {
                 currentFilterIndex++
                 filter
             }
-            put("filters${filterType.type}$filterIndex${updatedField}[\$ne]", value)
+            put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.NOT_EQUALS.value}]", value)
+        }
+    }
+    fun notEqualToCaseInsensitive(
+        field: String,
+        values: List<String>,
+        filterType: StrapiFilterType = StrapiFilterType.NONE
+    ) = apply {
+        val splitField = field.split(".")
+        val updatedField = splitField.joinToString("") { "[$it]" }
+        values.forEach { value ->
+            val filterIndex = if (filterType == StrapiFilterType.NONE) {
+                ""
+            } else {
+                val filter = "[$currentFilterIndex]"
+                currentFilterIndex++
+                filter
+            }
+            put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.NOT_EQUALS_CASE_INSENSITIVE.value}]", value)
         }
     }
 
@@ -264,7 +331,7 @@ class StrapiQueryBuilder {
             currentFilterIndex++
             filter
         }
-        put("filters${filterType.type}$filterIndex${updatedField}[\$lt]", value)
+        put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.LESS_THAN.value}]", value)
     }
 
     fun lessThan(
@@ -282,7 +349,7 @@ class StrapiQueryBuilder {
                 currentFilterIndex++
                 filter
             }
-            put("filters${filterType.type}$filterIndex${updatedField}[\$lt]", value)
+            put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.LESS_THAN.value}]", value)
         }
     }
 
@@ -298,7 +365,7 @@ class StrapiQueryBuilder {
             currentFilterIndex++
             filter
         }
-        put("filters${filterType.type}$filterIndex${updatedField}[\$gt]", value)
+        put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.GREATER_THAN.value}]", value)
     }
 
     fun greaterThan(
@@ -316,7 +383,7 @@ class StrapiQueryBuilder {
                 currentFilterIndex++
                 filter
             }
-            put("filters${filterType.type}$filterIndex${updatedField}[\$gt]", value)
+            put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.GREATER_THAN.value}]", value)
         }
     }
 
@@ -332,7 +399,7 @@ class StrapiQueryBuilder {
             currentFilterIndex++
             filter
         }
-        put("filters${filterType.type}$filterIndex${updatedField}[\$lte]", value)
+        put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.LESS_THAN_OR_EQUAL.value}]", value)
     }
 
     fun greaterThanOrEqual(
@@ -347,7 +414,7 @@ class StrapiQueryBuilder {
             currentFilterIndex++
             filter
         }
-        put("filters${filterType.type}$filterIndex${updatedField}[\$gte]", value)
+        put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.GREATER_THAN_OR_EQUAL.value}]", value)
     }
 
     fun includedIn(
@@ -363,7 +430,7 @@ class StrapiQueryBuilder {
                 currentFilterIndex++
                 filter
             }
-            put("filters${filterType.type}$filterIndex${updatedField}[\$in]", it)
+            put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.INCLUDED_IN.value}]", it)
         }
     }
 
@@ -380,7 +447,7 @@ class StrapiQueryBuilder {
                 currentFilterIndex++
                 filter
             }
-            put("filters${filterType.type}$filterIndex${updatedField}[\$notIn]", it)
+            put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.NOT_INCLUDED_IN.value}]", it)
         }
     }
 
@@ -399,7 +466,7 @@ class StrapiQueryBuilder {
                 currentFilterIndex++
                 filter
             }
-            put("filters${filterType.type}$filterIndex${updatedField}[\$contains]", value)
+            put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.CONTAINS.value}]", value)
         }
     }
 
@@ -416,7 +483,7 @@ class StrapiQueryBuilder {
                 currentFilterIndex++
                 filter
             }
-            put("filters${filterType.type}$filterIndex${updatedField}[\$containsi]", it)
+            put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.CONTAINS_CASE_INSENSITIVE.value}]", it)
         }
     }
 
@@ -434,7 +501,7 @@ class StrapiQueryBuilder {
                 currentFilterIndex++
                 filter
             }
-            put("filters${filterType.type}$filterIndex${updatedField}[\$ncontain]", it)
+            put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.NOT_CONTAINS.value}]", it)
         }
     }
 
@@ -452,7 +519,7 @@ class StrapiQueryBuilder {
                 currentFilterIndex++
                 filter
             }
-            put("filters${filterType.type}$filterIndex${updatedField}[\$containss]", it)
+            put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.CONTAINS_CASE_SENSITIVE.value}]", it)
         }
     }
 
@@ -471,7 +538,7 @@ class StrapiQueryBuilder {
                 currentFilterIndex++
                 filter
             }
-            put("filters${filterType.type}$filterIndex${updatedField}[\$ncontainss]", value)
+            put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.NOT_CONTAINS_CASE_SENSITIVE.value}]", value)
         }
     }
 
@@ -490,7 +557,7 @@ class StrapiQueryBuilder {
                 currentFilterIndex++
                 filter
             }
-            put("filters${filterType.type}$filterIndex${updatedField}[\$notContainsi]", it)
+            put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.NOT_CONTAINS_CASE_INSENSITIVE.value}]", it)
         }
     }
 
@@ -508,7 +575,7 @@ class StrapiQueryBuilder {
             currentFilterIndex++
             filter
         }
-        put("filters${filterType.type}$filterIndex${updatedField}[\$null]", value.toString())
+        put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.NULL.value}]", value.toString())
     }
 
     fun notNullable(
@@ -525,7 +592,7 @@ class StrapiQueryBuilder {
             currentFilterIndex++
             filter
         }
-        put("filters${filterType.type}$filterIndex${updatedField}[\$notNull]", value.toString())
+        put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.NOT_NULL.value}]", value.toString())
     }
 
     fun populateEntity(
@@ -574,7 +641,7 @@ class StrapiQueryBuilder {
                 currentFilterIndex++
                 filter
             }
-            put("filters${filterType.type}$filterIndex${updatedField}[\$between]", it)
+            put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.BETWEEN.value}]", it)
         }
     }
 
@@ -593,7 +660,7 @@ class StrapiQueryBuilder {
                 currentFilterIndex++
                 filter
             }
-            put("filters${filterType.type}$filterIndex${updatedField}[\$startsWith]", it)
+            put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.STARTS_WITH.value}]", it)
         }
     }
 
@@ -612,7 +679,46 @@ class StrapiQueryBuilder {
                 currentFilterIndex++
                 filter
             }
-            put("filters${filterType.type}$filterIndex${updatedField}[\$endsWith]", it)
+            put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.ENDS_WITH.value}]", it)
+        }
+    }
+
+
+    fun startsWithCaseInsensitive(
+        field: String,
+        values: List<String>,
+        filterType: StrapiFilterType = StrapiFilterType.NONE
+    ) = apply {
+        val splitField = field.split(".")
+        val updatedField = splitField.joinToString("") { "[$it]" }
+        values.forEach {
+            val filterIndex = if (filterType == StrapiFilterType.NONE) {
+                ""
+            } else {
+                val filter = "[$currentFilterIndex]"
+                currentFilterIndex++
+                filter
+            }
+            put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.STARTS_WITH_CASE_INSENSITIVE.value}]", it)
+        }
+    }
+
+    fun endsWithCaseInsensitive(
+        field: String,
+        values: List<String>,
+        filterType: StrapiFilterType = StrapiFilterType.NONE
+    ) = apply {
+        val splitField = field.split(".")
+        val updatedField = splitField.joinToString("") { "[$it]" }
+        values.forEach {
+            val filterIndex = if (filterType == StrapiFilterType.NONE) {
+                ""
+            } else {
+                val filter = "[$currentFilterIndex]"
+                currentFilterIndex++
+                filter
+            }
+            put("filters${filterType.type}$filterIndex${updatedField}[\$${FilterType.ENDS_WITH_CASE_INSENSITIVE.value}]", it)
         }
     }
 
@@ -627,6 +733,22 @@ class StrapiQueryBuilder {
         put("pagination[page]", page.toString())
         put("pagination[pageSize]", pageSize.toString())
         put("pagination[withCount]", true.toString())
+    }
+
+    fun groupedFilters(
+        filters: List<GroupedFilter>,
+        filterType: StrapiFilterType = StrapiFilterType.NONE
+    ) {
+        filters.forEach { (key, value, queryFilter) ->
+            val filterIndex = if (filterType == StrapiFilterType.NONE) {
+                ""
+            } else {
+                val filter = "[$currentFilterIndex]"
+                filter
+            }
+            put("filters${filterType.type}$filterIndex[${key}][\$${queryFilter.value}]", value)
+        }
+        currentFilterIndex++
     }
 
     private fun put(key: String, value: String) {
@@ -652,6 +774,7 @@ enum class StrapiSortType(val type: String) {
 enum class StrapiFilterType(val type: String) {
     OR("[\$or]"),
     AND("[\$and]"),
+    NOT("[\$not]"),
     NONE("");
 }
 
