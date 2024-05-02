@@ -24,6 +24,11 @@ actual class AppsFlyerOneLinkService actual constructor(
         if (options.appleAppId.isNullOrEmpty()) {
             throw IllegalArgumentException("Apple App ID must be provided for iOS platform")
         }
+
+        AppsFlyerLib.shared().apply {
+            setDelegate(this@AppsFlyerOneLinkService)
+            setDeepLinkDelegate(this@AppsFlyerOneLinkService)
+        }
     }
 
     actual fun initialize() {
