@@ -55,7 +55,7 @@ actual class AppsFlyerOneLinkService actual constructor(
         when (deepLinkResult.status) {
             DeepLinkResult.Status.FOUND -> {
                 val deepLink = deepLinkResult.deepLink
-                val result = com.metacto.strapikmm.deeplink.model.DeepLinkResult.Found(
+                val result = com.metacto.strapikmm.deeplink.model.DeepLinkResult(
                     deepLinkValue = deepLink.deepLinkValue ?: deepLink.clickEvent.toMap().getDeepLinkValue(),
                     campaign = deepLink.campaign,
                     campaignId = deepLink.campaignId,
@@ -70,7 +70,7 @@ actual class AppsFlyerOneLinkService actual constructor(
             }
 
             DeepLinkResult.Status.NOT_FOUND -> {
-                options.listener.onDeepLinkingResult(com.metacto.strapikmm.deeplink.model.DeepLinkResult.NotFound)
+                options.listener.onDeepLinkingResult(null)
             }
 
             else -> {
