@@ -8,5 +8,6 @@ data class DeepLinkResult(
     val isDeferred: Boolean?,
     val mediaSource: String?,
     val matchType: String?,
-    val clickEventJson: String?
+    val clickEventJson: String?,
+    val metadata: DeepLinkMetadata?
 )
