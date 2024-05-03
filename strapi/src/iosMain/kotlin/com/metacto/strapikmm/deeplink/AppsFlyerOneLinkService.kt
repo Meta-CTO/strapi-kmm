@@ -9,6 +9,8 @@ import cocoapods.AppsFlyerFramework.AppsFlyerLib
 import cocoapods.AppsFlyerFramework.AppsFlyerLibDelegateProtocol
 import com.metacto.strapikmm.deeplink.model.DeepLinkError
 import com.metacto.strapikmm.deeplink.model.DeepLinkResult
+import com.metacto.strapikmm.deeplink.model.getDeepLinkValue
+import com.metacto.strapikmm.deeplink.model.toDeepLinkMetadata
 import com.metacto.strapikmm.deeplink.util.getAppAttributionResult
 import com.rickclephas.kmp.nserrorkt.asThrowable
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -59,14 +61,15 @@ actual class AppsFlyerOneLinkService actual constructor(
             AFSDKDeepLinkResultStatus.AFSDKDeepLinkResultStatusFound -> {
                 val deepLink = result.deepLink
                 val deepLinkResult = DeepLinkResult(
-                    deepLinkValue = deepLink?.deeplinkValue,
+                    deepLinkValue = deepLink?.deeplinkValue ?: deepLink?.clickEvent?.getDeepLinkValue(),
                     campaign = deepLink?.campaign,
                     campaignId = deepLink?.campaignId,
                     clickHttpReferrer = deepLink?.clickHTTPReferrer,
                     isDeferred = deepLink?.isDeferred,
                     mediaSource = deepLink?.mediaSource,
                     matchType = deepLink?.matchType,
-                    clickEventJson = deepLink?.clickEvent.toString()
+                    clickEventJson = deepLink?.clickEvent.toString(),
+                    metadata = deepLink?.clickEvent?.toDeepLinkMetadata()
                 )
 
                 options.listener.onDeepLinkingResult(deepLinkResult)

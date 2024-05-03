@@ -6,6 +6,8 @@ import com.appsflyer.AppsFlyerLib
 import com.appsflyer.attribution.AppsFlyerRequestListener
 import com.appsflyer.deeplink.DeepLinkListener
 import com.appsflyer.deeplink.DeepLinkResult
+import com.metacto.strapikmm.deeplink.model.getDeepLinkValue
+import com.metacto.strapikmm.deeplink.model.toDeepLinkMetadata
 import com.metacto.strapikmm.deeplink.model.toError
 import com.metacto.strapikmm.deeplink.util.getAppAttributionResult
 
@@ -54,14 +56,15 @@ actual class AppsFlyerOneLinkService actual constructor(
             DeepLinkResult.Status.FOUND -> {
                 val deepLink = deepLinkResult.deepLink
                 val result = com.metacto.strapikmm.deeplink.model.DeepLinkResult(
-                    deepLinkValue = deepLink.deepLinkValue,
+                    deepLinkValue = deepLink.deepLinkValue ?: deepLink.clickEvent.toMap().getDeepLinkValue(),
                     campaign = deepLink.campaign,
                     campaignId = deepLink.campaignId,
                     clickHttpReferrer = deepLink.clickHttpReferrer,
                     isDeferred = deepLink.isDeferred,
                     mediaSource = deepLink.mediaSource,
                     matchType = deepLink.matchType,
-                    clickEventJson = deepLink.clickEvent.toString()
+                    clickEventJson = deepLink.clickEvent.toString(),
+                    metadata = deepLink.clickEvent.toMap().toDeepLinkMetadata(),
                 )
                 options.listener.onDeepLinkingResult(result)
             }
