@@ -82,6 +82,9 @@ actual class AppsFlyerOneLinkService actual constructor(
             options.minTimeBetweenSessions?.let { setMinTimeBetweenSessions(it) }
             init(options.devAppKey, conversionListener, options.context as Context)
             subscribeForDeepLink(deepLinkListener)
+            setOneLinkCustomDomain(
+                *options.oneLinkCustomDomains?.toTypedArray().orEmpty()
+            )
             if (options.appInviteOneLinkTemplateId != null) {
                 //set the OneLink template id for share invite links
                 setAppInviteOneLink(options.appInviteOneLinkTemplateId)

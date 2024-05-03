@@ -28,6 +28,7 @@ actual class AppsFlyerOneLinkService actual constructor(
         AppsFlyerLib.shared().apply {
             setDelegate(this@AppsFlyerOneLinkService)
             setDeepLinkDelegate(this@AppsFlyerOneLinkService)
+            setOneLinkCustomDomains(options.oneLinkCustomDomains)
         }
     }
 
