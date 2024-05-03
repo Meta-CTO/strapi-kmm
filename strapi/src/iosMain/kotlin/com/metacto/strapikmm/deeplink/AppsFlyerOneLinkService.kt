@@ -60,7 +60,7 @@ actual class AppsFlyerOneLinkService actual constructor(
         when (result.status) {
             AFSDKDeepLinkResultStatus.AFSDKDeepLinkResultStatusFound -> {
                 val deepLink = result.deepLink
-                val deepLinkResult = DeepLinkResult(
+                val deepLinkResult = DeepLinkResult.Found(
                     deepLinkValue = deepLink?.deeplinkValue ?: deepLink?.clickEvent?.getDeepLinkValue(),
                     campaign = deepLink?.campaign,
                     campaignId = deepLink?.campaignId,
@@ -75,13 +75,13 @@ actual class AppsFlyerOneLinkService actual constructor(
                 options.listener.onDeepLinkingResult(deepLinkResult)
             }
             AFSDKDeepLinkResultStatus.AFSDKDeepLinkResultStatusNotFound -> {
-                options.listener.onDeepLinkingResult(null)
+                options.listener.onDeepLinkingResult(DeepLinkResult.NotFound)
             }
             AFSDKDeepLinkResultStatus.AFSDKDeepLinkResultStatusFailure -> {
                 options.listener.onDeepLinkingError(DeepLinkError(result.error))
             }
             else -> {
-                options.listener.onDeepLinkingResult(null)
+                options.listener.onDeepLinkingResult(DeepLinkResult.NotFound)
             }
         }
     }
