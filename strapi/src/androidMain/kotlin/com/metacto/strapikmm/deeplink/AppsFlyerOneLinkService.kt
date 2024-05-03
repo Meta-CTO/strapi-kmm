@@ -18,6 +18,7 @@ actual class AppsFlyerOneLinkService actual constructor(
         if (options.context == null || options.context !is Context) {
             throw IllegalArgumentException("Context must be provided and must be an instance of android.content.Context")
         }
+        initialize()
     }
 
 
