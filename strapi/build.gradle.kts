@@ -131,6 +131,8 @@ kotlin {
                 api(ProjectDependencies.sharedPreferencesMultiplatformSettings)
                 api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
                 api("dev.gitlive:firebase-auth:1.12.0-metacto-5")
+
+                api("dev.gitlive:firebase-config:1.10.4")
             }
         }
         val androidMain by getting {

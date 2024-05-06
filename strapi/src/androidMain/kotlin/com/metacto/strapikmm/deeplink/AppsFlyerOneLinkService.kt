@@ -7,7 +7,7 @@ import com.appsflyer.attribution.AppsFlyerRequestListener
 import com.appsflyer.deeplink.DeepLinkListener
 import com.appsflyer.deeplink.DeepLinkResult
 import com.metacto.strapikmm.deeplink.model.getDeepLinkValue
-import com.metacto.strapikmm.deeplink.model.toDeepLinkMetadata
+import com.metacto.strapikmm.deeplink.model.getDeepLinkMetadata
 import com.metacto.strapikmm.deeplink.model.toError
 import com.metacto.strapikmm.deeplink.util.getAppAttributionResult
 
@@ -25,7 +25,7 @@ actual class AppsFlyerOneLinkService actual constructor(
     private val conversionListener = object : AppsFlyerConversionListener {
         override fun onConversionDataSuccess(p0: MutableMap<String, Any>?) {
             if (p0 != null) {
-                val appConversionResult = p0.getAppAttributionResult()
+                val appConversionResult = this@AppsFlyerOneLinkService.getAppAttributionResult(p0)
                 options.listener.onAppAttribution(
                     appConversionResult.isOrganic,
                     appConversionResult.extras
@@ -39,7 +39,7 @@ actual class AppsFlyerOneLinkService actual constructor(
 
         override fun onAppOpenAttribution(p0: MutableMap<String, String>?) {
             if (p0 != null) {
-                val appConversionResult = p0.getAppAttributionResult()
+                val appConversionResult = this@AppsFlyerOneLinkService.getAppAttributionResult(p0)
                 options.listener.onAppAttribution(
                     appConversionResult.isOrganic,
                     appConversionResult.extras
@@ -56,8 +56,10 @@ actual class AppsFlyerOneLinkService actual constructor(
         when (deepLinkResult.status) {
             DeepLinkResult.Status.FOUND -> {
                 val deepLink = deepLinkResult.deepLink
+                val clickEventValues = deepLink.clickEvent.toMap()
+                val deepLinkValue = deepLink.deepLinkValue ?: this.getDeepLinkValue(clickEventValues)
                 val result = com.metacto.strapikmm.deeplink.model.DeepLinkResult(
-                    deepLinkValue = deepLink.deepLinkValue ?: deepLink.clickEvent.toMap().getDeepLinkValue(),
+                    deepLinkValue = deepLinkValue,
                     campaign = deepLink.campaign,
                     campaignId = deepLink.campaignId,
                     clickHttpReferrer = deepLink.clickHttpReferrer,
@@ -65,7 +67,7 @@ actual class AppsFlyerOneLinkService actual constructor(
                     mediaSource = deepLink.mediaSource,
                     matchType = deepLink.matchType,
                     clickEventJson = deepLink.clickEvent.toString(),
-                    metadata = deepLink.clickEvent.toMap().toDeepLinkMetadata(),
+                    metadata = deepLinkValue?.let { this.getDeepLinkMetadata(deepLinkValue) },
                 )
                 options.listener.onDeepLinkingResult(result)
             }

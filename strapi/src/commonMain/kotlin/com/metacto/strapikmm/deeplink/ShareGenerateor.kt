@@ -5,7 +5,7 @@ import com.metacto.strapikmm.deeplink.model.BaseUrl
 expect object ShareLinkGenerator {
     suspend fun generateShareLink(
         context: Any?,
-        deepLinkValue: String,
+        path: String,
         channel: String? = null,
         referrerCustomerId: String? = null,
         referrerName: String? = null,
