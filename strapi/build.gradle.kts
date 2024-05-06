@@ -84,6 +84,7 @@ kotlin {
                     create("ContactsDataCollector")
                     create("BackgroundDownloader")
                     create("GZipDecompressor")
+                    create("DESEncryption")
                 }
             }
         }
@@ -101,6 +102,10 @@ kotlin {
         create("GZipDecompressor") {
             path = file("src/iosMain/native/gzipdecompressor")
             packageName("com.metacto.strapikmm.common.gzip.decompressor")
+        }
+        create("DESEncryption") {
+            path = file("src/iosMain/native/desencryption")
+            packageName("com.metacto.strapikmm.common.encryption")
         }
     }
 
