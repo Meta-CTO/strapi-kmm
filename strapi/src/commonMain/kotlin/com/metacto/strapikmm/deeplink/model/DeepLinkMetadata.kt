@@ -44,6 +44,7 @@ fun AppsFlyerOneLinkService.getDeepLinkMetadata(deepLinkValue: String): DeepLink
                 && !it.startsWith(AppsFlyerConstants.CHANNEL)
                 && !it.startsWith(AppsFlyerConstants.CAMPAIGN)
                 && !it.startsWith(AppsFlyerConstants.REFERRER_CUSTOMER_ID)
+                && !it.startsWith(AppsFlyerConstants.DEEP_LINK_DESTINATION)
                 && !it.startsWith(AppsFlyerConstants.REFERRER_UID)
                 && !it.startsWith(AppsFlyerConstants.REFERRER_IMAGE_URL)
     }.map {
