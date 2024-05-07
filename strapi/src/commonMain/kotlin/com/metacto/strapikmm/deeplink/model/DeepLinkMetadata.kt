@@ -18,6 +18,11 @@ fun AppsFlyerOneLinkService.getDeepLinkValue(values: Map<Any?, *>): String? {
     return values[AppsFlyerConstants.DEEP_LINK_VALUE]?.toString()
 }
 
+fun AppsFlyerOneLinkService.getDestinationPath(fullDeepLinkValue: String): String? {
+    val values = fullDeepLinkValue.split("__")
+    return values.find { it.startsWith(AppsFlyerConstants.DEEP_LINK_DESTINATION) }?.substringAfter("=")
+}
+
 fun AppsFlyerOneLinkService.getDeepLinkMetadata(deepLinkValue: String): DeepLinkMetadata {
     val values = deepLinkValue.split("__")
     val referrerName =

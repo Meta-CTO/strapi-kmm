@@ -16,7 +16,7 @@ fun AppsFlyerOneLinkService.getAppAttributionResult(
 }
 
 fun ShareLinkGenerator.generateDeepLinkValue(
-    path: String,
+    destination: String,
     channel: String?,
     referrerCustomerId: String?,
     baseDeepLink: String?,
@@ -27,7 +27,7 @@ fun ShareLinkGenerator.generateDeepLinkValue(
     parameters: Map<String, String>?
 ): String {
     val stringBuilder = StringBuilder()
-    stringBuilder.append("${AppsFlyerConstants.DEEP_LINK_DESTINATION}=$path")
+    stringBuilder.append("${AppsFlyerConstants.DEEP_LINK_DESTINATION}=$destination")
     channel?.let {
         stringBuilder.append("__${AppsFlyerConstants.CHANNEL}=$it")
     }

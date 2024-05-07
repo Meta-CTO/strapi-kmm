@@ -14,7 +14,7 @@ import kotlin.coroutines.resume
 actual object ShareLinkGenerator {
     actual suspend fun generateShareLink(
         context: Any?,
-        path: String,
+        destination: String,
         channel: String?,
         referrerCustomerId: String?,
         referrerName: String?,
@@ -31,7 +31,7 @@ actual object ShareLinkGenerator {
             val configureLinkGenerator: (AppsFlyerLinkGenerator?) -> AppsFlyerLinkGenerator? =
                 { linkGenerator ->
                     val deepLinkValue = generateDeepLinkValue(
-                        path,
+                        destination,
                         channel,
                         referrerCustomerId,
                         baseDeepLink,

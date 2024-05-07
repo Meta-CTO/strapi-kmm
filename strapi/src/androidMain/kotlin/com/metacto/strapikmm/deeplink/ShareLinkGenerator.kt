@@ -4,13 +4,11 @@ import com.appsflyer.share.ShareInviteHelper
 import com.metacto.strapikmm.deeplink.model.BaseUrl
 import com.metacto.strapikmm.deeplink.util.AppsFlyerConstants
 import com.metacto.strapikmm.deeplink.util.generateDeepLinkValue
-import com.metacto.strapikmm.util.DESEncryption
-import io.ktor.http.URLBuilder
 
 actual object ShareLinkGenerator {
     actual suspend fun generateShareLink(
         context: Any?,
-        path: String,
+        destination: String,
         channel: String?,
         referrerCustomerId: String?,
         referrerName: String?,
@@ -29,7 +27,7 @@ actual object ShareLinkGenerator {
 
        val generator =  ShareInviteHelper.generateInviteUrl(context).apply {
            val deepLinkValue = generateDeepLinkValue(
-               path,
+               destination,
                channel,
                referrerCustomerId,
                baseDeepLink,
