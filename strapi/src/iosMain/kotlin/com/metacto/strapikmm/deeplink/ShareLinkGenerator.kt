@@ -5,6 +5,8 @@ package com.metacto.strapikmm.deeplink
 import cocoapods.AppsFlyerFramework.AppsFlyerLinkGenerator
 import cocoapods.AppsFlyerFramework.AppsFlyerShareInviteHelper
 import com.metacto.strapikmm.deeplink.model.BaseUrl
+import com.metacto.strapikmm.deeplink.util.AppsFlyerConstants
+import com.metacto.strapikmm.deeplink.util.generateDeepLinkValue
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
@@ -12,6 +14,7 @@ import kotlin.coroutines.resume
 actual object ShareLinkGenerator {
     actual suspend fun generateShareLink(
         context: Any?,
+        destination: String,
         channel: String?,
         referrerCustomerId: String?,
         referrerName: String?,
@@ -27,6 +30,23 @@ actual object ShareLinkGenerator {
         return suspendCancellableCoroutine { cont ->
             val configureLinkGenerator: (AppsFlyerLinkGenerator?) -> AppsFlyerLinkGenerator? =
                 { linkGenerator ->
+                    val deepLinkValue = generateDeepLinkValue(
+                        destination,
+                        channel,
+                        referrerCustomerId,
+                        baseDeepLink,
+                        referrerName,
+                        referrerUID,
+                        campaign,
+                        referrerImageURL,
+                        parameters
+                    )
+
+                    linkGenerator?.addParameterValue(
+                        forKey = AppsFlyerConstants.DEEP_LINK_VALUE,
+                        value = deepLinkValue
+                    )
+
                     channel?.let {
                         linkGenerator?.setChannel(it)
                     }

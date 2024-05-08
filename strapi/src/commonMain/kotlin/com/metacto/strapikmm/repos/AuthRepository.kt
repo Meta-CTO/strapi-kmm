@@ -25,6 +25,7 @@ class AuthRepository(
     val authService: StrapiService,
     val userRepository: UserRepository,
     val sharedPreference: KmmPreference,
+    private val logoutUseCase: LogoutUseCase,
     private val actionCodeSettings: ActionCodeSettings
 ) {
 
@@ -199,10 +200,7 @@ class AuthRepository(
     }
 
     suspend fun signOut() {
-        sharedPreference.clearValue(SharedConstants.CACHED_USER_DATA)
-        sharedPreference.clearSecureValue(SharedConstants.ACCESS_TOKEN)
-        sharedPreference.putBool(SharedConstants.ENABLE_ANALYTICS_TRACKING, true)
-        Firebase.auth.signOut()
+        logoutUseCase.logout()
     }
 
     fun clearCachedCredentialsData() {

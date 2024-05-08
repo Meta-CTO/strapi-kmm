@@ -4,6 +4,7 @@ import com.metacto.strapikmm.deeplink.model.BaseUrl
 
 class DeepLinkGenerator private constructor(
     private val context: Any?,
+    private val destination: String,
     private val channel: String?,
     private val referrerCustomerId: String?,
     private val referrerName: String?,
@@ -16,7 +17,7 @@ class DeepLinkGenerator private constructor(
     private val baseURL: BaseUrl?,
     private val parameters: Map<String, String>
 ) {
-    class Builder(private val context: Any? = null) {
+    class Builder(private val context: Any? = null, private val destination: String) {
         private var channel: String? = null
         private var referrerCustomerId: String? = null
         private var referrerName: String? = null
@@ -46,6 +47,7 @@ class DeepLinkGenerator private constructor(
         fun addParameters(params: Map<String, String>) = apply { this.parameters.putAll(params) }
         fun build() = DeepLinkGenerator(
             context,
+            destination,
             channel,
             referrerCustomerId,
             referrerName,
@@ -62,6 +64,7 @@ class DeepLinkGenerator private constructor(
 
     suspend fun generateShareLink() = ShareLinkGenerator.generateShareLink(
         context,
+        destination,
         channel,
         referrerCustomerId,
         referrerName,

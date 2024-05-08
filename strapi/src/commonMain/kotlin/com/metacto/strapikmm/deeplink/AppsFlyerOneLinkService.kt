@@ -19,5 +19,6 @@ class AppsFlyerOneLinkOptions(
     val enableDebugLog: Boolean? = null,
     val minTimeBetweenSessions: Int? = null,
     val appInviteOneLinkTemplateId: String? = null,
-    val listener: AppsFlyerOneLinkListener
+    val listener: AppsFlyerOneLinkListener,
+    val oneLinkCustomDomains: List<String>? = null
 )

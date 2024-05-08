@@ -6,6 +6,9 @@ import com.appsflyer.AppsFlyerLib
 import com.appsflyer.attribution.AppsFlyerRequestListener
 import com.appsflyer.deeplink.DeepLinkListener
 import com.appsflyer.deeplink.DeepLinkResult
+import com.metacto.strapikmm.deeplink.model.getDeepLinkValue
+import com.metacto.strapikmm.deeplink.model.getDeepLinkMetadata
+import com.metacto.strapikmm.deeplink.model.getDestinationPath
 import com.metacto.strapikmm.deeplink.model.toError
 import com.metacto.strapikmm.deeplink.util.getAppAttributionResult
 
@@ -16,13 +19,14 @@ actual class AppsFlyerOneLinkService actual constructor(
         if (options.context == null || options.context !is Context) {
             throw IllegalArgumentException("Context must be provided and must be an instance of android.content.Context")
         }
+        initialize()
     }
 
 
     private val conversionListener = object : AppsFlyerConversionListener {
         override fun onConversionDataSuccess(p0: MutableMap<String, Any>?) {
             if (p0 != null) {
-                val appConversionResult = p0.getAppAttributionResult()
+                val appConversionResult = this@AppsFlyerOneLinkService.getAppAttributionResult(p0)
                 options.listener.onAppAttribution(
                     appConversionResult.isOrganic,
                     appConversionResult.extras
@@ -36,7 +40,7 @@ actual class AppsFlyerOneLinkService actual constructor(
 
         override fun onAppOpenAttribution(p0: MutableMap<String, String>?) {
             if (p0 != null) {
-                val appConversionResult = p0.getAppAttributionResult()
+                val appConversionResult = this@AppsFlyerOneLinkService.getAppAttributionResult(p0)
                 options.listener.onAppAttribution(
                     appConversionResult.isOrganic,
                     appConversionResult.extras
@@ -53,15 +57,18 @@ actual class AppsFlyerOneLinkService actual constructor(
         when (deepLinkResult.status) {
             DeepLinkResult.Status.FOUND -> {
                 val deepLink = deepLinkResult.deepLink
+                val clickEventValues = deepLink.clickEvent.toMap()
+                val fullDeepLinkValue = deepLink.deepLinkValue ?: this.getDeepLinkValue(clickEventValues)
                 val result = com.metacto.strapikmm.deeplink.model.DeepLinkResult(
-                    deepLinkValue = deepLink.deepLinkValue,
+                    destination = fullDeepLinkValue?.let { this.getDestinationPath(fullDeepLinkValue) },
                     campaign = deepLink.campaign,
                     campaignId = deepLink.campaignId,
                     clickHttpReferrer = deepLink.clickHttpReferrer,
                     isDeferred = deepLink.isDeferred,
                     mediaSource = deepLink.mediaSource,
                     matchType = deepLink.matchType,
-                    clickEventJson = deepLink.clickEvent.toString()
+                    clickEventJson = deepLink.clickEvent.toString(),
+                    metadata = fullDeepLinkValue?.let { this.getDeepLinkMetadata(fullDeepLinkValue) },
                 )
                 options.listener.onDeepLinkingResult(result)
             }
@@ -82,6 +89,9 @@ actual class AppsFlyerOneLinkService actual constructor(
             options.minTimeBetweenSessions?.let { setMinTimeBetweenSessions(it) }
             init(options.devAppKey, conversionListener, options.context as Context)
             subscribeForDeepLink(deepLinkListener)
+            setOneLinkCustomDomain(
+                *options.oneLinkCustomDomains?.toTypedArray().orEmpty()
+            )
             if (options.appInviteOneLinkTemplateId != null) {
                 //set the OneLink template id for share invite links
                 setAppInviteOneLink(options.appInviteOneLinkTemplateId)
