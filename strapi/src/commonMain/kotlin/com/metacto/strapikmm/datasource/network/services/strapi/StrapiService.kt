@@ -528,7 +528,7 @@ suspend fun <T> executeRequestWithNetworkHandling(block: suspend () -> T): T {
                     NetworkErrorMapper.NO_INTERNET_CONNECTION
                 )
             )
-            NetworkLogConfiguration.shouldShowActualErrorMessages || NetworkLogConfiguration.logLevel != NetworkLogLevel.NONE -> throw throwable
+            NetworkLogConfiguration.shouldShowActualErrorMessages -> throw throwable
             else -> throw AppException(
                 errorCode = NetworkErrorMapper.SOMETHING_WRONG,
                 errorMessage = createErrorJsonResponse(
