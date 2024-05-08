@@ -18,7 +18,7 @@ enum class FilterType(val value: String) {
     CONTAINS("contains"),
     NOT_CONTAINS("ncontains"),
     NULL("null"),
-    NOT_NULL("nnull"),
+    NOT_NULL("notNull"),
     STARTS_WITH("startsWith"),
     ENDS_WITH("endsWith"),
     STARTS_WITH_CASE_INSENSITIVE("startsWithi"),
