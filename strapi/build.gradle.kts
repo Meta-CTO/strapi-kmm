@@ -84,6 +84,7 @@ kotlin {
                     create("ContactsDataCollector")
                     create("BackgroundDownloader")
                     create("GZipDecompressor")
+                    create("DESEncryption")
                 }
             }
         }
@@ -101,6 +102,10 @@ kotlin {
         create("GZipDecompressor") {
             path = file("src/iosMain/native/gzipdecompressor")
             packageName("com.metacto.strapikmm.common.gzip.decompressor")
+        }
+        create("DESEncryption") {
+            path = file("src/iosMain/native/desencryption")
+            packageName("com.metacto.strapikmm.common.encryption")
         }
     }
 
@@ -126,6 +131,8 @@ kotlin {
                 api(ProjectDependencies.sharedPreferencesMultiplatformSettings)
                 api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
                 api("dev.gitlive:firebase-auth:1.12.0-metacto-5")
+
+                api("dev.gitlive:firebase-config:1.10.4")
             }
         }
         val androidMain by getting {

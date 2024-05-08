@@ -3,11 +3,12 @@ package com.metacto.strapikmm.deeplink
 import com.appsflyer.share.ShareInviteHelper
 import com.metacto.strapikmm.deeplink.model.BaseUrl
 import com.metacto.strapikmm.deeplink.util.AppsFlyerConstants
+import com.metacto.strapikmm.deeplink.util.generateDeepLinkValue
 
 actual object ShareLinkGenerator {
     actual suspend fun generateShareLink(
         context: Any?,
-        deepLinkValue: String,
+        destination: String,
         channel: String?,
         referrerCustomerId: String?,
         referrerName: String?,
@@ -23,7 +24,19 @@ actual object ShareLinkGenerator {
         if (context == null || context !is android.content.Context) {
             throw IllegalArgumentException("Context is required and must be an instance of android.content.Context")
         }
+
        val generator =  ShareInviteHelper.generateInviteUrl(context).apply {
+           val deepLinkValue = generateDeepLinkValue(
+               destination,
+               channel,
+               referrerCustomerId,
+               baseDeepLink,
+               referrerName,
+               referrerUID,
+               campaign,
+               referrerImageURL,
+               parameters
+           )
 
            addParameter(AppsFlyerConstants.DEEP_LINK_VALUE, deepLinkValue)
 

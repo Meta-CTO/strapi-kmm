@@ -1,7 +1,7 @@
 package com.metacto.strapikmm.deeplink.model
 
 data class DeepLinkResult(
-    val deepLinkValue: String?,
+    val destination: String?,
     val campaign: String?,
     val campaignId: String?,
     val clickHttpReferrer: String?,

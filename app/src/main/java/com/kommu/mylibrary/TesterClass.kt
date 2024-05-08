@@ -1,52 +1,31 @@
 package com.kommu.mylibrary
 
-import android.util.Log
-import com.metacto.strapikmm.datasource.network.FilterType
-import com.metacto.strapikmm.datasource.network.GroupedFilter
-import com.metacto.strapikmm.datasource.network.KmmBaseService
-import com.metacto.strapikmm.datasource.network.StrapiFilterType
-import com.metacto.strapikmm.datasource.network.StrapiQueryBuilder
-import com.metacto.strapikmm.datasource.network.StrapiRequestBuilder
-import com.metacto.strapikmm.datasource.network.StrapiSortType
-import com.metacto.strapikmm.datasource.network.services.strapi.JsonFlatter
-import com.metacto.strapikmm.datasource.network.services.strapi.convert
-import com.metacto.strapikmm.sharedpreference.KmmPreference
+import com.metacto.strapikmm.util.DESEncryption
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.JsonArray
 
 class TesterClass {
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-            val strapiQueryBuilder = StrapiQueryBuilder().apply {
-                groupedFilters(
-                    listOf(
-                        GroupedFilter(key = "type", value = "roundInvite", type = FilterType.EQUALS),
-                        GroupedFilter(key = "endDate", value = "2024-04-23", type = FilterType.LESS_THAN),
-                        GroupedFilter(key = "hasRound", value = "true", type = FilterType.EQUALS)
-                    ),
-                    StrapiFilterType.OR
-                )
+            val key = "u1BvOHzUOcklgNpn1MaWvdn9DT4LyzSX"
+            val iv = "fsd23243"
 
-                groupedFilters(
-                    listOf(
-                        GroupedFilter(key = "type", value = "socialEvent", type = FilterType.EQUALS),
-                        GroupedFilter(key = "endDate", value = "2024-04-23", type = FilterType.LESS_THAN),
-                    ),
-                    StrapiFilterType.OR
-                )
+            val des = DESEncryption(key, iv)
 
-                equalTo("type", "roundInvite")
-                lessThan("endDate", "2024-04-23")
-                equalTo("hasRound", "true")
-                equalTo("type", "socialEvent")
-                lessThan("endDate", "2024-04-23")
+            // String to encrypt
+            val plainText = "channel=myChannel&path=/round/2&referrerCustomerId=referrerCustomerId&referrerName=referrerName&refererID=refererID&campaign=campaign&baseDeepLink=baseDeepLink&deepLinkPath=deepLinkPath&referrerImageURL=referrerImageURL&jwt=12344"
 
-            }
+            // Padding the input string
+            // Encrypting the padded string
+            val encrypted = des.encrypt(plainText)
 
-            val filters = strapiQueryBuilder.filters
-            val first = filters.size
+            println("Encrypted: ${encrypted}")
+
+            // Decrypting the encrypted string
+            val decrypted = des.decrypt(encrypted)
+            println("Decrypted: $decrypted")
         }
     }
 }

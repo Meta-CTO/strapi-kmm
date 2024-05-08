@@ -1,5 +1,6 @@
 package com.metacto.strapikmm.deeplink.model
 
+import com.metacto.strapikmm.deeplink.AppsFlyerOneLinkService
 import com.metacto.strapikmm.deeplink.util.AppsFlyerConstants
 
 data class DeepLinkMetadata(
@@ -13,38 +14,51 @@ data class DeepLinkMetadata(
     val extras: Map<Any?, *>?
 )
 
-fun Map<Any?, *>.getDeepLinkValue(): String? {
-    return this[AppsFlyerConstants.DEEP_LINK_VALUE]?.toString()
+fun AppsFlyerOneLinkService.getDeepLinkValue(values: Map<Any?, *>): String? {
+    return values[AppsFlyerConstants.DEEP_LINK_VALUE]?.toString()
 }
 
-fun Map<Any?, *>.toDeepLinkMetadata(): DeepLinkMetadata {
+fun AppsFlyerOneLinkService.getDestinationPath(fullDeepLinkValue: String): String? {
+    val values = fullDeepLinkValue.split("__")
+    return values.find { it.startsWith(AppsFlyerConstants.DEEP_LINK_DESTINATION) }?.substringAfter("=")
+}
+
+fun AppsFlyerOneLinkService.getDeepLinkMetadata(deepLinkValue: String): DeepLinkMetadata {
+    val values = deepLinkValue.split("__")
+    val referrerName =
+        values.find { it.startsWith(AppsFlyerConstants.REFERRER_NAME) }?.substringAfter("=")
+    val baseDeepLinkPath =
+        values.find { it.startsWith(AppsFlyerConstants.BASE_DEEP_LINK) }?.substringAfter("=")
+    val channel = values.find { it.startsWith(AppsFlyerConstants.CHANNEL) }?.substringAfter("=")
+    val campaign = values.find { it.startsWith(AppsFlyerConstants.CAMPAIGN) }?.substringAfter("=")
+    val referrerCustomerId =
+        values.find { it.startsWith(AppsFlyerConstants.REFERRER_CUSTOMER_ID) }?.substringAfter("=")
+    val referrerUID =
+        values.find { it.startsWith(AppsFlyerConstants.REFERRER_UID) }?.substringAfter("=")
+    val referrerImageURL =
+        values.find { it.startsWith(AppsFlyerConstants.REFERRER_IMAGE_URL) }?.substringAfter("=")
+    val extras = values.filter {
+        !it.startsWith(AppsFlyerConstants.REFERRER_NAME)
+                && !it.startsWith(AppsFlyerConstants.DEEP_LINK_VALUE)
+                && !it.startsWith(AppsFlyerConstants.BASE_DEEP_LINK)
+                && !it.startsWith(AppsFlyerConstants.CHANNEL)
+                && !it.startsWith(AppsFlyerConstants.CAMPAIGN)
+                && !it.startsWith(AppsFlyerConstants.REFERRER_CUSTOMER_ID)
+                && !it.startsWith(AppsFlyerConstants.DEEP_LINK_DESTINATION)
+                && !it.startsWith(AppsFlyerConstants.REFERRER_UID)
+                && !it.startsWith(AppsFlyerConstants.REFERRER_IMAGE_URL)
+    }.map {
+        it.substringBefore("=") to it.substringAfter("=")
+    }
+
     return DeepLinkMetadata(
-        referrerName = this[AppsFlyerConstants.REFERRER_NAME]?.toString(),
-        baseDeepLinkPath = this[AppsFlyerConstants.BASE_DEEP_LINK_PATH]?.toString(),
-        channel = this[AppsFlyerConstants.CHANNEL]?.toString(),
-        campaign = this[AppsFlyerConstants.CAMPAIGN]?.toString(),
-        referrerCustomerId = this[AppsFlyerConstants.REFERRER_CUSTOMER_ID]?.toString(),
-        referrerUID = this[AppsFlyerConstants.REFERRER_UID]?.toString(),
-        referrerImageURL = this[AppsFlyerConstants.REFERRER_IMAGE_URL]?.toString(),
-        extras = this.getExtras()
+        referrerName = referrerName,
+        baseDeepLinkPath = baseDeepLinkPath,
+        channel = channel,
+        campaign = campaign,
+        referrerCustomerId = referrerCustomerId,
+        referrerUID = referrerUID,
+        referrerImageURL = referrerImageURL,
+        extras = extras.toMap()
     )
-}
-
-fun Map<Any?, *>.getExtras(): Map<Any?, *> {
-    val extras =
-        this.filter {
-            it.key != AppsFlyerConstants.REFERRER_NAME
-                    && it.key != AppsFlyerConstants.DEEP_LINK_VALUE
-                    && it.key != AppsFlyerConstants.BASE_DEEP_LINK_PATH
-                    && it.key != AppsFlyerConstants.CHANNEL
-                    && it.key != AppsFlyerConstants.CAMPAIGN
-                    && it.key != AppsFlyerConstants.REFERRER_CUSTOMER_ID
-                    && it.key != AppsFlyerConstants.REFERRER_UID
-                    && it.key != AppsFlyerConstants.REFERRER_IMAGE_URL
-                    && it.key != AppsFlyerConstants.SCHEME
-                    && it.key != AppsFlyerConstants.HOST
-                    && it.key != AppsFlyerConstants.LINK
-                    && it.key != AppsFlyerConstants.MEDIA_SOURCE
-        } as Map<Any?, *>
-    return extras
 }

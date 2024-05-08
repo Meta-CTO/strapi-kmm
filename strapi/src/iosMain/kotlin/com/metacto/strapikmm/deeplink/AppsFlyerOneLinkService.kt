@@ -10,7 +10,8 @@ import cocoapods.AppsFlyerFramework.AppsFlyerLibDelegateProtocol
 import com.metacto.strapikmm.deeplink.model.DeepLinkError
 import com.metacto.strapikmm.deeplink.model.DeepLinkResult
 import com.metacto.strapikmm.deeplink.model.getDeepLinkValue
-import com.metacto.strapikmm.deeplink.model.toDeepLinkMetadata
+import com.metacto.strapikmm.deeplink.model.getDeepLinkMetadata
+import com.metacto.strapikmm.deeplink.model.getDestinationPath
 import com.metacto.strapikmm.deeplink.util.getAppAttributionResult
 import com.rickclephas.kmp.nserrorkt.asThrowable
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -19,9 +20,8 @@ import platform.Foundation.NSError
 import platform.darwin.NSObject
 
 actual class AppsFlyerOneLinkService actual constructor(
-    val options: AppsFlyerOneLinkOptions
-) : NSObject(), AppsFlyerDeepLinkDelegateProtocol,  AppsFlyerLibDelegateProtocol
-{
+    private val options: AppsFlyerOneLinkOptions
+) : NSObject(), AppsFlyerDeepLinkDelegateProtocol, AppsFlyerLibDelegateProtocol {
     init {
         if (options.appleAppId.isNullOrEmpty()) {
             throw IllegalArgumentException("Apple App ID must be provided for iOS platform")
@@ -61,8 +61,11 @@ actual class AppsFlyerOneLinkService actual constructor(
         when (result.status) {
             AFSDKDeepLinkResultStatus.AFSDKDeepLinkResultStatusFound -> {
                 val deepLink = result.deepLink
+                val clickEventValues = deepLink?.clickEvent?.toMap() ?: emptyMap()
+                val fullDeepLinkValue =
+                    deepLink?.deeplinkValue ?: this.getDeepLinkValue(clickEventValues)
                 val deepLinkResult = DeepLinkResult(
-                    deepLinkValue = deepLink?.deeplinkValue ?: deepLink?.clickEvent?.getDeepLinkValue(),
+                    destination = fullDeepLinkValue?.let { this.getDestinationPath(fullDeepLinkValue) },
                     campaign = deepLink?.campaign,
                     campaignId = deepLink?.campaignId,
                     clickHttpReferrer = deepLink?.clickHTTPReferrer,
@@ -70,17 +73,20 @@ actual class AppsFlyerOneLinkService actual constructor(
                     mediaSource = deepLink?.mediaSource,
                     matchType = deepLink?.matchType,
                     clickEventJson = deepLink?.clickEvent.toString(),
-                    metadata = deepLink?.clickEvent?.toDeepLinkMetadata()
+                    metadata = fullDeepLinkValue?.let { this.getDeepLinkMetadata(fullDeepLinkValue) }
                 )
 
                 options.listener.onDeepLinkingResult(deepLinkResult)
             }
+
             AFSDKDeepLinkResultStatus.AFSDKDeepLinkResultStatusNotFound -> {
                 options.listener.onDeepLinkingResult(null)
             }
+
             AFSDKDeepLinkResultStatus.AFSDKDeepLinkResultStatusFailure -> {
                 options.listener.onDeepLinkingError(DeepLinkError(result.error))
             }
+
             else -> {
                 options.listener.onDeepLinkingResult(null)
             }
@@ -92,7 +98,7 @@ actual class AppsFlyerOneLinkService actual constructor(
     }
 
     override fun onConversionDataSuccess(conversionInfo: Map<Any?, *>) {
-        val appConversionResult = conversionInfo.getAppAttributionResult()
+        val appConversionResult = this.getAppAttributionResult(conversionInfo)
         options.listener.onAppAttribution(appConversionResult.isOrganic, appConversionResult.extras)
     }
 
