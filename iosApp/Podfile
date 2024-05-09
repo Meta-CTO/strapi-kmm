@@ -1,0 +1,7 @@
+source 'https://github.com/CocoaPods/Specs.git'
+source 'https://cdn.cocoapods.org'
+target 'iosApp' do
+  use_frameworks!
+  platform :ios, '14.1'
+  pod 'strapi', :path => '../strapi'
+end

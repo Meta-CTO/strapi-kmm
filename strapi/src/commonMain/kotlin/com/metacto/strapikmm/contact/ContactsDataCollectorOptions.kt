@@ -1,0 +1,3 @@
+package com.metacto.strapikmm.contact
+
+expect class ContactsDataCollectorOptions
