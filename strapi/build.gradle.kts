@@ -49,13 +49,6 @@ kotlin {
             moduleName = "CleverTapSDK"
         }
 
-        pod("AppsFlyerFramework") {
-            version = "6.11.2"
-            moduleName = "AppsFlyerLib"
-        }
-
-//        pod("AWSS3")
-
         framework {
             baseName = libName + "pods" // DON'T CHANGE THIS LINE, there is a bug in the plugin that requires unique names for each framework
             isStatic = true
@@ -157,9 +150,6 @@ kotlin {
 
                 implementation("androidx.tonyodev.fetch2:xfetch2:$fetchVersion")
                 api("com.amazonaws:aws-android-sdk-s3:$awsS3Version")
-
-                api("com.appsflyer:af-android-sdk:6.+")
-                api("com.android.installreferrer:installreferrer:2.2")
             }
         }
 
@@ -197,27 +187,7 @@ kotlin {
         }
     }
 
-    // DON'T REMOVE OR UNCOMMENT THIS
-//    afterEvaluate {
-//        publishing {
-//            publications {
-//                create<MavenPublication>("release") {
-//                    groupId = publishGroupId
-//                    artifactId = libName.toLowerCase()
-//                    version = currentVersion
-//
-//                    from(components.getByName("release"))
-//                }
-//                create<MavenPublication>("debug") {
-//                    groupId = publishGroupId
-//                    artifactId = "${libName.toLowerCase()}-debug"
-//                    version = currentVersion
-//
-//                    from(components.getByName("debug"))
-//                }
-//            }
-//        }
-//    }
+    task("testClasses")
 }
 
 sqldelight {
@@ -257,23 +227,6 @@ afterEvaluate {
 
 publishing {
     repositories {
-        // DON'T REMOVE OR UNCOMMENT THIS TILL WE REMOVE sonatype FROM PROJECT
-//        maven {
-//            name = "oss"
-//            setUrl("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-//            val releasesRepoUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-//            val snapshotsRepoUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-//            url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
-//
-//            credentials {
-//                username = publishUsername
-//                password = publishPassword
-//            }
-//        }
-
-        println("PUBLISH_REPO_USER: ${gradleLocalProperties(rootDir).getProperty("PUBLISH_REPO_USER")}")
-        println("PUBLISH_REPO_TOKEN: ${gradleLocalProperties(rootDir).getProperty("PUBLISH_REPO_TOKEN")}")
-
         repositories {
             maven("https://maven.pkg.github.com/Meta-CTO/strapi-kmm") {
                 name = "Github"
@@ -316,18 +269,3 @@ publishing {
         }
     }
 }
-
-// DON'T REMOVE SIGNING FOR NOW
-//signing {
-//    useInMemoryPgpKeys(publishKey,publishSecret, publishUsername)
-//    sign(publishing.publications)
-//}
-
-//afterEvaluate {
-//    val compilation = kotlin.targets["metadata"].compilations["iosMain"]
-//    compilation.compileKotlinTask.doFirst {
-//        compilation.compileDependencyFiles = files(
-//            compilation.compileDependencyFiles.filterNot { it.absolutePath.endsWith("klib/common/stdlib") }
-//        )
-//    }
-//}
