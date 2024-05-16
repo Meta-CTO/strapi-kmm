@@ -105,21 +105,30 @@ suspend fun Throwable.handleNetworkException() {
         when (this) {
             is ServerResponseException -> {
                 val bodyString = response.bodyAsText()
-                Logger("").log("Error: $bodyString")
+                Logger("").log("ServerResponseException Error: $bodyString")
+                val httpErrorCode = response.status.value
+                throw NetworkErrorMapper().mapToAppException(this, bodyString, httpErrorCode)
             }
 
             is ClientRequestException -> {
                 val bodyString = response.bodyAsText()
-                Logger("").log("Error: $bodyString")
+                Logger("").log("ClientRequestException Error: $bodyString")
+                val httpErrorCode = response.status.value
+                throw NetworkErrorMapper().mapToAppException(this, bodyString, httpErrorCode)
             }
 
             is RedirectResponseException -> {
                 val bodyString = response.bodyAsText()
-                Logger("").log("Error: $bodyString")
+                Logger("").log("RedirectResponseException Error: $bodyString")
+                val httpErrorCode = response.status.value
+                throw NetworkErrorMapper().mapToAppException(this, bodyString, httpErrorCode)
             }
 
             else -> {
-                Logger("").log("Error: $this")
+                val className = this::class.simpleName
+                val error = this.message ?: this.toString()
+                Logger("").log("$className Error: $error")
+                throw NetworkErrorMapper().mapToAppException(this, error, -1)
             }
         }
     }

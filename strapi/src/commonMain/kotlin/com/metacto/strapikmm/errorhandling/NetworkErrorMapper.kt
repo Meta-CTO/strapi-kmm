@@ -10,7 +10,21 @@ class NetworkErrorMapper {
     fun mapThrowable(throwable: Throwable): AppException {
         return UnexpectedException(
             code = UNEXPECTED,
-            errorMessage = createErrorJsonResponse("$throwable", -1),
+            errorMessage = createErrorJsonResponse(throwable.message ?: throwable.toString(), -1),
+            throwable = throwable
+        )
+    }
+
+    fun mapToAppException(
+        throwable: Throwable,
+        errorMessage: String? = null,
+        httpErrorCode: Int?,
+    ): AppException {
+        return UnexpectedException(
+            code = httpErrorCode ?: -1,
+            errorMessage = createErrorJsonResponse(
+                errorMessage ?: throwable.message ?: throwable.toString(), httpErrorCode ?: -1
+            ),
             throwable = throwable
         )
     }
@@ -49,7 +63,8 @@ class NetworkErrorMapper {
         private const val UNAUTHORIZED = 401
         const val NO_INTERNET_CONNECTION = 4232
         const val SOMETHING_WRONG = 4222
-        const val NO_INTERNET_CONNECTION_MESSAGE = "Hmm, there seems to be a problem with your internet connection."
+        const val NO_INTERNET_CONNECTION_MESSAGE =
+            "Hmm, there seems to be a problem with your internet connection."
         const val SOMETHING_WRONG_MESSAGE = "Oops, something went wrong. Please try again later."
     }
 }
@@ -60,3 +75,6 @@ fun createErrorJsonResponse(message: String, code: Int) = JsonObject(
         "code" to JsonPrimitive(code)
     )
 ).toString()
+
+
+
