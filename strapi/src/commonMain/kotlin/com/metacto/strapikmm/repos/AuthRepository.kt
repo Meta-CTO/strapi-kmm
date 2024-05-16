@@ -1,7 +1,7 @@
 package com.metacto.strapikmm.repos
 
 import com.metacto.strapikmm.auth.AuthOptions
-import com.metacto.strapikmm.auth.IAuthenticator
+import com.metacto.strapikmm.auth.Authenticator
 import com.metacto.strapikmm.auth.ProfileMetadata
 import com.metacto.strapikmm.constants.SharedConstants
 import com.metacto.strapikmm.datasource.network.StrapiQueryBuilder
@@ -10,7 +10,6 @@ import com.metacto.strapikmm.model.AuthResponse
 import com.metacto.strapikmm.model.FirebaseAuthRequest
 import com.metacto.strapikmm.model.OverrideUserRequest
 import com.metacto.strapikmm.sharedpreference.KmmPreference
-import dev.gitlive.firebase.auth.AuthCredential
 import dev.gitlive.firebase.auth.PhoneVerificationMetadata
 import dev.gitlive.firebase.auth.PhoneVerificationProvider
 import kotlinx.datetime.TimeZone
@@ -20,7 +19,7 @@ class AuthRepository(
     val userRepository: UserRepository,
     private val logoutUseCase: LogoutUseCase,
     val sharedPreference: KmmPreference,
-    val authenticator: IAuthenticator
+    val authenticator: Authenticator
 ) {
     @Throws(Throwable::class)
     suspend inline fun <reified T> signInWithCurrentIdToken(
@@ -28,19 +27,20 @@ class AuthRepository(
         shouldUpdateTimeZone: Boolean = true
     ): T {
         val token = authenticator.authenticateCurrentUser()
-        return exchangeFirebaseToken(token.orEmpty(), null, userQueryBuilder, shouldUpdateTimeZone)
+        return exchangeFirebaseToken(token, null, userQueryBuilder, shouldUpdateTimeZone)
     }
 
     @Throws(Throwable::class)
     suspend inline fun <reified T> signInWithGoogle(
-        authOptions: AuthOptions?,
+        authOptions: AuthOptions,
         noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
         shouldUpdateTimeZone: Boolean = true
     ): T {
-       val googleAuthResult = authenticator.authenticateWithGoogle(authOptions)
+        val authenticationMetadata = authenticator.authenticateWithGoogle(authOptions)
+
         return exchangeFirebaseToken(
-            googleAuthResult.first.orEmpty(),
-            googleAuthResult.second,
+            authenticationMetadata.idToken,
+            authenticationMetadata.profileMetadata,
             userQueryBuilder,
             shouldUpdateTimeZone
         )
@@ -51,10 +51,11 @@ class AuthRepository(
         noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
         shouldUpdateTimeZone: Boolean = true
     ): T {
-        val appleAuthResult = authenticator.authenticateWithApple()
+        val authenticationMetadata = authenticator.authenticateWithApple()
+
         return exchangeFirebaseToken(
-            appleAuthResult.first.orEmpty(),
-            appleAuthResult.second,
+            authenticationMetadata.idToken,
+            authenticationMetadata.profileMetadata,
             userQueryBuilder,
             shouldUpdateTimeZone
         )
@@ -77,7 +78,13 @@ class AuthRepository(
         shouldUpdateTimeZone: Boolean = true
     ): T {
         val idToken = authenticator.verifyEmailLink(emailLink)
-        return exchangeFirebaseToken(idToken.orEmpty(), null, userQueryBuilder, shouldUpdateTimeZone)
+
+        return exchangeFirebaseToken(
+            idToken.orEmpty(),
+            null,
+            userQueryBuilder,
+            shouldUpdateTimeZone
+        )
     }
 
     @Throws(Throwable::class)
@@ -106,22 +113,6 @@ class AuthRepository(
     }
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T> signInWithCredentials(
-        credentials: AuthCredential,
-        profileMetadata: ProfileMetadata? = null,
-        noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
-        shouldUpdateTimeZone: Boolean = true
-    ): T {
-        val token = authenticator.authenticateWithCredentials(credentials)
-        return exchangeFirebaseToken(
-            token.orEmpty(),
-            profileMetadata,
-            userQueryBuilder,
-            shouldUpdateTimeZone
-        )
-    }
-
-    @Throws(Throwable::class)
     suspend fun sendPhoneVerificationCode(
         phoneNumber: String,
         phoneVerificationProvider: PhoneVerificationProvider
@@ -141,11 +132,13 @@ class AuthRepository(
         shouldUpdateTimeZone: Boolean = true
     ): T {
         val idToken = authenticator.verifyPhoneVerification(otp)
-        return exchangeFirebaseToken(idToken.orEmpty(), null, userQueryBuilder, shouldUpdateTimeZone)
-    }
 
-    fun saveUserToken(token: String) {
-        sharedPreference.putSecureString(SharedConstants.ACCESS_TOKEN, token)
+        return exchangeFirebaseToken(
+            idToken,
+            null,
+            userQueryBuilder,
+            shouldUpdateTimeZone
+        )
     }
 
     fun isUserLoggedIn(): Boolean {
@@ -154,6 +147,10 @@ class AuthRepository(
 
     suspend fun signOut() {
         logoutUseCase.logout()
+    }
+
+    fun saveUserToken(token: String) {
+        sharedPreference.putSecureString(SharedConstants.ACCESS_TOKEN, token)
     }
 
     fun clearCachedCredentialsData() {

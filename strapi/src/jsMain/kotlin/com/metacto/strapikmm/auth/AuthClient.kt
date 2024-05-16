@@ -57,7 +57,7 @@ actual class AuthClient : AuthProvider {
         }
     }
 
-    actual fun setAuthOptions(options: AuthOptions?) {
+    actual fun setAuthOptions(options: AuthOptions) {
     }
 }
 
