@@ -1,9 +1,15 @@
 package com.metacto.strapikmm.errorhandling
 
+import com.metacto.strapikmm.datasource.network.services.strapi.JsonFlatter
+import com.metacto.strapikmm.datasource.network.services.strapi.JsonWithIgnoredUnknownKeys
 import com.metacto.strapikmm.errorhandling.errortype.UnAuthorizedException
 import com.metacto.strapikmm.errorhandling.errortype.UnexpectedException
+import io.ktor.client.call.body
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.decodeFromJsonElement
 
 class NetworkErrorMapper {
 
@@ -69,12 +75,32 @@ class NetworkErrorMapper {
     }
 }
 
-fun createErrorJsonResponse(message: String, code: Int) = JsonObject(
-    mapOf(
-        "message" to JsonPrimitive(message),
-        "code" to JsonPrimitive(code)
-    )
-).toString()
+fun createErrorJsonResponse(message: String, code: Int): String {
+    val errorMessage = if (isValidJson(message)) {
+        val errorData =
+            JsonFlatter.flat<NetworkError>(JsonWithIgnoredUnknownKeys.decodeFromString(message))
+        val errorResponse =
+            JsonWithIgnoredUnknownKeys.decodeFromJsonElement<NetworkError>(errorData)
+        errorResponse.message ?: message
+    } else {
+        message
+    }
 
+    return JsonObject(
+        mapOf(
+            "message" to JsonPrimitive(errorMessage),
+            "code" to JsonPrimitive(code)
+        )
+    ).toString()
+}
+
+fun isValidJson(jsonString: String): Boolean {
+    return try {
+        JsonWithIgnoredUnknownKeys.parseToJsonElement(jsonString)
+        true
+    } catch (e: Exception) {
+        false
+    }
+}
 
 
