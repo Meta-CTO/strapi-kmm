@@ -82,8 +82,7 @@ actual class AuthClient : AuthProvider {
         options.launcher.launch(gClient.signInIntent)
     }
 
-    actual fun setAuthOptions(options: AuthOptions?) {
-        if (options == null) throw IllegalArgumentException("options cannot be null")
+    actual fun setAuthOptions(options: AuthOptions) {
         this.options = options
     }
 }
