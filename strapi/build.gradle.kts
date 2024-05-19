@@ -44,10 +44,6 @@ kotlin {
         pod("FirebaseAuth", linkOnly = true)
         pod("GoogleSignIn")
         pod("FirebaseDynamicLinks")
-        pod("Amplitude")
-        pod("CleverTap-iOS-SDK") {
-            moduleName = "CleverTapSDK"
-        }
 
         framework {
             baseName = libName + "pods" // DON'T CHANGE THIS LINE, there is a bug in the plugin that requires unique names for each framework
@@ -141,13 +137,8 @@ kotlin {
                 implementation("com.google.android.gms:play-services-auth:20.7.0")
                 implementation(platform("com.google.firebase:firebase-bom:32.1.1"))
                 implementation("com.google.firebase:firebase-dynamic-links-ktx")
-                api("com.amplitude:android-sdk:2.39.8")
-                api("com.clevertap.android:clevertap-android-sdk:6.0.0")
-                api("com.android.installreferrer:installreferrer:2.2")
-
                 implementation("com.alexstyl:contactstore:$contactsVersion")
                 implementation("com.alexstyl:contactstore-coroutines:$contactsVersion")
-
                 implementation("androidx.tonyodev.fetch2:xfetch2:$fetchVersion")
                 api("com.amazonaws:aws-android-sdk-s3:$awsS3Version")
             }
