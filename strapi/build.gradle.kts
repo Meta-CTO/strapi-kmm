@@ -121,7 +121,7 @@ kotlin {
                 api(Ktor.contentNegotiation)
                 api(Ktor.logback)
                 api(Ktor.logging)
-                api(ProjectDependencies.sharedPreferencesMultiplatformSettings)
+                api(ProjectDependencies.MULTIPLATFORM_SETTINGS)
                 api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
                 api("dev.gitlive:firebase-auth:1.12.0-metacto-5")
 
