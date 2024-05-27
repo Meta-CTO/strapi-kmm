@@ -9,9 +9,7 @@ Pod::Spec.new do |spec|
     spec.vendored_frameworks      = 'build/cocoapods/framework/strapiKMMpods.framework'
     spec.libraries                = 'c++'
     spec.ios.deployment_target = '14.1'
-    spec.dependency 'FirebaseAuth'
-    spec.dependency 'FirebaseDynamicLinks'
-    spec.dependency 'GoogleSignIn'
+                
                 
     if !Dir.exist?('build/cocoapods/framework/strapiKMMpods.framework') || Dir.empty?('build/cocoapods/framework/strapiKMMpods.framework')
         raise "

@@ -1,8 +1,10 @@
 package com.metacto.strapikmm.repos
 
-import com.metacto.strapikmm.auth.AuthOptions
-import com.metacto.strapikmm.auth.Authenticator
-import com.metacto.strapikmm.auth.ProfileMetadata
+import com.metacto.kmm.auth.common.AuthOptions
+import com.metacto.kmm.auth.common.Authenticator
+import com.metacto.kmm.auth.common.PhoneVerifierMetadata
+import com.metacto.kmm.auth.common.PhoneVerifierProvider
+import com.metacto.kmm.auth.common.ProfileMetadata
 import com.metacto.strapikmm.constants.SharedConstants
 import com.metacto.strapikmm.datasource.network.StrapiQueryBuilder
 import com.metacto.strapikmm.datasource.network.services.strapi.StrapiService
@@ -10,8 +12,6 @@ import com.metacto.strapikmm.model.AuthResponse
 import com.metacto.strapikmm.model.FirebaseAuthRequest
 import com.metacto.strapikmm.model.OverrideUserRequest
 import com.metacto.strapikmm.sharedpreference.KmmPreference
-import dev.gitlive.firebase.auth.PhoneVerificationMetadata
-import dev.gitlive.firebase.auth.PhoneVerificationProvider
 import kotlinx.datetime.TimeZone
 
 class AuthRepository(
@@ -36,7 +36,7 @@ class AuthRepository(
         noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
         shouldUpdateTimeZone: Boolean = true
     ): T {
-        val authenticationMetadata = authenticator.authenticateWithGoogle(authOptions)
+        val authenticationMetadata = authenticator.authenticateWithGoogle(authOptions) ?: throw Throwable("Google authentication failed")
 
         return exchangeFirebaseToken(
             authenticationMetadata.idToken,
@@ -51,7 +51,7 @@ class AuthRepository(
         noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
         shouldUpdateTimeZone: Boolean = true
     ): T {
-        val authenticationMetadata = authenticator.authenticateWithApple()
+        val authenticationMetadata = authenticator.authenticateWithApple() ?: throw Throwable("Apple authentication failed")
 
         return exchangeFirebaseToken(
             authenticationMetadata.idToken,
@@ -115,13 +115,13 @@ class AuthRepository(
     @Throws(Throwable::class)
     suspend fun sendPhoneVerificationCode(
         phoneNumber: String,
-        phoneVerificationProvider: PhoneVerificationProvider
-    ): PhoneVerificationMetadata {
+        phoneVerificationProvider: PhoneVerifierProvider
+    ): PhoneVerifierMetadata {
         return authenticator.sendPhoneVerification(phoneNumber, phoneVerificationProvider)
     }
 
     @Throws(Throwable::class)
-    suspend fun resendVerificationCode(phoneVerificationProvider: PhoneVerificationProvider): PhoneVerificationMetadata {
+    suspend fun resendVerificationCode(phoneVerificationProvider: PhoneVerifierProvider): PhoneVerifierMetadata {
         return authenticator.resendVerificationCode(phoneVerificationProvider)
     }
 

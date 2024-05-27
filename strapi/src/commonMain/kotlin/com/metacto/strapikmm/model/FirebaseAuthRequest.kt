@@ -1,6 +1,6 @@
 package com.metacto.strapikmm.model
 
-import com.metacto.strapikmm.auth.ProfileMetadata
+import com.metacto.kmm.auth.common.ProfileMetadata
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

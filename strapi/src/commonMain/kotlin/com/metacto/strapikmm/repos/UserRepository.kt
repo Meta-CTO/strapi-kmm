@@ -7,8 +7,6 @@ import com.metacto.strapikmm.datasource.network.services.strapi.StrapiService
 import com.metacto.strapikmm.model.UpdateTimeZoneRequest
 import com.metacto.strapikmm.sharedpreference.KmmPreference
 import com.metacto.strapikmm.util.asCommonFlow
-import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.auth.auth
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.ObsoleteCoroutinesApi
