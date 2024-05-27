@@ -1,15 +1,10 @@
 PODS:
-  - Amplitude (8.17.1):
-    - AnalyticsConnector (~> 1.0.0)
-  - AnalyticsConnector (1.0.1)
   - AppAuth (1.6.2):
     - AppAuth/Core (= 1.6.2)
     - AppAuth/ExternalUserAgent (= 1.6.2)
   - AppAuth/Core (1.6.2)
   - AppAuth/ExternalUserAgent (1.6.2):
     - AppAuth/Core
-  - CleverTap-iOS-SDK (5.2.0):
-    - SDWebImage (~> 5.11)
   - FirebaseAppCheckInterop (10.12.0)
   - FirebaseAuth (10.12.0):
     - FirebaseAppCheckInterop (~> 10.0)
@@ -49,12 +44,7 @@ PODS:
     - GTMSessionFetcher/Core (< 4.0, >= 1.5)
   - GTMSessionFetcher/Core (3.1.1)
   - PromisesObjC (2.3.1)
-  - SDWebImage (5.18.0):
-    - SDWebImage/Core (= 5.18.0)
-  - SDWebImage/Core (5.18.0)
   - strapi (1.0.0):
-    - Amplitude
-    - CleverTap-iOS-SDK
     - FirebaseAuth
     - FirebaseDynamicLinks
     - GoogleSignIn
@@ -64,8 +54,6 @@ DEPENDENCIES:
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
-    - Amplitude
-    - AnalyticsConnector
     - FirebaseAppCheckInterop
     - FirebaseAuth
     - FirebaseCore
@@ -75,21 +63,16 @@ SPEC REPOS:
     - PromisesObjC
   trunk:
     - AppAuth
-    - CleverTap-iOS-SDK
     - FirebaseDynamicLinks
     - GoogleUtilities
     - GTMSessionFetcher
-    - SDWebImage
 
 EXTERNAL SOURCES:
   strapi:
     :path: "../strapi"
 
 SPEC CHECKSUMS:
-  Amplitude: a43a03b98ce379b1fd7a08b5733d199ff5d9130f
-  AnalyticsConnector: eccd7e1cd3dd18e6bd09ac2506e37d4ed43ba3f4
   AppAuth: 3bb1d1cd9340bd09f5ed189fb00b1cc28e1e8570
-  CleverTap-iOS-SDK: 6a38eea6d2f0c336fb142baadcca2cd8aafd2290
   FirebaseAppCheckInterop: f95a4feb9089867aff1a4bdc2ce309137e07736a
   FirebaseAuth: a66c1e14ec58f41d154a4b41ce1a23ea00ad4805
   FirebaseCore: f86a1394906b97ac445ae49c92552a9425831bed
@@ -100,8 +83,7 @@ SPEC CHECKSUMS:
   GTMAppAuth: 99fb010047ba3973b7026e45393f51f27ab965ae
   GTMSessionFetcher: e8647203b65cee28c5f73d0f473d096653945e72
   PromisesObjC: c50d2056b5253dadbd6c2bea79b0674bd5a52fa4
-  SDWebImage: 182830bcddc30cde95fbc60dfe4badc3553d94ba
-  strapi: 63448ddb9fc586a52a2ecf9470a9b69eb102b4a2
+  strapi: 6936c121da670c961ad99c594ecb8c919ae76545
 
 PODFILE CHECKSUM: 8fdbab4a3f34faf6824d9bda0b6882b6b75583dd
 
