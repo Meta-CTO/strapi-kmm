@@ -41,10 +41,6 @@ kotlin {
         ios.deploymentTarget = "14.1"
         podfile = project.file("../iosApp/Podfile")
 
-        pod("FirebaseAuth", linkOnly = true)
-        pod("GoogleSignIn")
-        pod("FirebaseDynamicLinks")
-
         framework {
             baseName = libName + "pods" // DON'T CHANGE THIS LINE, there is a bug in the plugin that requires unique names for each framework
             isStatic = true
@@ -119,9 +115,9 @@ kotlin {
                 api(Ktor.logging)
                 api(ProjectDependencies.MULTIPLATFORM_SETTINGS)
                 api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
-                api("dev.gitlive:firebase-auth:1.12.0-metacto-5")
 
-                api("dev.gitlive:firebase-config:1.10.4")
+
+                api("com.metacto.kmm:auth-common:0.0.5")
             }
         }
         val androidMain by getting {
@@ -134,9 +130,6 @@ kotlin {
                 api(Ktor.android)
                 api(ProjectDependencies.SqlDelight.ANDROID_DRIVER)
                 implementation("androidx.activity:activity-ktx:1.7.2")
-                implementation("com.google.android.gms:play-services-auth:20.7.0")
-                implementation(platform("com.google.firebase:firebase-bom:32.1.1"))
-                implementation("com.google.firebase:firebase-dynamic-links-ktx")
                 implementation("com.alexstyl:contactstore:$contactsVersion")
                 implementation("com.alexstyl:contactstore-coroutines:$contactsVersion")
                 implementation("androidx.tonyodev.fetch2:xfetch2:$fetchVersion")

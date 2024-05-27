@@ -13,6 +13,14 @@ buildscript {
             }
         }
 
+        maven {
+            url = uri("https://maven.pkg.github.com/Meta-CTO/kmm-firebase-extensions")
+            credentials {
+                username = "metactoengineer"
+                password = "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"
+            }
+        }
+
         jcenter()
         mavenLocal()
         maven(url = "https://jitpack.io")
