@@ -8,3 +8,9 @@ fun handleError(throwable: Throwable): AppException {
         NetworkErrorMapper().mapThrowable(throwable)
     }
 }
+
+fun String.mapError(
+    code: Int,
+): Throwable {
+    return Throwable("{\"message\": \"$this\",\"code\": $code}")
+}

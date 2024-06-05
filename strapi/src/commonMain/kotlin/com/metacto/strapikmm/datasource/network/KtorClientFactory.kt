@@ -82,10 +82,18 @@ fun DefaultRequest.DefaultRequestBuilder.handleAuthenticationHeader(preference: 
 
 suspend fun Throwable.handleNetworkException() {
     val isResponseException = (cause as? ResponseException) != null
-    if (isResponseException) {
+    val isClientRequestResponse = (cause as? ClientRequestException) != null
+    val isServerResponse = (cause as? ServerResponseException) != null
+
+    if (isResponseException || isClientRequestResponse || isServerResponse) {
         val responseException = cause as ResponseException
-        val response = responseException.response
-        val bytes = response.body<JsonElement>()
+        val response = ((cause as? ResponseException)?.response)
+            ?: ((cause as? ClientRequestException)?.response)
+            ?: ((cause as? ServerResponseException)?.response)
+        if (response == null) {
+            this.handleError()
+        }
+        val bytes = response!!.body<JsonElement>()
         val errorData =
             JsonFlatter.flat<NetworkError>(JsonWithIgnoredUnknownKeys.decodeFromJsonElement(bytes))
         val errorResponse =
@@ -102,34 +110,38 @@ suspend fun Throwable.handleNetworkException() {
 
         throw error
     } else {
-        when (this) {
-            is ServerResponseException -> {
-                val bodyString = response.bodyAsText()
-                Logger("").log("ServerResponseException Error: $bodyString")
-                val httpErrorCode = response.status.value
-                throw NetworkErrorMapper().mapToAppException(this, bodyString, httpErrorCode)
-            }
+        this.handleError()
+    }
+}
 
-            is ClientRequestException -> {
-                val bodyString = response.bodyAsText()
-                Logger("").log("ClientRequestException Error: $bodyString")
-                val httpErrorCode = response.status.value
-                throw NetworkErrorMapper().mapToAppException(this, bodyString, httpErrorCode)
-            }
+suspend fun Throwable.handleError() {
+    when (this) {
+        is ServerResponseException -> {
+            val bodyString = response.bodyAsText()
+            Logger("").log("ServerResponseException Error: $bodyString")
+            val httpErrorCode = response.status.value
+            throw NetworkErrorMapper().mapToAppException(this, bodyString, httpErrorCode)
+        }
 
-            is RedirectResponseException -> {
-                val bodyString = response.bodyAsText()
-                Logger("").log("RedirectResponseException Error: $bodyString")
-                val httpErrorCode = response.status.value
-                throw NetworkErrorMapper().mapToAppException(this, bodyString, httpErrorCode)
-            }
+        is ClientRequestException -> {
+            val bodyString = response.bodyAsText()
+            Logger("").log("ClientRequestException Error: $bodyString")
+            val httpErrorCode = response.status.value
+            throw NetworkErrorMapper().mapToAppException(this, bodyString, httpErrorCode)
+        }
 
-            else -> {
-                val className = this::class.simpleName
-                val error = this.message ?: this.toString()
-                Logger("").log("$className Error: $error")
-                throw NetworkErrorMapper().mapToAppException(this, error, -1)
-            }
+        is RedirectResponseException -> {
+            val bodyString = response.bodyAsText()
+            Logger("").log("RedirectResponseException Error: $bodyString")
+            val httpErrorCode = response.status.value
+            throw NetworkErrorMapper().mapToAppException(this, bodyString, httpErrorCode)
+        }
+
+        else -> {
+            val className = this::class.simpleName
+            val error = this.message ?: this.toString()
+            Logger("").log("$className Error: $error")
+            throw NetworkErrorMapper().mapToAppException(this, error, -1)
         }
     }
 }

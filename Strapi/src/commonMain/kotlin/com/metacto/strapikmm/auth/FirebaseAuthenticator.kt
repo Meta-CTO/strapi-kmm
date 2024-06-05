@@ -33,6 +33,8 @@ interface Authenticator {
     suspend fun resendVerificationCode(phoneVerificationProvider: PhoneVerificationProvider): PhoneVerificationMetadata
     @Throws(Throwable::class)
     suspend fun verifyPhoneVerification(code: String): String
+    @Throws(Throwable::class)
+    suspend fun linkPhoneNumber(code: String)
 }
 
 class FirebaseAuthenticator(
@@ -128,6 +130,16 @@ class FirebaseAuthenticator(
         if (verificationId.isNullOrEmpty()) throw Throwable("Unable to verify phone number")
         val credentials = PhoneAuthProvider().credential(verificationId, code)
         return authenticateWithCredentials(credentials)
+    }
+
+    @Throws(Throwable::class)
+    override suspend fun linkPhoneNumber(code: String) {
+        val verificationId =
+            sharedPreference.getSecureString(SharedConstants.VERIFICATION_PHONE_NUMBER_VERIFICATION_ID)
+        if (verificationId.isNullOrEmpty()) throw Throwable("Unable to verify phone number")
+        val credentials = PhoneAuthProvider().credential(verificationId, code)
+        if (Firebase.auth.currentUser == null) throw Throwable("Firebase user is null, unable to link phone number")
+        Firebase.auth.currentUser?.linkWithCredential(credentials)
     }
 
     @Throws(Throwable::class)

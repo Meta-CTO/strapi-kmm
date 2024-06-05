@@ -1,5 +1,6 @@
 package com.metacto.strapikmm.auth
 
+import com.metacto.strapikmm.errorhandling.mapError
 import platform.AuthenticationServices.*
 import platform.Foundation.NSError
 import platform.Foundation.NSString
@@ -44,14 +45,16 @@ class SignInWithAppleProvider(
 
         idToken?.let {
             onSuccess(idToken, profile)
-        } ?: onFailure(Throwable("idToken cannot be null"))
+        } ?: onFailure("idToken cannot be null".mapError(-1))
     }
 
     override fun authorizationController(
         controller: ASAuthorizationController,
         didCompleteWithError: NSError
     ) {
-        onFailure(Throwable(didCompleteWithError.localizedDescription))
+        onFailure(
+            didCompleteWithError.localizedDescription.mapError(didCompleteWithError.code.toInt())
+        )
     }
 
     override fun presentationAnchorForAuthorizationController(controller: ASAuthorizationController): ASPresentationAnchor {

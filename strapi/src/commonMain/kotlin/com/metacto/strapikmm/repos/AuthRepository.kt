@@ -141,6 +141,11 @@ class AuthRepository(
         )
     }
 
+    @Throws(Throwable::class)
+    suspend inline fun <reified T> linkPhoneNumber(otp: String) {
+        authenticator.linkPhoneNumber(otp)
+    }
+
     fun isUserLoggedIn(): Boolean {
         return sharedPreference.getSecureString(SharedConstants.ACCESS_TOKEN).isNullOrEmpty().not()
     }
