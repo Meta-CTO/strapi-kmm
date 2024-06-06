@@ -16,10 +16,14 @@ actual class AuthClient : AuthProvider {
     private lateinit var onError: (Throwable) -> Unit
     private lateinit var options: AuthOptions
 
+    private var signInWithAppleProvider: SignInWithAppleProvider? = null
+    private var signInWithGoogleProvider: SignInWithGoogleProvider? = null
+
     actual fun init() {}
 
-    private val signInWithAppleProvider by lazy {
-        SignInWithAppleProvider(
+
+    private fun createSignInWithAppleProvider() {
+        val provider =  SignInWithAppleProvider(
             onSuccess = { token, profileMetadata ->
                 val credential = FIROAuthProvider.credentialWithProviderID(
                     providerID = "apple.com",
@@ -29,15 +33,19 @@ actual class AuthClient : AuthProvider {
                 )
 
                 onResult.invoke(AuthCredential(credential), profileMetadata)
+                signInWithAppleProvider = null
             },
             onFailure = {
                 onError.invoke(it)
+                signInWithAppleProvider = null
             }
         )
+
+        signInWithAppleProvider = provider
     }
 
-    private val signInWithGoogleProvider by lazy {
-        SignInWithGoogleProvider(
+    private fun createSignInWithGoogleProvider() {
+        val provider =  SignInWithGoogleProvider(
             presentingViewController = options.presentingViewController,
             onSuccess = { token, profileMetadata ->
                 val credential = FIROAuthProvider.credentialWithProviderID(
@@ -48,29 +56,72 @@ actual class AuthClient : AuthProvider {
                 )
 
                 onResult.invoke(AuthCredential(credential), profileMetadata)
+                signInWithGoogleProvider = null
             },
             onFailure = {
                 onError.invoke(it)
+                signInWithGoogleProvider = null
             }
         )
+
+        signInWithGoogleProvider = provider
     }
+//
+//    private val signInWithAppleProvider by lazy {
+//        SignInWithAppleProvider(
+//            onSuccess = { token, profileMetadata ->
+//                val credential = FIROAuthProvider.credentialWithProviderID(
+//                    providerID = "apple.com",
+//                    IDToken = token,
+//                    rawNonce = "",
+//                    accessToken = null
+//                )
+//
+//                onResult.invoke(AuthCredential(credential), profileMetadata)
+//            },
+//            onFailure = {
+//                onError.invoke(it)
+//            }
+//        )
+//    }
+//
+//    private val signInWithGoogleProvider by lazy {
+//        SignInWithGoogleProvider(
+//            presentingViewController = options.presentingViewController,
+//            onSuccess = { token, profileMetadata ->
+//                val credential = FIROAuthProvider.credentialWithProviderID(
+//                    providerID = "google.com",
+//                    IDToken = token,
+//                    rawNonce = "",
+//                    accessToken = null
+//                )
+//
+//                onResult.invoke(AuthCredential(credential), profileMetadata)
+//            },
+//            onFailure = {
+//                onError.invoke(it)
+//            }
+//        )
+//    }
 
     override fun signInWithGoogle(
         onSuccess: (AuthCredential, ProfileMetadata) -> Unit,
         onFail: (Throwable) -> Unit
     ) {
+        createSignInWithGoogleProvider()
         this.onResult = onSuccess
         this.onError = onFail
-        signInWithGoogleProvider.start()
+        signInWithGoogleProvider?.start()
     }
 
     override fun signInWithApple(
         onSuccess: (AuthCredential, ProfileMetadata) -> Unit,
         onFail: (Throwable) -> Unit
     ) {
+        createSignInWithAppleProvider()
         this.onResult = onSuccess
         this.onError = onFail
-        signInWithAppleProvider.start()
+        signInWithAppleProvider?.start()
     }
 
     actual fun setAuthOptions(options: AuthOptions) {
