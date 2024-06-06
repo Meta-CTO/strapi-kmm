@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'master'
+      - 'auth_upgrade'
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build:

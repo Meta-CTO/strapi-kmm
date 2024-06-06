@@ -6,6 +6,8 @@ import com.metacto.strapikmm.auth.ProfileMetadata
 import com.metacto.strapikmm.constants.SharedConstants
 import com.metacto.strapikmm.datasource.network.StrapiQueryBuilder
 import com.metacto.strapikmm.datasource.network.services.strapi.StrapiService
+import com.metacto.strapikmm.errorhandling.isValidJson
+import com.metacto.strapikmm.errorhandling.mapError
 import com.metacto.strapikmm.model.AuthResponse
 import com.metacto.strapikmm.model.FirebaseAuthRequest
 import com.metacto.strapikmm.model.OverrideUserRequest
@@ -13,6 +15,19 @@ import com.metacto.strapikmm.sharedpreference.KmmPreference
 import dev.gitlive.firebase.auth.PhoneVerificationMetadata
 import dev.gitlive.firebase.auth.PhoneVerificationProvider
 import kotlinx.datetime.TimeZone
+
+inline fun <reified T> executeCatching(block: () -> T): T {
+    return try {
+        block()
+    } catch (throwable: Throwable) {
+        val errorMessage = throwable.message.orEmpty()
+        if (isValidJson(errorMessage)) {
+            throw throwable
+        } else {
+            throw Throwable(errorMessage.mapError(-1))
+        }
+    }
+}
 
 class AuthRepository(
     val authService: StrapiService,
@@ -25,7 +40,7 @@ class AuthRepository(
     suspend inline fun <reified T> signInWithCurrentIdToken(
         noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
         shouldUpdateTimeZone: Boolean = true
-    ): T {
+    ): T = executeCatching {
         val token = authenticator.authenticateCurrentUser()
         return exchangeFirebaseToken(token, null, userQueryBuilder, shouldUpdateTimeZone)
     }
@@ -35,7 +50,7 @@ class AuthRepository(
         authOptions: AuthOptions,
         noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
         shouldUpdateTimeZone: Boolean = true
-    ): T {
+    ): T  = executeCatching {
         val authenticationMetadata = authenticator.authenticateWithGoogle(authOptions)
 
         return exchangeFirebaseToken(
@@ -50,7 +65,7 @@ class AuthRepository(
     suspend inline fun <reified T> signInWithApple(
         noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
         shouldUpdateTimeZone: Boolean = true
-    ): T {
+    ): T = executeCatching {
         val authenticationMetadata = authenticator.authenticateWithApple()
 
         return exchangeFirebaseToken(
@@ -62,12 +77,12 @@ class AuthRepository(
     }
 
     @Throws(Throwable::class)
-    suspend fun sendSignInLinkToEmail(email: String) {
+    suspend fun sendSignInLinkToEmail(email: String) = executeCatching {
         authenticator.sendEmailLink(email)
     }
 
     @Throws(Throwable::class)
-    suspend fun resendSignInLink() {
+    suspend fun resendSignInLink() = executeCatching {
         authenticator.resendSignInLink()
     }
 
@@ -76,7 +91,7 @@ class AuthRepository(
         emailLink: String,
         noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
         shouldUpdateTimeZone: Boolean = true
-    ): T {
+    ): T = executeCatching {
         val idToken = authenticator.verifyEmailLink(emailLink)
 
         return exchangeFirebaseToken(
@@ -93,7 +108,7 @@ class AuthRepository(
         profileMetadata: ProfileMetadata? = null,
         noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
         shouldUpdateTimeZone: Boolean = true
-    ): T {
+    ): T = executeCatching {
         val response = authService.post<AuthResponse<T>> {
             endpoint("/firebase-auth")
             authenticated(false)
@@ -116,12 +131,12 @@ class AuthRepository(
     suspend fun sendPhoneVerificationCode(
         phoneNumber: String,
         phoneVerificationProvider: PhoneVerificationProvider
-    ): PhoneVerificationMetadata {
+    ): PhoneVerificationMetadata = executeCatching {
         return authenticator.sendPhoneVerification(phoneNumber, phoneVerificationProvider)
     }
 
     @Throws(Throwable::class)
-    suspend fun resendVerificationCode(phoneVerificationProvider: PhoneVerificationProvider): PhoneVerificationMetadata {
+    suspend fun resendVerificationCode(phoneVerificationProvider: PhoneVerificationProvider): PhoneVerificationMetadata = executeCatching {
         return authenticator.resendVerificationCode(phoneVerificationProvider)
     }
 
@@ -130,7 +145,7 @@ class AuthRepository(
         otp: String,
         noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
         shouldUpdateTimeZone: Boolean = true
-    ): T {
+    ): T = executeCatching {
         val idToken = authenticator.verifyPhoneVerification(otp)
 
         return exchangeFirebaseToken(
@@ -142,7 +157,7 @@ class AuthRepository(
     }
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T> linkPhoneNumber(otp: String) {
+    suspend inline fun <reified T> linkPhoneNumber(otp: String) = executeCatching {
         authenticator.linkPhoneNumber(otp)
     }
 
@@ -150,7 +165,7 @@ class AuthRepository(
         return sharedPreference.getSecureString(SharedConstants.ACCESS_TOKEN).isNullOrEmpty().not()
     }
 
-    suspend fun signOut() {
+    suspend fun signOut() = executeCatching {
         logoutUseCase.logout()
     }
 
@@ -168,7 +183,7 @@ class AuthRepository(
     suspend inline fun <reified T> overrideCurrentUser(
         userId: Int,
         noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
-    ): T {
+    ): T = executeCatching {
         val response = authService.post<AuthResponse<T>> {
             endpoint("/backdoor")
             authenticated(false)
@@ -191,7 +206,7 @@ class AuthRepository(
     @Throws(Throwable::class)
     suspend inline fun <reified T> clearOverrideUserAndResetCurrentUser(
         noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
-    ): T {
+    ): T = executeCatching {
         val user: T = signInWithCurrentIdToken(userQueryBuilder)
         // Enable analytics tracking after resetting the user
         sharedPreference.putBool(SharedConstants.ENABLE_ANALYTICS_TRACKING, true)
