@@ -13,7 +13,7 @@ import com.metacto.strapiKMM.R
 import dev.gitlive.firebase.auth.AuthCredential
 
 actual class AuthOptions(
-    val activity: Activity,
+    var activity: Activity?,
     val launcher: ActivityResultLauncher<Intent>,
     val onCanceled: () -> Unit = {}
 ) {
@@ -28,16 +28,18 @@ actual class AuthClient : AuthProvider {
     private lateinit var options: AuthOptions
 
     actual fun init() {
+        if (options.activity == null) throw Throwable("Activity cannot be null")
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(options.activity.getString(R.string.default_web_client_id))
+            .requestIdToken(options.activity!!.getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
 
-        gClient = GoogleSignIn.getClient(options.activity, gso)
+        gClient = GoogleSignIn.getClient(options.activity!!, gso)
 
         options.onResult = {
             if (it.resultCode == Activity.RESULT_CANCELED) {
                 options.onCanceled.invoke()
+                options.activity = null
             } else {
                 setActivityResult(it)
             }
@@ -59,8 +61,10 @@ actual class AuthClient : AuthProvider {
                         pictureUrl = account.photoUrl?.toString()
                     )
                     onResult.invoke(AuthCredential(credential), profile)
+                    options.activity = null
                 } catch (throwable: Throwable) {
                     onError.invoke(throwable)
+                    options.activity = null
                 }
             }
         }

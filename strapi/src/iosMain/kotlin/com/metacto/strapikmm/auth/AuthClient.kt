@@ -8,7 +8,7 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import platform.UIKit.UIViewController
 
 actual class AuthOptions(
-    val presentingViewController: UIViewController
+    var presentingViewController: UIViewController?
 )
 
 actual class AuthClient : AuthProvider {
@@ -18,9 +18,7 @@ actual class AuthClient : AuthProvider {
 
     private var signInWithAppleProvider: SignInWithAppleProvider? = null
     private var signInWithGoogleProvider: SignInWithGoogleProvider? = null
-
     actual fun init() {}
-
 
     private fun createSignInWithAppleProvider() {
         val provider =  SignInWithAppleProvider(
@@ -45,8 +43,9 @@ actual class AuthClient : AuthProvider {
     }
 
     private fun createSignInWithGoogleProvider() {
+        if (options.presentingViewController == null) throw Throwable("PresentingViewController cannot be null")
         val provider =  SignInWithGoogleProvider(
-            presentingViewController = options.presentingViewController,
+            presentingViewController = options.presentingViewController!!,
             onSuccess = { token, profileMetadata ->
                 val credential = FIROAuthProvider.credentialWithProviderID(
                     providerID = "google.com",
@@ -57,10 +56,12 @@ actual class AuthClient : AuthProvider {
 
                 onResult.invoke(AuthCredential(credential), profileMetadata)
                 signInWithGoogleProvider = null
+                options.presentingViewController = null
             },
             onFailure = {
                 onError.invoke(it)
                 signInWithGoogleProvider = null
+                options.presentingViewController = null
             }
         )
 
