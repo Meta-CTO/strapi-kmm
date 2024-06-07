@@ -123,7 +123,7 @@ kotlin {
                 api(Ktor.logging)
                 api(ProjectDependencies.MULTIPLATFORM_SETTINGS)
                 api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
-                api("dev.gitlive:firebase-auth:1.12.0-metacto-10")
+                api("dev.gitlive:firebase-auth:1.12.0-metacto-12")
 
                 api("dev.gitlive:firebase-config:1.10.4")
             }
