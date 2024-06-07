@@ -17,16 +17,18 @@ import dev.gitlive.firebase.auth.PhoneVerificationProvider
 import kotlinx.datetime.TimeZone
 
 inline fun <reified T> executeCatching(block: () -> T): T {
-    return try {
-        block()
-    } catch (throwable: Throwable) {
-        val errorMessage = throwable.message.orEmpty()
-        if (isValidJson(errorMessage)) {
-            throw throwable
-        } else {
-            throw Throwable(errorMessage.mapError(-1))
-        }
-    }
+//    return try {
+//        block()
+//    } catch (throwable: Throwable) {
+//        val errorMessage = throwable.message.orEmpty()
+//        if (isValidJson(errorMessage)) {
+//            throw throwable
+//        } else {
+//            throw Throwable(errorMessage.mapError(-1))
+//        }
+//    }
+
+    return block.invoke()
 }
 
 class AuthRepository(
