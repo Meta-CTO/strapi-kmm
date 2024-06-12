@@ -3,6 +3,7 @@
 package com.metacto.strapikmm.auth
 
 import cocoapods.FirebaseAuth.FIROAuthProvider
+import com.metacto.strapikmm.errorhandling.NetworkErrorMapper
 import dev.gitlive.firebase.auth.AuthCredential
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.UIKit.UIViewController
@@ -43,7 +44,10 @@ actual class AuthClient : AuthProvider {
     }
 
     private fun createSignInWithGoogleProvider() {
-        if (options.presentingViewController == null) throw Throwable("PresentingViewController cannot be null")
+        if (options.presentingViewController == null) throw NetworkErrorMapper.mapToAppException(
+            "PresentingViewController cannot be null",
+            -1
+        )
         val provider =  SignInWithGoogleProvider(
             presentingViewController = options.presentingViewController!!,
             onSuccess = { token, profileMetadata ->
@@ -67,43 +71,6 @@ actual class AuthClient : AuthProvider {
 
         signInWithGoogleProvider = provider
     }
-//
-//    private val signInWithAppleProvider by lazy {
-//        SignInWithAppleProvider(
-//            onSuccess = { token, profileMetadata ->
-//                val credential = FIROAuthProvider.credentialWithProviderID(
-//                    providerID = "apple.com",
-//                    IDToken = token,
-//                    rawNonce = "",
-//                    accessToken = null
-//                )
-//
-//                onResult.invoke(AuthCredential(credential), profileMetadata)
-//            },
-//            onFailure = {
-//                onError.invoke(it)
-//            }
-//        )
-//    }
-//
-//    private val signInWithGoogleProvider by lazy {
-//        SignInWithGoogleProvider(
-//            presentingViewController = options.presentingViewController,
-//            onSuccess = { token, profileMetadata ->
-//                val credential = FIROAuthProvider.credentialWithProviderID(
-//                    providerID = "google.com",
-//                    IDToken = token,
-//                    rawNonce = "",
-//                    accessToken = null
-//                )
-//
-//                onResult.invoke(AuthCredential(credential), profileMetadata)
-//            },
-//            onFailure = {
-//                onError.invoke(it)
-//            }
-//        )
-//    }
 
     override fun signInWithGoogle(
         onSuccess: (AuthCredential, ProfileMetadata) -> Unit,

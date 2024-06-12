@@ -6,11 +6,15 @@ import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.metacto.caching.datasource.database.AppDatabase
 import com.metacto.strapikmm.constants.SharedConstants
+import com.metacto.strapikmm.errorhandling.NetworkErrorMapper
 
 actual class DatabaseDriverFactory actual constructor(private val context: Any?) {
     init {
         if (context == null || context !is Context) {
-            throw IllegalStateException("Context must not be null")
+            throw NetworkErrorMapper.mapToAppException(
+                "Context must be an Android Context",
+                -1
+            )
         }
     }
 

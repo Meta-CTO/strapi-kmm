@@ -2,6 +2,7 @@ package com.metacto.strapikmm.analytics
 
 import android.content.Context
 import com.clevertap.android.sdk.CleverTapAPI
+import com.metacto.strapikmm.errorhandling.NetworkErrorMapper
 
 actual class CleverTapAnalyticsService actual constructor(
     private val context: Any?
@@ -11,7 +12,10 @@ actual class CleverTapAnalyticsService actual constructor(
 
     init {
         if (context == null || context !is Context) {
-            throw IllegalArgumentException("Context must be an Android Context")
+            throw NetworkErrorMapper.mapToAppException(
+                "Context must be an Android Context",
+                -1
+            )
         }
 
         initialize()

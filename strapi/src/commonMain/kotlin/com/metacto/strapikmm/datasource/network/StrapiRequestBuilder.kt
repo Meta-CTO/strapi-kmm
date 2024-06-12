@@ -1,6 +1,7 @@
 package com.metacto.strapikmm.datasource.network
 
 import com.metacto.strapikmm.datasource.network.services.strapi.FetchStrategy
+import com.metacto.strapikmm.errorhandling.NetworkErrorMapper
 import io.ktor.http.*
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.encodeToString
@@ -36,7 +37,10 @@ class StrapiRequestBuilder {
 
     fun authenticated(isAuthenticated: Boolean) {
         if (this.contents.any { it is RequestContent.Authentication }) {
-            throw IllegalStateException("You can configure the authentication onetime only inside the request")
+            throw NetworkErrorMapper.mapToAppException(
+                "You can configure the authentication one time only inside the request",
+                -1
+            )
         }
 
         contents.add(RequestContent.Authentication(isAuthenticated))
@@ -52,7 +56,10 @@ class StrapiRequestBuilder {
 
     inline fun <reified T> body(value: T) = apply {
         if (this.contents.any { it is RequestContent.Body<*> }) {
-            throw IllegalStateException("You can pass only one body data inside the request")
+            throw NetworkErrorMapper.mapToAppException(
+                "You can pass only one body data inside the request",
+                -1
+            )
         }
 
         header(HttpHeaders.ContentType, "application/json")

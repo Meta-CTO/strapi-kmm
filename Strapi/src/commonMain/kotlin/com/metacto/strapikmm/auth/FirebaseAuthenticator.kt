@@ -1,6 +1,7 @@
 package com.metacto.strapikmm.auth
 
 import com.metacto.strapikmm.constants.SharedConstants
+import com.metacto.strapikmm.errorhandling.NetworkErrorMapper
 import com.metacto.strapikmm.sharedpreference.KmmPreference
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.ActionCodeSettings
@@ -45,8 +46,14 @@ class FirebaseAuthenticator(
 
     @Throws(Throwable::class)
     override suspend fun authenticateCurrentUser(): String {
-        val user = Firebase.auth.currentUser ?: throw Throwable("Unable to authenticate current user, current user is null")
-        return user.getIdToken(true) ?: throw Throwable("Unable to get idToken")
+        val user = Firebase.auth.currentUser ?: throw NetworkErrorMapper.mapToAppException(
+            "Unable to authenticate current user, current user is null",
+            -1
+        )
+        return user.getIdToken(true) ?: throw NetworkErrorMapper.mapToAppException(
+            "Unable to getIdToken",
+            -1
+        )
     }
 
     @Throws(Throwable::class)
@@ -88,16 +95,28 @@ class FirebaseAuthenticator(
     @Throws(Throwable::class)
     override suspend fun resendSignInLink() {
         val email = sharedPreference.getSecureString(SharedConstants.SIGN_IN_EMAIL_LINK_EMAIL)
-        if (email.isNullOrEmpty()) throw Throwable("Email is null or empty, please try again.")
+        if (email.isNullOrEmpty()) throw NetworkErrorMapper.mapToAppException(
+            "Email is null or empty, please try again.",
+            -1
+        )
         sendEmailLink(email)
     }
 
     @Throws(Throwable::class)
     override suspend fun verifyEmailLink(link: String): String {
         val email = sharedPreference.getSecureString(SharedConstants.SIGN_IN_EMAIL_LINK_EMAIL)
-        if (email.isNullOrEmpty()) throw Throwable("Email is null or empty, please try again.")
-        val user = Firebase.auth.signInWithEmailLink(email, link).user ?: throw Throwable("Signing in failed user is null")
-        return user.getIdToken(true) ?: throw Throwable("Unable to getIdToken")
+        if (email.isNullOrEmpty()) throw NetworkErrorMapper.mapToAppException(
+            "Email is null or empty, please try again.",
+            -1
+        )
+        val user = Firebase.auth.signInWithEmailLink(email, link).user ?: throw NetworkErrorMapper.mapToAppException(
+            "Unable to sign in with email link",
+            -1
+        )
+        return user.getIdToken(true) ?: throw NetworkErrorMapper.mapToAppException(
+            "Unable to getIdToken",
+            -1
+        )
     }
 
     @Throws(Throwable::class)
@@ -119,7 +138,10 @@ class FirebaseAuthenticator(
     @Throws(Throwable::class)
     override suspend fun resendVerificationCode(phoneVerificationProvider: PhoneVerificationProvider): PhoneVerificationMetadata {
         val phoneNumber = sharedPreference.getSecureString(SharedConstants.VERIFICATION_PHONE_NUMBER)
-        if (phoneNumber.isNullOrEmpty()) throw Throwable("Invalid phone number")
+        if (phoneNumber.isNullOrEmpty()) throw NetworkErrorMapper.mapToAppException(
+            "Invalid phone number",
+            -1
+        )
         return PhoneAuthProvider().verifyPhoneNumber(phoneNumber, phoneVerificationProvider)
     }
 
@@ -127,7 +149,10 @@ class FirebaseAuthenticator(
     override suspend fun verifyPhoneVerification(code: String): String {
         val verificationId =
             sharedPreference.getSecureString(SharedConstants.VERIFICATION_PHONE_NUMBER_VERIFICATION_ID)
-        if (verificationId.isNullOrEmpty()) throw Throwable("Unable to verify phone number")
+        if (verificationId.isNullOrEmpty()) throw NetworkErrorMapper.mapToAppException(
+            "Unable to verify phone number",
+            -1
+        )
         val credentials = PhoneAuthProvider().credential(verificationId, code)
         return authenticateWithCredentials(credentials)
     }
@@ -136,15 +161,27 @@ class FirebaseAuthenticator(
     override suspend fun linkPhoneNumber(code: String) {
         val verificationId =
             sharedPreference.getSecureString(SharedConstants.VERIFICATION_PHONE_NUMBER_VERIFICATION_ID)
-        if (verificationId.isNullOrEmpty()) throw Throwable("Unable to verify phone number")
+        if (verificationId.isNullOrEmpty()) throw NetworkErrorMapper.mapToAppException(
+            "Unable to verify phone number",
+            -1
+        )
         val credentials = PhoneAuthProvider().credential(verificationId, code)
-        if (Firebase.auth.currentUser == null) throw Throwable("Firebase user is null, unable to link phone number")
+        if (Firebase.auth.currentUser == null) throw NetworkErrorMapper.mapToAppException(
+            "Firebase user is null, unable to link phone number",
+            -1
+        )
         Firebase.auth.currentUser?.linkWithCredential(credentials)
     }
 
     @Throws(Throwable::class)
     private suspend fun authenticateWithCredentials(credentials: AuthCredential): String {
-        val user = Firebase.auth.signInWithCredential(credentials).user ?: throw Throwable("Signing in failed user is null")
-        return user.getIdToken(true) ?: throw Throwable("Unable to getIdToken")
+        val user = Firebase.auth.signInWithCredential(credentials).user ?: throw NetworkErrorMapper.mapToAppException(
+            "Signing in failed user is null",
+            -1
+        )
+        return user.getIdToken(true) ?: throw NetworkErrorMapper.mapToAppException(
+            "Unable to getIdToken",
+            -1
+        )
     }
 }

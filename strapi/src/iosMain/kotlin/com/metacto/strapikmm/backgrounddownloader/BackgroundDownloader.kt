@@ -5,6 +5,7 @@ package com.metacto.strapikmm.backgrounddownloader
 import com.metacto.strapikmm.common.downloader.backgrounddownloader.SHBackgroundDownloader
 import com.metacto.strapikmm.common.downloader.backgrounddownloader.PathMonitor
 import com.metacto.strapikmm.common.downloader.backgrounddownloader.SHBackgroundDownloaderDelegateProtocol
+import com.metacto.strapikmm.errorhandling.NetworkErrorMapper
 import com.metacto.strapikmm.util.Logger
 import kotlinx.cinterop.*
 import platform.Foundation.NSError
@@ -36,7 +37,7 @@ actual class BackgroundDownloader(
             val errorPtr: ObjCObjectVar<NSError?> = alloc()
             val identifier = SHBackgroundDownloader.shared().downloadURL(NSURL(string = url), errorPtr.ptr)
             errorPtr.value?.let {
-                throw Throwable(it.localizedDescription)
+                throw NetworkErrorMapper.mapThrowable(it)
             }
 
             identifier ?: ""

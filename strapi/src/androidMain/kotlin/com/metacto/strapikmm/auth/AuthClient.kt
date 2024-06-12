@@ -10,6 +10,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
 import com.metacto.strapiKMM.R
+import com.metacto.strapikmm.errorhandling.NetworkErrorMapper
 import dev.gitlive.firebase.auth.AuthCredential
 
 actual class AuthOptions(
@@ -28,7 +29,7 @@ actual class AuthClient : AuthProvider {
     private lateinit var options: AuthOptions
 
     actual fun init() {
-        if (options.activity == null) throw Throwable("Activity cannot be null")
+        if (options.activity == null) throw NetworkErrorMapper.mapToAppException("Activity cannot be null", -1)
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(options.activity!!.getString(R.string.default_web_client_id))
             .requestEmail()

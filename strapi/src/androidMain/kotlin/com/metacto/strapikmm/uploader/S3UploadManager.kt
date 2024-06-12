@@ -14,6 +14,7 @@ import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.CannedAccessControlList
 import com.amazonaws.services.s3.model.ObjectMetadata
+import com.metacto.strapikmm.errorhandling.NetworkErrorMapper
 import com.metacto.strapikmm.model.file.UploadFileRequest
 import com.metacto.strapikmm.repos.UploaderRepository
 import com.metacto.strapikmm.util.files.FileUtilsImpl
@@ -56,7 +57,10 @@ actual class S3UploadManager actual constructor(
      */
     init {
         if (context == null || context !is Context) {
-            throw IllegalArgumentException("Context must be provided, and must be an Android Context")
+            throw NetworkErrorMapper.mapToAppException(
+                "Context must be provided, and must be an Android Context",
+                -1
+            )
         }
     }
 
@@ -71,7 +75,10 @@ actual class S3UploadManager actual constructor(
     override suspend fun performUpload(file: UploadableFile): UploadFileRequest {
         val currentFile =
             file.file ?: file.uri?.let { fileUtils.createCopyAndReturnRealFile(file.uri) }
-            ?: throw IllegalArgumentException("File or Uri must be provided")
+            ?: throw NetworkErrorMapper.mapToAppException(
+                "File or Uri must be provided",
+                -1
+            )
         val fileExtension =
             currentFile.extension.nullIfEmpty() ?: file.uri?.path?.split(".")?.last()?.nullIfEmpty()
             ?: MimeTypeMap.getSingleton()
