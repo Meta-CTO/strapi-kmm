@@ -12,6 +12,8 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.bodyAsText
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlin.js.ExperimentalJsExport
@@ -78,26 +80,51 @@ suspend fun Throwable.handleNetworkException() {
     val isResponseException = (cause as? ResponseException) != null
     val isClientRequestResponse = (cause as? ClientRequestException) != null
     val isServerResponse = (cause as? ServerResponseException) != null
+    val isRedirectResponseException = (cause as? RedirectResponseException) != null
 
-    if (isResponseException || isClientRequestResponse || isServerResponse) {
-        val responseException = cause as ResponseException
+    Logger("").log("isResponseException: $isResponseException")
+    Logger("").log("isClientRequestResponse: $isClientRequestResponse")
+    Logger("").log("isServerResponse: $isServerResponse")
+    Logger("").log("isRedirectResponseException: $isRedirectResponseException")
+
+
+    Logger("").log("cause: $cause")
+    Logger("").log("condition: ${isResponseException || isClientRequestResponse || isServerResponse || isRedirectResponseException}")
+
+    if (isResponseException || isClientRequestResponse || isServerResponse|| isRedirectResponseException) {
         val response = ((cause as? ResponseException)?.response)
             ?: ((cause as? ClientRequestException)?.response)
             ?: ((cause as? ServerResponseException)?.response)
+            ?: ((cause as? RedirectResponseException)?.response)
+
+        Logger("").log("ResponseException: ${(cause as? ResponseException)?.response}")
+        Logger("").log("ClientRequestException: ${(cause as? ClientRequestException)?.response}")
+        Logger("").log("ServerResponseException: ${(cause as? ServerResponseException)?.response}")
+        Logger("").log("RedirectResponseException: ${(cause as? RedirectResponseException)?.response}")
+        Logger("").log("response: $response")
+
+        Logger("").log("response == null: ${response == null}")
+
+
         if (response == null) {
+            Logger("").log("response == null, call handleError()")
             this.handleError()
         }
         val bytes = response!!.body<JsonElement>()
+        Logger("").log("bytes: $bytes")
         val errorData =
             JsonFlatter.flat<NetworkError>(JsonWithIgnoredUnknownKeys.decodeFromJsonElement(bytes))
+        Logger("").log("errorData: $errorData")
         val errorResponse =
             JsonWithIgnoredUnknownKeys.decodeFromJsonElement<NetworkError>(errorData)
+        Logger("").log("errorResponse: $errorResponse")
 
         val error = NetworkErrorMapper.mapServerError(
             httpErrorCode = errorResponse.httpStatusCode,
             errorCode = errorResponse.errorCode,
             errorMessage = errorResponse.message,
-            throwable = responseException
+            errorBody = JsonWithIgnoredUnknownKeys.encodeToString(errorResponse),
+            throwable = cause ?: Throwable()
         )
 
         Logger("").log("Error: $error")
