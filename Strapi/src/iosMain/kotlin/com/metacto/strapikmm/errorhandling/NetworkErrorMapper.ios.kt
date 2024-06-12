@@ -8,7 +8,7 @@ actual object NetworkErrorMapper {
         val errorMessage = throwable.message ?: throwable.toString()
         val error = NSError(
             code = NetworkMapperConstants.UNEXPECTED.toLong(),
-            domain = null,
+            domain = "com.metacto.strapikmm",
             userInfo = mapOf(NSLocalizedDescriptionKey to errorMessage)
         )
 
@@ -34,7 +34,7 @@ actual object NetworkErrorMapper {
     ): AppException {
         val error = NSError(
             code = errorCode.toLong(),
-            domain = null,
+            domain = "com.metacto.strapikmm",
             userInfo = mapOf(NSLocalizedDescriptionKey to errorMessage)
         )
 
@@ -54,7 +54,7 @@ actual object NetworkErrorMapper {
 
         val error = NSError(
             code = errorCode.toLong(),
-            domain = null,
+            domain = "com.metacto.strapikmm",
             userInfo = mapOf(NSLocalizedDescriptionKey to message)
         )
 
@@ -78,7 +78,7 @@ actual object NetworkErrorMapper {
 
         val error = NSError(
             code = code?.toLong() ?: -1,
-            domain = null,
+            domain = "com.metacto.strapikmm",
             userInfo = mapOf(NSLocalizedDescriptionKey to message)
         )
 
