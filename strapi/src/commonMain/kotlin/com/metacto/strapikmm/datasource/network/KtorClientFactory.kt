@@ -77,10 +77,10 @@ fun DefaultRequest.DefaultRequestBuilder.handleAuthenticationHeader(preference: 
 }
 
 suspend fun Throwable.handleNetworkException() {
-    val isResponseException = cause is ResponseException
-    val isClientRequestException = cause is ClientRequestException
-    val isServerResponseException = cause is ServerResponseException
-    val isRedirectResponseException = cause is RedirectResponseException
+    val isResponseException = this is ResponseException
+    val isClientRequestException = this is ClientRequestException
+    val isServerResponseException = this is ServerResponseException
+    val isRedirectResponseException = this is RedirectResponseException
 
     Logger("").log("isResponseException: $isResponseException")
     Logger("").log("isClientRequestResponse: $isClientRequestException")
@@ -88,20 +88,21 @@ suspend fun Throwable.handleNetworkException() {
     Logger("").log("isRedirectResponseException: $isRedirectResponseException")
 
     Logger("").log("cause: $cause")
+    Logger("").log("this: $this")
     Logger("").log("condition: ${isResponseException || isClientRequestException || isServerResponseException || isRedirectResponseException}")
 
     val response = if (isResponseException) {
-        Logger("").log("ResponseException: ${(cause as? ResponseException)?.response}")
-        (cause as? ResponseException)?.response
+        Logger("").log("ResponseException: ${(this as? ResponseException)?.response}")
+        (this as? ResponseException)?.response
     } else if (isClientRequestException) {
-        Logger("").log("ClientRequestException: ${(cause as? ClientRequestException)?.response}")
-        (cause as? ClientRequestException)?.response
+        Logger("").log("ClientRequestException: ${(this as? ClientRequestException)?.response}")
+        (this as? ClientRequestException)?.response
     } else if (isServerResponseException) {
-        Logger("").log("ServerResponseException: ${(cause as? ServerResponseException)?.response}")
-        (cause as? ServerResponseException)?.response
+        Logger("").log("ServerResponseException: ${(this as? ServerResponseException)?.response}")
+        (this as? ServerResponseException)?.response
     } else if (isRedirectResponseException) {
-        Logger("").log("RedirectResponseException: ${(cause as? RedirectResponseException)?.response}")
-        (cause as? RedirectResponseException)?.response
+        Logger("").log("RedirectResponseException: ${(this as? RedirectResponseException)?.response}")
+        (this as? RedirectResponseException)?.response
     } else {
         null
     }
@@ -127,7 +128,7 @@ suspend fun Throwable.handleNetworkException() {
         errorCode = errorResponse.errorCode,
         errorMessage = errorResponse.message,
         errorBody = JsonWithIgnoredUnknownKeys.encodeToString(errorResponse),
-        throwable = cause ?: Throwable()
+        throwable = this
     )
 
     Logger("").log("Error: $error")
