@@ -77,62 +77,62 @@ fun DefaultRequest.DefaultRequestBuilder.handleAuthenticationHeader(preference: 
 }
 
 suspend fun Throwable.handleNetworkException() {
-    val isResponseException = (cause as? ResponseException) != null
-    val isClientRequestResponse = (cause as? ClientRequestException) != null
-    val isServerResponse = (cause as? ServerResponseException) != null
-    val isRedirectResponseException = (cause as? RedirectResponseException) != null
+    val isResponseException = cause is ResponseException
+    val isClientRequestException = cause is ClientRequestException
+    val isServerResponseException = cause is ServerResponseException
+    val isRedirectResponseException = cause is RedirectResponseException
 
     Logger("").log("isResponseException: $isResponseException")
-    Logger("").log("isClientRequestResponse: $isClientRequestResponse")
-    Logger("").log("isServerResponse: $isServerResponse")
+    Logger("").log("isClientRequestResponse: $isClientRequestException")
+    Logger("").log("isServerResponseException: $isServerResponseException")
     Logger("").log("isRedirectResponseException: $isRedirectResponseException")
 
-
     Logger("").log("cause: $cause")
-    Logger("").log("condition: ${isResponseException || isClientRequestResponse || isServerResponse || isRedirectResponseException}")
+    Logger("").log("condition: ${isResponseException || isClientRequestException || isServerResponseException || isRedirectResponseException}")
 
-    if (isResponseException || isClientRequestResponse || isServerResponse|| isRedirectResponseException) {
-        val response = ((cause as? ResponseException)?.response)
-            ?: ((cause as? ClientRequestException)?.response)
-            ?: ((cause as? ServerResponseException)?.response)
-            ?: ((cause as? RedirectResponseException)?.response)
-
+    val response = if (isResponseException) {
         Logger("").log("ResponseException: ${(cause as? ResponseException)?.response}")
+        (cause as? ResponseException)?.response
+    } else if (isClientRequestException) {
         Logger("").log("ClientRequestException: ${(cause as? ClientRequestException)?.response}")
+        (cause as? ClientRequestException)?.response
+    } else if (isServerResponseException) {
         Logger("").log("ServerResponseException: ${(cause as? ServerResponseException)?.response}")
+        (cause as? ServerResponseException)?.response
+    } else if (isRedirectResponseException) {
         Logger("").log("RedirectResponseException: ${(cause as? RedirectResponseException)?.response}")
-        Logger("").log("response: $response")
-
-        Logger("").log("response == null: ${response == null}")
-
-
-        if (response == null) {
-            Logger("").log("response == null, call handleError()")
-            this.handleError()
-        }
-        val bytes = response!!.body<JsonElement>()
-        Logger("").log("bytes: $bytes")
-        val errorData =
-            JsonFlatter.flat<NetworkError>(JsonWithIgnoredUnknownKeys.decodeFromJsonElement(bytes))
-        Logger("").log("errorData: $errorData")
-        val errorResponse =
-            JsonWithIgnoredUnknownKeys.decodeFromJsonElement<NetworkError>(errorData)
-        Logger("").log("errorResponse: $errorResponse")
-
-        val error = NetworkErrorMapper.mapServerError(
-            httpErrorCode = errorResponse.httpStatusCode,
-            errorCode = errorResponse.errorCode,
-            errorMessage = errorResponse.message,
-            errorBody = JsonWithIgnoredUnknownKeys.encodeToString(errorResponse),
-            throwable = cause ?: Throwable()
-        )
-
-        Logger("").log("Error: $error")
-
-        throw error
+        (cause as? RedirectResponseException)?.response
     } else {
+        null
+    }
+
+    Logger("").log("response: $response")
+
+    if (response == null) {
+        Logger("").log("response == null, call handleError()")
         this.handleError()
     }
+
+    val bytes = response!!.body<JsonElement>()
+    Logger("").log("bytes: $bytes")
+    val errorData =
+        JsonFlatter.flat<NetworkError>(JsonWithIgnoredUnknownKeys.decodeFromJsonElement(bytes))
+    Logger("").log("errorData: $errorData")
+    val errorResponse =
+        JsonWithIgnoredUnknownKeys.decodeFromJsonElement<NetworkError>(errorData)
+    Logger("").log("errorResponse: $errorResponse")
+
+    val error = NetworkErrorMapper.mapServerError(
+        httpErrorCode = errorResponse.httpStatusCode,
+        errorCode = errorResponse.errorCode,
+        errorMessage = errorResponse.message,
+        errorBody = JsonWithIgnoredUnknownKeys.encodeToString(errorResponse),
+        throwable = cause ?: Throwable()
+    )
+
+    Logger("").log("Error: $error")
+
+    throw error
 }
 
 suspend fun Throwable.handleError() {
