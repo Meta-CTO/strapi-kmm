@@ -205,6 +205,6 @@ class AuthRepository(
         val user: T = signInWithCurrentIdToken(userQueryBuilder)
         // Enable analytics tracking after resetting the user
         sharedPreference.putBool(SharedConstants.ENABLE_ANALYTICS_TRACKING, true)
-        return user
+        return user as T
     }
 }
