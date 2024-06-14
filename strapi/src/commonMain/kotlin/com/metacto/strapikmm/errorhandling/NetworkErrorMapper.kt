@@ -39,31 +39,3 @@ expect object NetworkErrorMapper {
         throwable: Throwable
     ): AppException
 }
-
-fun createErrorJsonResponse(message: String, code: Int): String {
-    val errorMessage = if (isValidJson(message)) {
-        val errorData =
-            JsonFlatter.flat<NetworkError>(JsonWithIgnoredUnknownKeys.decodeFromString(message))
-        val errorResponse =
-            JsonWithIgnoredUnknownKeys.decodeFromJsonElement<NetworkError>(errorData)
-        errorResponse.message ?: message
-    } else {
-        message
-    }
-
-    return JsonObject(
-        mapOf(
-            "message" to JsonPrimitive(errorMessage),
-            "code" to JsonPrimitive(code)
-        )
-    ).toString()
-}
-
-fun isValidJson(jsonString: String): Boolean {
-    return try {
-        JsonWithIgnoredUnknownKeys.parseToJsonElement(jsonString)
-        true
-    } catch (e: Exception) {
-        false
-    }
-}

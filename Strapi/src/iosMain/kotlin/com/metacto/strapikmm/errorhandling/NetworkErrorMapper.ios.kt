@@ -1,50 +1,47 @@
 package com.metacto.strapikmm.errorhandling
 
+import com.rickclephas.kmp.nserrorkt.asNSError
 import platform.Foundation.NSError
 import platform.Foundation.NSLocalizedDescriptionKey
+import kotlin.native.internal.ObjCErrorException
 
 actual object NetworkErrorMapper {
     private const val ERROR_DOMAIN = "com.metacto.strapikmm"
 
     actual fun mapThrowable(throwable: Throwable): AppException {
+        if (throwable is ObjCErrorException) {
+            return mapThrowable(throwable)
+        }
         val errorMessage = throwable.message ?: throwable.toString()
-        val error = NSError(
-            code = NetworkMapperConstants.UNEXPECTED.toLong(),
-            domain = ERROR_DOMAIN,
-            userInfo = mapOf(NSLocalizedDescriptionKey to errorMessage)
-        )
-
-
-        return AppException(
+        val error = createNsError(
+            httpErrorCode = null,
             errorCode = NetworkMapperConstants.UNEXPECTED,
-            errorMessage = error.localizedDescription,
-            error = error
+            errorMessage = errorMessage,
+            errorBody = null
         )
+        return AppException(error = error)
+    }
+
+    fun mapThrowable(error: ObjCErrorException): AppException {
+        return AppException(error = error.asNSError())
     }
 
     fun mapThrowable(error: NSError): AppException {
-        return AppException(
-            errorCode = error.code.toInt(),
-            errorMessage = error.localizedDescription,
-            error = error
-        )
+        return AppException(error = error)
     }
 
     actual fun mapToAppException(
         errorMessage: String,
         errorCode: Int
     ): AppException {
-        val error = NSError(
-            code = errorCode.toLong(),
-            domain = ERROR_DOMAIN,
-            userInfo = mapOf(NSLocalizedDescriptionKey to errorMessage)
-        )
-
-        return AppException(
+        val error = createNsError(
+            httpErrorCode = null,
             errorCode = errorCode,
             errorMessage = errorMessage,
-            error = error
+            errorBody = null
         )
+
+        return AppException(error = error)
     }
     actual fun mapToAppException(
         throwable: Throwable,
@@ -54,17 +51,14 @@ actual object NetworkErrorMapper {
         val errorCode = httpErrorCode ?: -1
         val message = errorMessage ?: throwable.message ?: throwable.toString()
 
-        val error = NSError(
-            code = errorCode.toLong(),
-            domain = ERROR_DOMAIN,
-            userInfo = mapOf(NSLocalizedDescriptionKey to message)
+        val error = createNsError(
+            httpErrorCode = httpErrorCode,
+            errorCode = errorCode,
+            errorMessage = message,
+            errorBody = null
         )
 
-        return AppException(
-            errorCode = errorCode,
-            errorMessage = error.localizedDescription,
-            error = error
-        )
+        return AppException(error = error)
     }
 
     actual fun mapServerError(
@@ -74,21 +68,32 @@ actual object NetworkErrorMapper {
         errorBody: String?,
         throwable: Throwable
     ): AppException {
-        val code =
-            if (httpErrorCode == NetworkMapperConstants.UNAUTHORIZED) httpErrorCode else errorCode
         val message = errorMessage ?: "The application has encountered an unknown error"
 
-        val error = NSError(
-            code = code?.toLong() ?: -1,
-            domain = ERROR_DOMAIN,
-            userInfo = mapOf(NSLocalizedDescriptionKey to message)
-        )
-
-        return AppException(
-            errorCode = code ?: -1,
-            errorMessage = error.localizedDescription,
-            error = error,
+        val error = createNsError(
+            httpErrorCode = httpErrorCode,
+            errorCode = errorCode,
+            errorMessage = message,
             errorBody = errorBody
+        )
+        return AppException(error = error)
+    }
+
+    private fun createNsError(
+        httpErrorCode: Int?,
+        errorCode: Int?,
+        errorMessage: String?,
+        errorBody: String?,
+    ): NSError {
+        val userInfo = mutableMapOf<Any?, Any>()
+        errorMessage?.let { userInfo.put(NSLocalizedDescriptionKey.orEmpty(), it) }
+        errorBody?.let { userInfo.put("errorBody", it) }
+        httpErrorCode?.let { userInfo.put("httpErrorCode", it) }
+        errorCode?.let { userInfo.put("errorCode", it) }
+        return NSError(
+            code = errorCode?.toLong() ?: -1,
+            domain = ERROR_DOMAIN,
+            userInfo = userInfo
         )
     }
 }
