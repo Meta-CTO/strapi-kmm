@@ -15,7 +15,7 @@ import com.metacto.strapikmm.annotations.getModelVersion
 import com.metacto.strapikmm.database.DatabaseDriverFactory
 import com.metacto.strapikmm.datasource.network.NetworkLogConfiguration
 import com.metacto.strapikmm.errorhandling.AppException
-import com.metacto.strapikmm.errorhandling.NetworkErrorMapper
+import com.metacto.strapikmm.errorhandling.ErrorMapper
 import com.metacto.strapikmm.errorhandling.NetworkMapperConstants
 import com.metacto.strapikmm.errorhandling.errortype.isNetworkException
 import com.metacto.strapikmm.util.nullIfEmpty
@@ -136,7 +136,7 @@ class StrapiService(
         builder.requestBuilder()
 
         val modelSerializer = builder.modelSerializer
-            ?: throw NetworkErrorMapper.mapToAppException(
+            ?: throw ErrorMapper.mapToAppException(
                 "You must provide the responseType in the requestBuilder",
                 -1
             )
@@ -275,7 +275,7 @@ class StrapiService(
             builder.requestBuilder()
 
             val modelSerializer = builder.modelSerializer
-                ?: throw NetworkErrorMapper.mapToAppException(
+                ?: throw ErrorMapper.mapToAppException(
                     "You must provide the responseType in the requestBuilder",
                     -1
                 )
@@ -516,12 +516,12 @@ inline fun <reified T> JsonElement.convert(): T {
         return JsonWithIgnoredUnknownKeys.decodeFromString(this.toString())
     } catch (throwable: Throwable) {
         if (throwable is kotlinx.serialization.SerializationException && NetworkLogConfiguration.logLevel == NetworkLogLevel.NONE) {
-            throw NetworkErrorMapper.mapToAppException(
+            throw ErrorMapper.mapToAppException(
                 errorCode = NetworkMapperConstants.UNEXPECTED,
                 errorMessage = NetworkMapperConstants.SOMETHING_WRONG_MESSAGE
             )
         } else {
-            throw NetworkErrorMapper.mapThrowable(throwable)
+            throw ErrorMapper.mapThrowable(throwable)
         }
     }
 }
@@ -531,18 +531,18 @@ suspend fun <T> executeRequestWithNetworkHandling(block: suspend () -> T): T {
         return block()
     } catch (throwable: Throwable) {
         when {
-            throwable.isNetworkException() -> throw NetworkErrorMapper.mapToAppException(
+            throwable.isNetworkException() -> throw ErrorMapper.mapToAppException(
                 errorCode = NetworkMapperConstants.NO_INTERNET_CONNECTION,
                 errorMessage = NetworkMapperConstants.NO_INTERNET_CONNECTION_MESSAGE
             )
 
             throwable is AppException && NetworkLogConfiguration.shouldShowActualErrorMessages -> throw throwable
 
-            NetworkLogConfiguration.shouldShowActualErrorMessages -> throw NetworkErrorMapper.mapThrowable(
+            NetworkLogConfiguration.shouldShowActualErrorMessages -> throw ErrorMapper.mapThrowable(
                 throwable
             )
 
-            else -> throw NetworkErrorMapper.mapToAppException(
+            else -> throw ErrorMapper.mapToAppException(
                 errorCode = NetworkMapperConstants.SOMETHING_WRONG,
                 errorMessage = NetworkMapperConstants.SOMETHING_WRONG_MESSAGE
             )

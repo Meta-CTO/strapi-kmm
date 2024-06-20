@@ -1,11 +1,5 @@
 package com.metacto.strapikmm.errorhandling
 
-import com.metacto.strapikmm.datasource.network.services.strapi.JsonFlatter
-import com.metacto.strapikmm.datasource.network.services.strapi.JsonWithIgnoredUnknownKeys
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.decodeFromJsonElement
-
 object NetworkMapperConstants {
     const val UNEXPECTED = -102
     const val UNAUTHORIZED = 401
@@ -16,7 +10,7 @@ object NetworkMapperConstants {
     const val SOMETHING_WRONG_MESSAGE = "Oops, something went wrong. Please try again later."
 }
 
-expect object NetworkErrorMapper {
+expect object ErrorMapper {
 
     fun mapThrowable(throwable: Throwable): AppException
 
@@ -38,4 +32,12 @@ expect object NetworkErrorMapper {
         errorBody: String? = null,
         throwable: Throwable
     ): AppException
+}
+
+inline fun <reified T> executeCatching(block: () -> T): T {
+    try{
+        return block()
+    } catch (e: Throwable) {
+        throw ErrorMapper.mapThrowable(e)
+    }
 }

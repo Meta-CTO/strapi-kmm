@@ -3,7 +3,7 @@
 package com.metacto.strapikmm.auth
 
 import cocoapods.FirebaseAuth.FIROAuthProvider
-import com.metacto.strapikmm.errorhandling.NetworkErrorMapper
+import com.metacto.strapikmm.errorhandling.ErrorMapper
 import dev.gitlive.firebase.auth.AuthCredential
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.UIKit.UIViewController
@@ -44,7 +44,7 @@ actual class AuthClient : AuthProvider {
     }
 
     private fun createSignInWithGoogleProvider() {
-        if (options.presentingViewController == null) throw NetworkErrorMapper.mapToAppException(
+        if (options.presentingViewController == null) throw ErrorMapper.mapToAppException(
             "PresentingViewController cannot be null",
             -1
         )

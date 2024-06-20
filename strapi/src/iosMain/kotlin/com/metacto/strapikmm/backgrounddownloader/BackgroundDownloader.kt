@@ -5,7 +5,8 @@ package com.metacto.strapikmm.backgrounddownloader
 import com.metacto.strapikmm.common.downloader.backgrounddownloader.SHBackgroundDownloader
 import com.metacto.strapikmm.common.downloader.backgrounddownloader.PathMonitor
 import com.metacto.strapikmm.common.downloader.backgrounddownloader.SHBackgroundDownloaderDelegateProtocol
-import com.metacto.strapikmm.errorhandling.NetworkErrorMapper
+import com.metacto.strapikmm.errorhandling.ErrorMapper
+import com.metacto.strapikmm.errorhandling.executeCatching
 import com.metacto.strapikmm.util.Logger
 import kotlinx.cinterop.*
 import platform.Foundation.NSError
@@ -32,12 +33,13 @@ actual class BackgroundDownloader(
     }
 
     @Throws(Throwable::class)
-    actual suspend fun download(url: String): String {
+    actual suspend fun download(url: String): String = executeCatching {
         return memScoped {
             val errorPtr: ObjCObjectVar<NSError?> = alloc()
-            val identifier = SHBackgroundDownloader.shared().downloadURL(NSURL(string = url), errorPtr.ptr)
+            val identifier =
+                SHBackgroundDownloader.shared().downloadURL(NSURL(string = url), errorPtr.ptr)
             errorPtr.value?.let {
-                throw NetworkErrorMapper.mapThrowable(it)
+                throw ErrorMapper.mapThrowable(it)
             }
 
             identifier ?: ""
@@ -45,7 +47,7 @@ actual class BackgroundDownloader(
     }
 
     @Throws(Throwable::class)
-    actual suspend fun download(urls: List<String>): List<String> {
+    actual suspend fun download(urls: List<String>): List<String> = executeCatching {
         return urls.map { download(it) }
     }
 
@@ -53,7 +55,8 @@ actual class BackgroundDownloader(
         SHBackgroundDownloader.shared().resumeUnfinishedDownloads()
     }
 
-    private inner class BackgroundDownloaderDelegate: NSObject(), SHBackgroundDownloaderDelegateProtocol {
+    private inner class BackgroundDownloaderDelegate : NSObject(),
+        SHBackgroundDownloaderDelegateProtocol {
         override fun downloaderDidDownloadAssetWithIdentifier(id: String, url: NSURL?) {
             logger.log("Did download asset with identifier: $id url: $url")
             downloadStatusListener.onDownloadDone(

@@ -4,6 +4,7 @@ import com.metacto.strapikmm.constants.SharedConstants
 import com.metacto.strapikmm.datasource.network.StrapiQueryBuilder
 import com.metacto.strapikmm.datasource.network.services.strapi.JsonWithIgnoredUnknownKeys
 import com.metacto.strapikmm.datasource.network.services.strapi.StrapiService
+import com.metacto.strapikmm.errorhandling.executeCatching
 import com.metacto.strapikmm.model.UpdateTimeZoneRequest
 import com.metacto.strapikmm.sharedpreference.KmmPreference
 import com.metacto.strapikmm.util.asCommonFlow
@@ -33,7 +34,7 @@ class UserRepository(
     suspend inline fun <reified T> getCurrentUser(
         forceUpdate: Boolean = false,
         noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {}
-    ): T {
+    ): T = executeCatching {
         val cachedUser = sharedPreference.getString(SharedConstants.CACHED_USER_DATA)
         return if (cachedUser.isNullOrEmpty() || forceUpdate || cachedUser.trim() == "{}") {
             val user = userService.get<T> {
@@ -58,7 +59,7 @@ class UserRepository(
     }
 
     @Throws(Throwable::class)
-    suspend fun deleteUserAccount() {
+    suspend fun deleteUserAccount(): Unit = executeCatching {
         val result = userService.delete<Unit> {
             endpoint("/users/me")
         }
@@ -72,7 +73,7 @@ class UserRepository(
     suspend inline fun <reified T> updateTimZone(
         timezone: String,
         noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {}
-    ): T {
+    ): T = executeCatching {
         return updateUserData(UpdateTimeZoneRequest(timezone), userQueryBuilder)
     }
 
@@ -80,7 +81,7 @@ class UserRepository(
     suspend inline fun <reified T, reified D> updateUserData(
         data: D,
         noinline userQueryBuilder: StrapiQueryBuilder.() -> Unit = {}
-    ): T {
+    ): T = executeCatching {
         val updatedUser = userService.put<T> {
             endpoint("/users/me")
             strapiQueryBuilder(userQueryBuilder)
@@ -96,7 +97,7 @@ class UserRepository(
         return updatedUser
     }
 
-    inline fun <reified T> saveUserData(user: T) {
+    inline fun <reified T> saveUserData(user: T) = executeCatching {
         val userString = JsonWithIgnoredUnknownKeys.encodeToString(user)
         sharedPreference.putString(SharedConstants.CACHED_USER_DATA, userString)
     }
@@ -105,7 +106,7 @@ class UserRepository(
         return sharedPreference.getSecureString(SharedConstants.ACCESS_TOKEN).isNullOrEmpty().not()
     }
 
-    inline fun <reified T> getCachedUser(): T? {
+    inline fun <reified T> getCachedUser(): T? = executeCatching {
         val cachedData = sharedPreference.getString(SharedConstants.CACHED_USER_DATA)
         return if (cachedData.isNullOrEmpty()) {
             null

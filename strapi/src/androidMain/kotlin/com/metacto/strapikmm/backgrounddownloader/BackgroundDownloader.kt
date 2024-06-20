@@ -3,6 +3,7 @@ package com.metacto.strapikmm.backgrounddownloader
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import com.metacto.strapikmm.errorhandling.executeCatching
 import com.metacto.strapikmm.util.exceptionIfActive
 import com.metacto.strapikmm.util.resumeIfActive
 import com.metacto.strapikmm.util.Logger
@@ -90,32 +91,35 @@ actual class BackgroundDownloader(
     }
 
     @Throws(Throwable::class)
-    actual suspend fun download(url: String): String = suspendCancellableCoroutine { cont ->
-        // Create the download file path
-        val filePath = getDownloadFileFullPath(url)
+    actual suspend fun download(url: String): String = executeCatching {
+        suspendCancellableCoroutine { cont ->
+            // Create the download file path
+            val filePath = getDownloadFileFullPath(url)
 
-        // Create and config the request
-        val request = Request(url, filePath).apply {
-            networkType = if (allowsCellularDownloads) NetworkType.ALL else NetworkType.WIFI_ONLY
-            autoRetryMaxAttempts = DEFAULT_MAX_RETRY_COUNT
-        }
-
-        // Then enqueue this request
-        fetch.enqueue(
-            request = request,
-            func = {
-                cont.resumeIfActive(it.id.toString())
-            },
-            func2 = {
-                cont.exceptionIfActive(
-                    it.throwable ?: Throwable(it.name)
-                )
+            // Create and config the request
+            val request = Request(url, filePath).apply {
+                networkType =
+                    if (allowsCellularDownloads) NetworkType.ALL else NetworkType.WIFI_ONLY
+                autoRetryMaxAttempts = DEFAULT_MAX_RETRY_COUNT
             }
-        )
+
+            // Then enqueue this request
+            fetch.enqueue(
+                request = request,
+                func = {
+                    cont.resumeIfActive(it.id.toString())
+                },
+                func2 = {
+                    cont.exceptionIfActive(
+                        it.throwable ?: Throwable(it.name)
+                    )
+                }
+            )
+        }
     }
 
     @Throws(Throwable::class)
-    actual suspend fun download(urls: List<String>): List<String> {
+    actual suspend fun download(urls: List<String>): List<String> = executeCatching {
         return urls.map { download(it) }
     }
 

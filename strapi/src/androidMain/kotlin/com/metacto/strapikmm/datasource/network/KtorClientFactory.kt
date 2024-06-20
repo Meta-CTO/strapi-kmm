@@ -1,19 +1,12 @@
 package com.metacto.strapikmm.datasource.network
 
-import com.metacto.strapikmm.datasource.network.services.strapi.JsonFlatter
-import com.metacto.strapikmm.datasource.network.services.strapi.JsonWithIgnoredUnknownKeys
-import com.metacto.strapikmm.errorhandling.NetworkError
-import com.metacto.strapikmm.errorhandling.NetworkErrorMapper
 import com.metacto.strapikmm.sharedpreference.KmmPreference
 import io.ktor.client.*
-import io.ktor.client.call.*
 import io.ktor.client.engine.android.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.statement.*
 import io.ktor.serialization.kotlinx.json.*
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.decodeFromJsonElement
 
 actual class KtorClientFactory actual constructor(
     networkLogLevel: NetworkLogLevel,

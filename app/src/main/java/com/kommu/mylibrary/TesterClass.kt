@@ -1,6 +1,5 @@
 package com.kommu.mylibrary
 
-import com.metacto.strapikmm.errorhandling.createErrorJsonResponse
 import com.metacto.strapikmm.util.DESEncryption
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

@@ -5,7 +5,7 @@ import platform.Foundation.NSError
 import platform.Foundation.NSLocalizedDescriptionKey
 import kotlin.native.internal.ObjCErrorException
 
-actual object NetworkErrorMapper {
+actual object ErrorMapper {
     private const val ERROR_DOMAIN = "com.metacto.strapikmm"
 
     actual fun mapThrowable(throwable: Throwable): AppException {

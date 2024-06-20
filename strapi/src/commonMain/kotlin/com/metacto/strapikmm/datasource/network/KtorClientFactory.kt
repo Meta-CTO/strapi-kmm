@@ -4,7 +4,7 @@ import com.metacto.strapikmm.constants.SharedConstants
 import com.metacto.strapikmm.datasource.network.services.strapi.JsonFlatter
 import com.metacto.strapikmm.datasource.network.services.strapi.JsonWithIgnoredUnknownKeys
 import com.metacto.strapikmm.errorhandling.NetworkError
-import com.metacto.strapikmm.errorhandling.NetworkErrorMapper
+import com.metacto.strapikmm.errorhandling.ErrorMapper
 import com.metacto.strapikmm.sharedpreference.KmmPreference
 import com.metacto.strapikmm.util.Logger
 import io.ktor.client.*
@@ -13,10 +13,8 @@ import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
-import kotlin.js.ExperimentalJsExport
 
 expect class KtorClientFactory(
     networkLogLevel: NetworkLogLevel,
@@ -123,7 +121,7 @@ suspend fun Throwable.handleNetworkException() {
         JsonWithIgnoredUnknownKeys.decodeFromJsonElement<NetworkError>(errorData)
     Logger("").log("errorResponse: $errorResponse")
 
-    val error = NetworkErrorMapper.mapServerError(
+    val error = ErrorMapper.mapServerError(
         httpErrorCode = errorResponse.httpStatusCode,
         errorCode = errorResponse.errorCode,
         errorMessage = errorResponse.message,
@@ -142,28 +140,28 @@ suspend fun Throwable.handleError() {
             val bodyString = response.bodyAsText()
             Logger("").log("ServerResponseException Error: $bodyString")
             val httpErrorCode = response.status.value
-            throw NetworkErrorMapper.mapToAppException(this, bodyString, httpErrorCode)
+            throw ErrorMapper.mapToAppException(this, bodyString, httpErrorCode)
         }
 
         is ClientRequestException -> {
             val bodyString = response.bodyAsText()
             Logger("").log("ClientRequestException Error: $bodyString")
             val httpErrorCode = response.status.value
-            throw NetworkErrorMapper.mapToAppException(this, bodyString, httpErrorCode)
+            throw ErrorMapper.mapToAppException(this, bodyString, httpErrorCode)
         }
 
         is RedirectResponseException -> {
             val bodyString = response.bodyAsText()
             Logger("").log("RedirectResponseException Error: $bodyString")
             val httpErrorCode = response.status.value
-            throw NetworkErrorMapper.mapToAppException(this, bodyString, httpErrorCode)
+            throw ErrorMapper.mapToAppException(this, bodyString, httpErrorCode)
         }
 
         else -> {
             val className = this::class.simpleName
             val error = this.message ?: this.toString()
             Logger("").log("$className Error: $error")
-            throw NetworkErrorMapper.mapToAppException(this, error, -1)
+            throw ErrorMapper.mapToAppException(this, error, -1)
         }
     }
 }

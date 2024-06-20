@@ -3,7 +3,7 @@ package com.metacto.strapikmm.auth
 import cocoapods.FirebaseCore.FIRApp
 import cocoapods.GoogleSignIn.GIDConfiguration
 import cocoapods.GoogleSignIn.GIDSignIn
-import com.metacto.strapikmm.errorhandling.NetworkErrorMapper
+import com.metacto.strapikmm.errorhandling.ErrorMapper
 
 import platform.UIKit.UIViewController
 
@@ -16,7 +16,7 @@ class SignInWithGoogleProvider(
     @Throws(Throwable::class)
     fun start() {
         val clientId = FIRApp.defaultApp()?.options?.clientID
-            ?: throw NetworkErrorMapper.mapToAppException(
+            ?: throw ErrorMapper.mapToAppException(
                 "clientId cannot be null",
                 -1
             )
@@ -27,7 +27,7 @@ class SignInWithGoogleProvider(
             presentingViewController,
             completion = { result, error ->
                 error?.let {
-                    onFailure(NetworkErrorMapper.mapThrowable(it))
+                    onFailure(ErrorMapper.mapThrowable(it))
                 }
 
                 result?.user?.idToken?.tokenString?.let { idToken ->
