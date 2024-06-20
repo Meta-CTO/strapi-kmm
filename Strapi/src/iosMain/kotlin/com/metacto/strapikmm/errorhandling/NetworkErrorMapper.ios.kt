@@ -9,6 +9,10 @@ actual object ErrorMapper {
     private const val ERROR_DOMAIN = "com.metacto.strapikmm"
 
     actual fun mapThrowable(throwable: Throwable): AppException {
+        if (throwable is AppException) {
+            return throwable
+        }
+
         if (throwable is ObjCErrorException) {
             return mapThrowable(throwable)
         }

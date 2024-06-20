@@ -2,6 +2,10 @@ package com.metacto.strapikmm.errorhandling
 
 actual object ErrorMapper {
     actual fun mapThrowable(throwable: Throwable): AppException {
+        if (throwable is AppException) {
+            return throwable
+        }
+
         return AppException(
             errorCode = NetworkMapperConstants.UNEXPECTED,
             errorMessage = throwable.message ?: throwable.toString(),
