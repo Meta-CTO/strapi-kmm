@@ -1,4 +1,3 @@
-import co.touchlab.skie.configuration.DefaultArgumentInterop
 import co.touchlab.skie.configuration.EnumInterop
 import co.touchlab.skie.configuration.FunctionInterop
 import co.touchlab.skie.configuration.SealedInterop
@@ -40,7 +39,6 @@ skie {
         group {
             EnumInterop.Enabled(true)
             SealedInterop.Enabled(true)
-            DefaultArgumentInterop.Enabled(true)
             FunctionInterop.FileScopeConversion.Enabled(true)
             SuspendInterop.Enabled(true)
         }
