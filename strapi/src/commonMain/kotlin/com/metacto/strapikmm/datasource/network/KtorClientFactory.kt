@@ -1,3 +1,5 @@
+@file:OptIn(InternalSerializationApi::class)
+
 package com.metacto.strapikmm.datasource.network
 
 import com.metacto.strapikmm.constants.SharedConstants
@@ -13,8 +15,11 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.bodyAsText
+import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.serializer
+import kotlin.reflect.KClass
 
 
 expect class KtorClientFactory(
@@ -22,7 +27,9 @@ expect class KtorClientFactory(
     shouldShowActualErrorMessages: Boolean,
     preference: KmmPreference
 ) {
-    inline fun <reified T : SerializableNetworkError> build(): HttpClient
+    inline fun <T : SerializableNetworkError> build(
+        errorClass: KClass<T>
+    ): HttpClient
 }
 
 
@@ -77,7 +84,9 @@ fun DefaultRequest.DefaultRequestBuilder.handleAuthenticationHeader(preference: 
 }
 
 
-suspend inline fun <reified T : SerializableNetworkError> Throwable.handleNetworkException() {
+suspend inline fun <T : SerializableNetworkError> Throwable.handleNetworkException(
+    errorClass: KClass<T>
+) {
     val isResponseException = (cause as? ResponseException) != null
     val isClientRequestResponse = (cause as? ClientRequestException) != null
     val isServerResponse = (cause as? ServerResponseException) != null
@@ -94,7 +103,7 @@ suspend inline fun <reified T : SerializableNetworkError> Throwable.handleNetwor
         val errorData =
             JsonFlatter.flat<NetworkError>(JsonWithIgnoredUnknownKeys.decodeFromJsonElement(bytes))
         val errorResponse =
-            JsonWithIgnoredUnknownKeys.decodeFromJsonElement<T>(errorData)
+            JsonWithIgnoredUnknownKeys.decodeFromJsonElement(errorClass.serializer(), errorData)
 
         val error = NetworkErrorMapper().mapServerError(
             httpErrorCode = errorResponse.httpCode,

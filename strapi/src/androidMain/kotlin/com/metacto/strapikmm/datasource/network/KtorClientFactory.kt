@@ -8,11 +8,13 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.statement.*
 import io.ktor.serialization.kotlinx.json.*
+import kotlin.reflect.KClass
 
 actual class KtorClientFactory actual constructor(
     networkLogLevel: NetworkLogLevel,
     shouldShowActualErrorMessages: Boolean,
-    val preference: KmmPreference
+    val preference: KmmPreference,
+
 ) {
 
     init {
@@ -20,7 +22,9 @@ actual class KtorClientFactory actual constructor(
         NetworkLogConfiguration.shouldShowActualErrorMessages = shouldShowActualErrorMessages
     }
 
-    actual inline fun <reified T : SerializableNetworkError> build(): HttpClient {
+    actual inline fun <T : SerializableNetworkError> build(
+        errorClass: KClass<T>
+    ): HttpClient {
         return HttpClient(Android) {
             expectSuccess = true
             install(ContentNegotiation) {
@@ -48,7 +52,7 @@ actual class KtorClientFactory actual constructor(
 
 
                 handleResponseExceptionWithRequest { cause, _ ->
-                    cause.handleNetworkException<T>()
+                    cause.handleNetworkException<T>(errorClass)
                 }
             }
         }

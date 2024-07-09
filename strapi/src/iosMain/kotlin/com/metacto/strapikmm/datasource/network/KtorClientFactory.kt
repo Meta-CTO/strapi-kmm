@@ -14,6 +14,7 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.serialization.kotlinx.json.json
+import kotlin.reflect.KClass
 
 actual class KtorClientFactory actual constructor(
     networkLogLevel: NetworkLogLevel,
@@ -26,7 +27,9 @@ actual class KtorClientFactory actual constructor(
         NetworkLogConfiguration.shouldShowActualErrorMessages = shouldShowActualErrorMessages
     }
 
-    actual inline fun <reified T : SerializableNetworkError> build(): HttpClient {
+    actual inline fun <T : SerializableNetworkError> build(
+        errorClass: KClass<T>
+    ): HttpClient {
 
         return HttpClient(Darwin) {
             expectSuccess = true
@@ -54,7 +57,7 @@ actual class KtorClientFactory actual constructor(
                 }
 
                 handleResponseExceptionWithRequest { cause, _ ->
-                    cause.handleNetworkException<T>()
+                    cause.handleNetworkException<T>(errorClass)
                 }
             }
         }
