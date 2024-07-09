@@ -337,11 +337,11 @@ class StrapiService(
     ): T = executeRequestWithNetworkHandling {
         val builder = StrapiRequestBuilder()
         builder.requestBuilder()
-        val json =
-            httpClient.post(buildRequest(builder, HttpMethod.Post.value)).body<JsonElement>()
+        val httpResponse = httpClient.post(buildRequest(builder, HttpMethod.Post.value))
         return@executeRequestWithNetworkHandling if (T::class.simpleName == Unit::class.simpleName) {
             Unit as T
         } else {
+            val json = httpResponse.body<JsonElement>()
             JsonFlatter.flat<T>(json).convert()
         }
     }
