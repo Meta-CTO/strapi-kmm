@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalJsExport::class)
-
 package com.metacto.strapikmm.datasource.network
 
 import com.metacto.strapikmm.constants.SharedConstants
@@ -7,6 +5,7 @@ import com.metacto.strapikmm.datasource.network.services.strapi.JsonFlatter
 import com.metacto.strapikmm.datasource.network.services.strapi.JsonWithIgnoredUnknownKeys
 import com.metacto.strapikmm.errorhandling.NetworkError
 import com.metacto.strapikmm.errorhandling.NetworkErrorMapper
+import com.metacto.strapikmm.errorhandling.SerializableNetworkError
 import com.metacto.strapikmm.sharedpreference.KmmPreference
 import com.metacto.strapikmm.util.Logger
 import io.ktor.client.*
@@ -14,11 +13,8 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.bodyAsText
-import io.ktor.util.*
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
-import kotlin.js.ExperimentalJsExport
-import kotlin.js.JsExport
 
 
 expect class KtorClientFactory(
@@ -26,8 +22,9 @@ expect class KtorClientFactory(
     shouldShowActualErrorMessages: Boolean,
     preference: KmmPreference
 ) {
-    fun build(): HttpClient
+    inline fun <reified T : SerializableNetworkError> build(): HttpClient
 }
+
 
 fun HttpRequestBuilder.printCURLDescription(
     bodyString: String? = null,
@@ -80,7 +77,7 @@ fun DefaultRequest.DefaultRequestBuilder.handleAuthenticationHeader(preference: 
 }
 
 
-suspend fun Throwable.handleNetworkException() {
+suspend inline fun <reified T : SerializableNetworkError> Throwable.handleNetworkException() {
     val isResponseException = (cause as? ResponseException) != null
     val isClientRequestResponse = (cause as? ClientRequestException) != null
     val isServerResponse = (cause as? ServerResponseException) != null
@@ -97,12 +94,12 @@ suspend fun Throwable.handleNetworkException() {
         val errorData =
             JsonFlatter.flat<NetworkError>(JsonWithIgnoredUnknownKeys.decodeFromJsonElement(bytes))
         val errorResponse =
-            JsonWithIgnoredUnknownKeys.decodeFromJsonElement<NetworkError>(errorData)
+            JsonWithIgnoredUnknownKeys.decodeFromJsonElement<T>(errorData)
 
         val error = NetworkErrorMapper().mapServerError(
-            httpErrorCode = errorResponse.httpStatusCode,
-            errorCode = errorResponse.errorCode,
-            errorMessage = errorResponse.message,
+            httpErrorCode = errorResponse.httpCode,
+            errorCode = errorResponse.code,
+            errorMessage = errorResponse.errorMessage,
             throwable = responseException
         )
 
