@@ -101,7 +101,7 @@ suspend inline fun <T : SerializableNetworkError> Throwable.handleNetworkExcepti
         }
         val bytes = response!!.body<JsonElement>()
         val errorData =
-            JsonFlatter.flat<NetworkError>(JsonWithIgnoredUnknownKeys.decodeFromJsonElement(bytes))
+            JsonFlatter.flat<T>(JsonWithIgnoredUnknownKeys.decodeFromJsonElement(bytes), errorClass)
         val errorResponse =
             JsonWithIgnoredUnknownKeys.decodeFromJsonElement(errorClass.serializer(), errorData)
 
