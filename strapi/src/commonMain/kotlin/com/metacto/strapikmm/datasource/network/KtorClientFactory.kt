@@ -27,7 +27,7 @@ expect class KtorClientFactory(
     shouldShowActualErrorMessages: Boolean,
     preference: KmmPreference
 ) {
-    inline fun <T : SerializableNetworkError> build(
+    fun <T : SerializableNetworkError> build(
         errorClass: KClass<T>
     ): HttpClient
 }
@@ -83,8 +83,28 @@ fun DefaultRequest.DefaultRequestBuilder.handleAuthenticationHeader(preference: 
     headers.remove(KmmBaseService.IS_AUTHENTICATED)
 }
 
+ inline fun <T : SerializableNetworkError> JsonElement.handleException(
+    errorClass: KClass<T>
+) {
+    val errorData =
+        JsonFlatter.flat<T>(JsonWithIgnoredUnknownKeys.decodeFromJsonElement(this), errorClass)
+    val errorResponse =
+        JsonWithIgnoredUnknownKeys.decodeFromJsonElement(errorClass.serializer(), errorData)
 
-suspend inline fun <T : SerializableNetworkError> Throwable.handleNetworkException(
+    val error = NetworkErrorMapper().mapServerError(
+        httpErrorCode = errorResponse.httpCode,
+        errorCode = errorResponse.code,
+        errorMessage = errorResponse.errorMessage,
+        throwable = Throwable()
+    )
+
+    Logger("").log("Error: $error")
+
+    throw error
+}
+
+
+suspend fun <T : SerializableNetworkError> Throwable.handleNetworkException(
     errorClass: KClass<T>
 ) {
     val isResponseException = (cause as? ResponseException) != null

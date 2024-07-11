@@ -22,7 +22,7 @@ actual class KtorClientFactory actual constructor(
         NetworkLogConfiguration.shouldShowActualErrorMessages = shouldShowActualErrorMessages
     }
 
-    actual inline fun <T : SerializableNetworkError> build(
+    actual fun <T : SerializableNetworkError> build(
         errorClass: KClass<T>
     ): HttpClient {
         return HttpClient(Android) {
