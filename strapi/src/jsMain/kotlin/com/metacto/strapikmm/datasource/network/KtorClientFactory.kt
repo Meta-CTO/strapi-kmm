@@ -39,7 +39,6 @@ actual class KtorClientFactory actual constructor(
             install(ContentNegotiation) {
                 json()
             }
-
             install(DefaultRequest) {
                 val sharedToken = preference.getSecureString(SharedConstants.ACCESS_TOKEN)
                 val token = TokenHandler.token
