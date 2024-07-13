@@ -1,3 +1,7 @@
+import co.touchlab.skie.configuration.EnumInterop
+import co.touchlab.skie.configuration.FunctionInterop
+import co.touchlab.skie.configuration.SealedInterop
+import co.touchlab.skie.configuration.SuspendInterop
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -13,6 +17,7 @@ plugins {
     id(Plugins.signing)
     id(Plugins.SQL_DELIGHT)
     id(Plugins.SWIFT_KLIB) version Plugins.Version.SWIFT_KLIB
+    id(Plugins.SKIE) version Plugins.Version.SKIE
 }
 
 val publishGroupId: String = project.property("publishGroupId") as String
@@ -28,6 +33,17 @@ val currentVersion = versionProperties.getProperty("PUBLISH_VERSION") as String
 val libName = "strapiKMM"
 
 version = currentVersion
+
+skie {
+    features {
+        group {
+            EnumInterop.Enabled(true)
+            SealedInterop.Enabled(true)
+            FunctionInterop.FileScopeConversion.Enabled(true)
+            SuspendInterop.Enabled(true)
+        }
+    }
+}
 
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
