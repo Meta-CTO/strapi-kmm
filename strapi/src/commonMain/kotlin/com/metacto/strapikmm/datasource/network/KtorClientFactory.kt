@@ -1,24 +1,28 @@
-@file:OptIn(ExperimentalJsExport::class)
+@file:OptIn(InternalSerializationApi::class)
 
 package com.metacto.strapikmm.datasource.network
 
 import com.metacto.strapikmm.constants.SharedConstants
 import com.metacto.strapikmm.datasource.network.services.strapi.JsonFlatter
 import com.metacto.strapikmm.datasource.network.services.strapi.JsonWithIgnoredUnknownKeys
-import com.metacto.strapikmm.errorhandling.NetworkError
 import com.metacto.strapikmm.errorhandling.NetworkErrorMapper
+import com.metacto.strapikmm.errorhandling.SerializableNetworkError
 import com.metacto.strapikmm.sharedpreference.KmmPreference
 import com.metacto.strapikmm.util.Logger
-import io.ktor.client.*
+import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.plugins.*
-import io.ktor.client.request.*
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.plugins.RedirectResponseException
+import io.ktor.client.plugins.ResponseException
+import io.ktor.client.plugins.ServerResponseException
+import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.statement.bodyAsText
-import io.ktor.util.*
+import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
-import kotlin.js.ExperimentalJsExport
-import kotlin.js.JsExport
+import kotlinx.serialization.serializer
+import kotlin.reflect.KClass
 
 
 expect class KtorClientFactory(
@@ -26,8 +30,11 @@ expect class KtorClientFactory(
     shouldShowActualErrorMessages: Boolean,
     preference: KmmPreference
 ) {
-    fun build(): HttpClient
+    fun <T : SerializableNetworkError> build(
+        errorClass: KClass<T>
+    ): HttpClient
 }
+
 
 fun HttpRequestBuilder.printCURLDescription(
     bodyString: String? = null,
@@ -79,40 +86,73 @@ fun DefaultRequest.DefaultRequestBuilder.handleAuthenticationHeader(preference: 
     headers.remove(KmmBaseService.IS_AUTHENTICATED)
 }
 
+ inline fun <T : SerializableNetworkError> JsonElement.handleException(
+    errorClass: KClass<T>
+) {
+    val errorData =
+        JsonFlatter.flat<T>(JsonWithIgnoredUnknownKeys.decodeFromJsonElement(this), errorClass)
+    val errorResponse =
+        JsonWithIgnoredUnknownKeys.decodeFromJsonElement(errorClass.serializer(), errorData)
 
-suspend fun Throwable.handleNetworkException() {
-    val isResponseException = (cause as? ResponseException) != null
-    val isClientRequestResponse = (cause as? ClientRequestException) != null
-    val isServerResponse = (cause as? ServerResponseException) != null
+    val error = NetworkErrorMapper().mapServerError(
+        httpErrorCode = errorResponse.httpCode,
+        errorCode = errorResponse.code,
+        errorMessage = errorResponse.errorMessage,
+        throwable = Throwable()
+    )
 
-    if (isResponseException || isClientRequestResponse || isServerResponse) {
-        val responseException = cause as ResponseException
-        val response = ((cause as? ResponseException)?.response)
-            ?: ((cause as? ClientRequestException)?.response)
-            ?: ((cause as? ServerResponseException)?.response)
-        if (response == null) {
-            this.handleError()
-        }
-        val bytes = response!!.body<JsonElement>()
+    Logger("").log("Error: $error")
+
+    throw error
+}
+
+
+suspend fun <T : SerializableNetworkError> Throwable.handleNetworkException(
+    errorClass: KClass<T>
+) {
+    val isResponseException = this is ResponseException
+    val isClientRequestException = this is ClientRequestException
+    val isServerResponseException = this is ServerResponseException
+    val isRedirectResponseException = this is RedirectResponseException
+
+    val response = if (isResponseException) {
+        (this as? ResponseException)?.response
+    } else if (isClientRequestException) {
+        (this as? ClientRequestException)?.response
+    } else if (isServerResponseException) {
+        (this as? ServerResponseException)?.response
+    } else if (isRedirectResponseException) {
+        (this as? RedirectResponseException)?.response
+    } else {
+        null
+    }
+
+
+    if (response == null) {
+        this.handleError()
+    } else {
+        val bytes = response.body<JsonElement>()
         val errorData =
-            JsonFlatter.flat<NetworkError>(JsonWithIgnoredUnknownKeys.decodeFromJsonElement(bytes))
+            JsonFlatter.flat<T>(
+                JsonWithIgnoredUnknownKeys.decodeFromJsonElement(bytes),
+                errorClass
+            )
         val errorResponse =
-            JsonWithIgnoredUnknownKeys.decodeFromJsonElement<NetworkError>(errorData)
+            JsonWithIgnoredUnknownKeys.decodeFromJsonElement(errorClass.serializer(), errorData)
 
         val error = NetworkErrorMapper().mapServerError(
-            httpErrorCode = errorResponse.httpStatusCode,
-            errorCode = errorResponse.errorCode,
-            errorMessage = errorResponse.message,
-            throwable = responseException
+            httpErrorCode = response.status.value,
+            errorCode = errorResponse.code,
+            errorMessage = errorResponse.errorMessage,
+            throwable = this
         )
 
         Logger("").log("Error: $error")
 
         throw error
-    } else {
-        this.handleError()
     }
 }
+
 
 suspend fun Throwable.handleError() {
     when (this) {

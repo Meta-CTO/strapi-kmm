@@ -1,24 +1,20 @@
 package com.metacto.strapikmm.datasource.network
 
-import com.metacto.strapikmm.datasource.network.services.strapi.JsonFlatter
-import com.metacto.strapikmm.datasource.network.services.strapi.JsonWithIgnoredUnknownKeys
-import com.metacto.strapikmm.errorhandling.NetworkError
-import com.metacto.strapikmm.errorhandling.NetworkErrorMapper
+import com.metacto.strapikmm.errorhandling.SerializableNetworkError
 import com.metacto.strapikmm.sharedpreference.KmmPreference
 import io.ktor.client.*
-import io.ktor.client.call.*
 import io.ktor.client.engine.android.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.statement.*
 import io.ktor.serialization.kotlinx.json.*
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.decodeFromJsonElement
+import kotlin.reflect.KClass
 
 actual class KtorClientFactory actual constructor(
     networkLogLevel: NetworkLogLevel,
     shouldShowActualErrorMessages: Boolean,
-    private val preference: KmmPreference
+    val preference: KmmPreference,
+
 ) {
 
     init {
@@ -26,7 +22,9 @@ actual class KtorClientFactory actual constructor(
         NetworkLogConfiguration.shouldShowActualErrorMessages = shouldShowActualErrorMessages
     }
 
-    actual fun build(): HttpClient {
+    actual fun <T : SerializableNetworkError> build(
+        errorClass: KClass<T>
+    ): HttpClient {
         return HttpClient(Android) {
             expectSuccess = true
             install(ContentNegotiation) {
@@ -54,7 +52,7 @@ actual class KtorClientFactory actual constructor(
 
 
                 handleResponseExceptionWithRequest { cause, _ ->
-                    cause.handleNetworkException()
+                    cause.handleNetworkException<T>(errorClass)
                 }
             }
         }

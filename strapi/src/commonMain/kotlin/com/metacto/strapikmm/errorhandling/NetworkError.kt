@@ -3,6 +3,12 @@ package com.metacto.strapikmm.errorhandling
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+interface SerializableNetworkError {
+    val httpCode: Int?
+    val errorMessage: String?
+    val code: Int?
+}
+
 @Serializable
 data class NetworkError(
     @SerialName("error.status")
@@ -11,4 +17,11 @@ data class NetworkError(
     val message: String? = null,
     @SerialName("error.details.code")
     val errorCode: Int? = null
-)
+) : SerializableNetworkError {
+    override val httpCode: Int?
+        get() = httpStatusCode
+    override val errorMessage: String?
+        get() = message
+    override val code: Int?
+        get() = errorCode
+}
