@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - 'master'
-      - 'custom_errors_handling'
+      - 'version_10'
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build:
@@ -37,7 +37,7 @@ jobs:
 
       - name: Update library version
         env:
-          PUBLISH_VERSION: 9.0.${{ github.run_number }}
+          PUBLISH_VERSION: 10.0.${{ github.run_number }}
         run: echo PUBLISH_VERSION=$PUBLISH_VERSION > ./versions.properties
 
       - name: Update local properties

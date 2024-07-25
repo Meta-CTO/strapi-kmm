@@ -18,11 +18,13 @@ import com.metacto.strapikmm.errorhandling.AppException
 import com.metacto.strapikmm.errorhandling.NetworkErrorMapper
 import com.metacto.strapikmm.errorhandling.createErrorJsonResponse
 import com.metacto.strapikmm.errorhandling.errortype.isNetworkException
+import com.metacto.strapikmm.model.ResponseWithHeaders
 import com.metacto.strapikmm.util.nullIfEmpty
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import io.ktor.util.toMap
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -54,6 +56,24 @@ class StrapiService(
     }
 
     @Throws(Throwable::class)
+    suspend inline fun <reified T> getWithHeaders(
+        crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
+    ): ResponseWithHeaders<T> = executeRequestWithNetworkHandling {
+        val builder = StrapiRequestBuilder()
+        builder.requestBuilder()
+
+        val request = buildRequest(builder, HttpMethod.Get.value)
+        val response = httpClient.get(request)
+
+        val body = response.body<JsonElement>()
+        val flattedResponse = JsonFlatter.flat<T>(body).convert<T>()
+        return@executeRequestWithNetworkHandling ResponseWithHeaders(
+            flattedResponse,
+            response.headers.toMap()
+        )
+    }
+
+    @Throws(Throwable::class)
     inline fun <reified T> getFlow(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
     ): Flow<T> {
@@ -68,6 +88,81 @@ class StrapiService(
         } else {
             getDefault(requestBuilder)
         }
+    }
+
+    @Throws(Throwable::class)
+    inline fun <reified T> getFlowWithHeaders(
+        crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
+    ): Flow<ResponseWithHeaders<T>> {
+        val builder = StrapiRequestBuilder()
+        builder.requestBuilder()
+
+        // throw exception if the model is PagingResponse or DataWrapper
+        return if (T::class == PagingResponse::class) {
+            getPagedWithHeaders<T>(requestBuilder)
+        } else if (T::class == DataWrapper::class) {
+            getOneWithHeaders<T>(requestBuilder)
+        } else {
+            getDefaultWithHeaders<T>(requestBuilder)
+        }
+    }
+
+    @Throws(Throwable::class)
+    inline fun <reified T> getDefaultWithHeaders(
+        crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {}
+    ): Flow<ResponseWithHeaders<T>> = flow {
+        // build the builder and the request to extract the path and the url
+        val builder = StrapiRequestBuilder()
+        builder.requestBuilder()
+
+        val request = buildRequest(builder, HttpMethod.Get.value)
+        val apiPath = request.url.encodedPath
+        val fetchStrategy = builder.requestFetchStrategy
+        val requestClassName = builder.requestClassName ?: T::class.simpleName ?: ""
+
+        val modelVersion = serializer<T>().getModelVersion()
+
+        // get data from cache if available
+        if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE) {
+            val localData = if (requestClassName.isNotEmpty()) {
+                localDataRepository.getContentDataByModelVersionAndModelTypeAndApiUrl(
+                    modelVersion,
+                    requestClassName,
+                    apiPath
+                )
+            } else {
+                localDataRepository.getContentDataByApiUrl(apiPath)
+            }
+
+            if (localData?.content.isNullOrEmpty().not()) {
+                val json = JsonWithIgnoredUnknownKeys.parseToJsonElement(localData?.content!!)
+                val response = JsonFlatter.flat<T>(json).convert<T>()
+                emit(ResponseWithHeaders(response, emptyMap()))
+            }
+        }
+
+        // get data from remote
+        val response = executeRequestWithNetworkHandling {
+            httpClient.get(request)
+        }
+
+        val json = response.body<JsonElement>()
+
+        val data = JsonFlatter.flat<T>(json).convert<T>()
+        // save data to cache
+        if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE) {
+            // Then cache
+
+            localDataRepository.insertOrUpdateContentData(
+                modelVersion,
+                requestClassName,
+                Json.encodeToString(json),
+                apiPath,
+                null
+            )
+        }
+
+        emit(ResponseWithHeaders(data, response.headers.toMap()))
     }
 
     @Throws(Throwable::class)
@@ -105,7 +200,7 @@ class StrapiService(
 
         // get data from remote
         val json = executeRequestWithNetworkHandling {
-             httpClient.get(request).body<JsonElement>()
+            httpClient.get(request).body<JsonElement>()
         }
 
         val response = JsonFlatter.flat<T>(json).convert<T>()
@@ -202,7 +297,7 @@ class StrapiService(
             val jsonArray = flatResponse.jsonObject["data"]?.jsonArray.orEmpty()
             val elementsIds = jsonArray.mapNotNull { jsonElement ->
                 jsonElement.jsonObject["id"]?.jsonPrimitive?.content
-               }.joinToString(",")
+            }.joinToString(",")
 
             // Cache each item in the list individually so that we can update the cache when the item is updated
             jsonArray.forEach { jsonElement ->
@@ -231,7 +326,8 @@ class StrapiService(
                             id
                         )
                     } else {
-                        val itemJsonElement = JsonWithIgnoredUnknownKeys.parseToJsonElement(localCachedItem?.content!!)
+                        val itemJsonElement =
+                            JsonWithIgnoredUnknownKeys.parseToJsonElement(localCachedItem?.content!!)
                         if (itemJsonElement as? JsonObject != null && jsonElement as? JsonObject != null) {
                             val cachedJsonObject = itemJsonElement.toMutableMap()
                             val newJsonObject = jsonElement.toMutableMap()
@@ -260,6 +356,150 @@ class StrapiService(
         }
 
         emit(response)
+    }
+
+    @Throws(Throwable::class)
+    inline fun <reified T> getPagedWithHeaders(
+        crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {}
+    ): Flow<ResponseWithHeaders<T>> = flow {
+
+        // build the builder and the request to extract the path and the url
+        val builder = StrapiRequestBuilder()
+
+        builder.requestBuilder()
+
+        val modelSerializer = builder.modelSerializer
+            ?: throw Throwable("You must provide the responseType in the requestBuilder")
+
+        val modelVersion = modelSerializer.getModelVersion()
+
+        val page = builder.queryBuilder?.pagingData?.page ?: 1
+
+        val fetchStrategy = builder.requestFetchStrategy
+
+        val request = buildRequest(builder, HttpMethod.Get.value)
+
+        val requestClassName = builder.requestClassName ?: ""
+
+        val apiUrl = request.url.buildString()
+
+        val apiPath = request.url.encodedPath
+
+        // get data from cache if available
+        if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE && page == 1) {
+            val localData =
+                localDataRepository.getListDataByModelVersionAndApiUrl(modelVersion, apiUrl)
+            val listItems = localData.orEmpty().map { localItem ->
+                if (localItem.content.isNullOrEmpty().not()) {
+                    Json.decodeFromJsonElement(
+                        modelSerializer,
+                        JsonWithIgnoredUnknownKeys.parseToJsonElement(localItem.content!!)
+                    )
+                } else {
+                    null
+                }
+            }.filterNotNull()
+
+            if (listItems.isNotEmpty()) {
+                val data = PagingResponse(
+                    data = listItems,
+                    meta = MetaResponse(
+                        Paging(
+                            page = 1,
+                            pageSize = listItems.size,
+                            total = listItems.size,
+                            pageCount = 1
+                        )
+                    )
+                ) as T
+                emit(ResponseWithHeaders(data, emptyMap()))
+            }
+        }
+
+        // get data from api
+        //////
+
+        val response = executeRequestWithNetworkHandling {
+            httpClient.get(request)
+        }
+
+        val json = response.body<JsonElement>()
+
+        val flatResponse = JsonFlatter.flat<T>(json)
+        val data = flatResponse.convert<T>()
+        /////
+
+        // Then cache the whole list and each item in the list individually
+        // if the page is 1 or the paging cache strategy is CACHE_LAST
+        if (page == 1) {
+            // Converting the list to json array to be able to cache it
+            val jsonArray = flatResponse.jsonObject["data"]?.jsonArray.orEmpty()
+            val elementsIds = jsonArray.mapNotNull { jsonElement ->
+                jsonElement.jsonObject["id"]?.jsonPrimitive?.content
+            }.joinToString(",")
+
+            // Cache each item in the list individually so that we can update the cache when the item is updated
+            jsonArray.forEach { jsonElement ->
+                // get each item content
+                val jsonContent = Json.encodeToString(jsonElement)
+
+                // get each item id
+                val id = jsonElement.jsonObject["id"]?.jsonPrimitive?.content?.toIntOrNull()
+
+                // cache each item individually if it has an id
+                if (id != null && requestClassName.isNotEmpty()) {
+                    val localCachedItem =
+                        localDataRepository.getContentDataByModelTypeAndModelVersionAndModelId(
+                            requestClassName,
+                            modelVersion,
+                            id
+                        )
+
+                    // if the item is not cached then cache it
+                    if (localCachedItem?.content.isNullOrEmpty()) {
+                        localDataRepository.insertOrUpdateContentData(
+                            modelVersion,
+                            requestClassName,
+                            jsonContent,
+                            "$apiPath/$id",
+                            id
+                        )
+                    } else {
+                        val itemJsonElement =
+                            JsonWithIgnoredUnknownKeys.parseToJsonElement(localCachedItem?.content!!)
+                        if (itemJsonElement as? JsonObject != null && jsonElement as? JsonObject != null) {
+                            val cachedJsonObject = itemJsonElement.toMutableMap()
+                            val newJsonObject = jsonElement.toMutableMap()
+                            cachedJsonObject.putAll(newJsonObject)
+                            val jsonData = JsonObject(cachedJsonObject).toString()
+
+                            localDataRepository.insertOrUpdateContentData(
+                                modelVersion,
+                                requestClassName,
+                                jsonData,
+                                "$apiPath/$id",
+                                id
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Then cache the whole list
+            localDataRepository.insertOrUpdateListData(
+                apiUrl,
+                modelVersion,
+                requestClassName,
+                elementsIds
+            )
+        }
+
+        emit(
+            ResponseWithHeaders(
+                data,
+                response.headers.toMap()
+            )
+        )
     }
 
     @Throws(Throwable::class)
@@ -332,6 +572,88 @@ class StrapiService(
         }
 
     @Throws(Throwable::class)
+    inline fun <reified T> getOneWithHeaders(crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {}): Flow<ResponseWithHeaders<T>> =
+        flow {
+
+            // build the builder and the request to extract the path and the url
+            val builder = StrapiRequestBuilder()
+            builder.requestBuilder()
+
+            val modelSerializer = builder.modelSerializer
+                ?: throw Throwable("You must provide the responseType in the requestBuilder")
+            val modelVersion = modelSerializer.getModelVersion()
+
+            val requestClassName = builder.requestClassName ?: ""
+
+            val fetchStrategy = builder.requestFetchStrategy
+
+            val request = buildRequest(builder, HttpMethod.Get.value)
+
+            val apiPath = request.url.encodedPath
+
+            // We need to get the id from the encoded path which is the last part of the path and it can be like posts/1 or comments/1 .. etc
+            val entityId = apiPath.split("/").lastOrNull()?.toInt()
+
+            // get data from cache if available
+            if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE) {
+                val localData = if (entityId != null && requestClassName.isNotEmpty()) {
+                    localDataRepository.getContentDataByModelTypeAndModelVersionAndModelId(
+                        requestClassName,
+                        modelVersion,
+                        entityId
+                    )
+                } else if (entityId == null && requestClassName.isEmpty()) {
+                    localDataRepository.getContentDataByModelVersionAndApiUrl(modelVersion, apiPath)
+                } else {
+                    localDataRepository.getContentDataByApiUrl(apiPath)
+                }
+
+                if (localData?.content.isNullOrEmpty().not()) {
+                    val cachedData = Json.decodeFromString(modelSerializer, localData?.content!!)
+                    val data = DataWrapper(cachedData) as T
+                    emit(
+                        ResponseWithHeaders(
+                            data,
+                            emptyMap()
+                        )
+                    )
+                }
+            }
+
+            // get data from api
+            //////
+            val response = executeRequestWithNetworkHandling {
+                httpClient.get(request)
+            }
+
+            val body = response.body<JsonElement>()
+
+            val data = JsonFlatter.flat<T>(body).convert<T>()
+            /////
+
+            val responseJson = Json.encodeToJsonElement(serializer<T>(), data)
+            val jsonObject = responseJson.jsonObject["data"]?.jsonObject.orEmpty()
+
+            val jsonContent = Json.encodeToString(jsonObject)
+
+            // Then Insert
+            localDataRepository.insertOrUpdateContentData(
+                modelVersion = modelVersion,
+                modelType = requestClassName.nullIfEmpty(),
+                jsonContent,
+                apiPath,
+                entityId
+            )
+
+            emit(
+                ResponseWithHeaders(
+                    data,
+                    response.headers.toMap()
+                )
+            )
+        }
+
+    @Throws(Throwable::class)
     suspend inline fun <reified T> post(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
     ): T = executeRequestWithNetworkHandling {
@@ -343,6 +665,22 @@ class StrapiService(
         } else {
             val json = httpResponse.body<JsonElement>()
             JsonFlatter.flat<T>(json).convert()
+        }
+    }
+
+    @Throws(Throwable::class)
+    suspend inline fun <reified T> postWithHeaders(
+        crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
+    ): ResponseWithHeaders<T> = executeRequestWithNetworkHandling {
+        val builder = StrapiRequestBuilder()
+        builder.requestBuilder()
+        val httpResponse = httpClient.post(buildRequest(builder, HttpMethod.Post.value))
+        return@executeRequestWithNetworkHandling if (T::class.simpleName == Unit::class.simpleName) {
+            ResponseWithHeaders(Unit as T, httpResponse.headers.toMap())
+        } else {
+            val json = httpResponse.body<JsonElement>()
+            val response = JsonFlatter.flat<T>(json).convert<T>()
+            ResponseWithHeaders(response, httpResponse.headers.toMap())
         }
     }
 
@@ -363,6 +701,25 @@ class StrapiService(
     }
 
     @Throws(Throwable::class)
+    suspend inline fun <reified T> patchWithHeaders(
+        crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
+    ): ResponseWithHeaders<T> = executeRequestWithNetworkHandling {
+        val builder = StrapiRequestBuilder()
+        builder.requestBuilder()
+
+        val request = buildRequest(builder, HttpMethod.Patch.value)
+        val httpResponse = httpClient.patch(request)
+        val json =  httpResponse.body<JsonElement>()
+
+        return@executeRequestWithNetworkHandling if (T::class.simpleName == Unit::class.simpleName) {
+            ResponseWithHeaders(Unit as T, httpResponse.headers.toMap())
+        } else {
+            val response = handleUpdateItem<T>(json, request, builder)
+            ResponseWithHeaders(response, httpResponse.headers.toMap())
+        }
+    }
+
+    @Throws(Throwable::class)
     suspend inline fun <reified T> put(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
     ): T = executeRequestWithNetworkHandling {
@@ -377,7 +734,26 @@ class StrapiService(
         } else {
             handleUpdateItem(json, request, builder)
         }
+    }
 
+    @Throws(Throwable::class)
+    suspend inline fun <reified T> putWithHeaders(
+        crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
+    ): ResponseWithHeaders<T> = executeRequestWithNetworkHandling {
+        val builder = StrapiRequestBuilder()
+        builder.requestBuilder()
+        val request = buildRequest(builder, HttpMethod.Put.value)
+        val httpResponse =
+            httpClient.put(request)
+
+        val json = httpResponse.body<JsonElement>()
+
+        return@executeRequestWithNetworkHandling if (T::class.simpleName == Unit::class.simpleName) {
+            ResponseWithHeaders(Unit as T, httpResponse.headers.toMap())
+        } else {
+            val response = handleUpdateItem<T>(json, request, builder)
+            ResponseWithHeaders(response, httpResponse.headers.toMap())
+        }
     }
 
     /**
@@ -435,7 +811,7 @@ class StrapiService(
     @Throws(Throwable::class)
     suspend inline fun <reified T> delete(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
-    ): T = executeRequestWithNetworkHandling{
+    ): T = executeRequestWithNetworkHandling {
         val builder = StrapiRequestBuilder()
         builder.requestBuilder()
         val request = buildRequest(builder, HttpMethod.Delete.value)
@@ -454,6 +830,7 @@ class StrapiService(
         } else {
             JsonFlatter.flat<T>(json).convert()
         }
+
         val elementId = apiPath.split("/").lastOrNull()
         deleteCachedItem(
             apiPath,
@@ -464,6 +841,38 @@ class StrapiService(
         return@executeRequestWithNetworkHandling response
     }
 
+    @Throws(Throwable::class)
+    suspend inline fun <reified T> deleteWithHeaders(
+        crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
+    ): ResponseWithHeaders<T> = executeRequestWithNetworkHandling {
+        val builder = StrapiRequestBuilder()
+        builder.requestBuilder()
+        val request = buildRequest(builder, HttpMethod.Delete.value)
+        val apiPath = request.url.encodedPath
+
+        val modelSerializer = builder.modelSerializer
+        val modelVersion = modelSerializer?.getModelVersion()
+        val requestClassName = builder.requestClassName
+
+
+        val httpResponse = httpClient.delete(request)
+        val json = httpResponse.body<JsonElement>()
+
+        val response = if (T::class.simpleName == Unit::class.simpleName) {
+            ResponseWithHeaders(Unit as T, httpResponse.headers.toMap())
+        } else {
+            val response = JsonFlatter.flat<T>(json).convert<T>()
+            ResponseWithHeaders(response, httpResponse.headers.toMap())
+        }
+        val elementId = apiPath.split("/").lastOrNull()
+        deleteCachedItem(
+            apiPath,
+            elementId,
+            modelVersion,
+            requestClassName
+        )
+        return@executeRequestWithNetworkHandling response
+    }
 
     @Throws(Throwable::class)
     suspend fun deleteCachedItem(
@@ -489,7 +898,7 @@ class StrapiService(
     }
 
     @Throws(Throwable::class)
-    suspend fun getBytesFromUrl(url: String): ByteArray = executeRequestWithNetworkHandling{
+    suspend fun getBytesFromUrl(url: String): ByteArray = executeRequestWithNetworkHandling {
         val httpResponse = httpClient.get(url)
         return@executeRequestWithNetworkHandling httpResponse.body()
     }
@@ -523,11 +932,12 @@ suspend fun <T> executeRequestWithNetworkHandling(block: suspend () -> T): T {
         when {
             throwable.isNetworkException() -> throw AppException(
                 errorCode = NetworkErrorMapper.NO_INTERNET_CONNECTION,
-                errorMessage =  createErrorJsonResponse(
+                errorMessage = createErrorJsonResponse(
                     NetworkErrorMapper.NO_INTERNET_CONNECTION_MESSAGE,
                     NetworkErrorMapper.NO_INTERNET_CONNECTION
                 )
             )
+
             NetworkLogConfiguration.shouldShowActualErrorMessages -> throw throwable
             else -> throw AppException(
                 errorCode = NetworkErrorMapper.SOMETHING_WRONG,

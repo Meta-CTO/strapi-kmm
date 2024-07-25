@@ -6,19 +6,26 @@ import kotlinx.serialization.Serializable
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
 
+
+@JsExport
+class ResponseWithHeaders<T>(
+    val response: T,
+    val headers: Map<String, List<String>>
+)
+
 @Serializable
 class PagingResponse<T>(
     @SerialName("data")
     val data: List<T>,
     @SerialName("meta")
-    val meta: MetaResponse?,
+    val meta: MetaResponse?
 )
 
 @Serializable
 @JsExport
 class DataWrapper<T>(
     @SerialName("data")
-    val data: T,
+    val data: T
 )
 
 @Serializable
