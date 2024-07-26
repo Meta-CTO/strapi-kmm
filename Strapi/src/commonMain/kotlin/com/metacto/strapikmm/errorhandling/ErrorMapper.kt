@@ -30,7 +30,8 @@ expect object ErrorMapper {
         errorCode: Int?,
         errorMessage: String? = null,
         errorBody: String? = null,
-        throwable: Throwable
+        throwable: Throwable,
+        headers: Map<String, List<String>>? = null
     ): AppException
 }
 

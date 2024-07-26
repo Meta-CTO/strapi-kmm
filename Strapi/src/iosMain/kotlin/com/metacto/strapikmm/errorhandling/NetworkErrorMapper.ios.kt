@@ -70,7 +70,8 @@ actual object ErrorMapper {
         errorCode: Int?,
         errorMessage: String?,
         errorBody: String?,
-        throwable: Throwable
+        throwable: Throwable,
+        headers: Map<String, List<String>>?
     ): AppException {
         val message = errorMessage ?: "The application has encountered an unknown error"
 
@@ -80,7 +81,7 @@ actual object ErrorMapper {
             errorMessage = message,
             errorBody = errorBody
         )
-        return AppException(error = error)
+        return AppException(error = error, headers = headers)
     }
 
     private fun createNsError(

@@ -19,6 +19,7 @@ import io.ktor.client.plugins.ResponseException
 import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.statement.bodyAsText
+import io.ktor.util.toMap
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
@@ -126,7 +127,8 @@ suspend fun <T : SerializableNetworkError> Throwable.handleNetworkException(
             errorCode = errorResponse.errorCode,
             errorMessage = errorResponse.message,
             errorBody = JsonWithIgnoredUnknownKeys.encodeToString(errorResponse),
-            throwable = this
+            throwable = this,
+            headers = response.headers.toMap()
         )
 
         throw error
@@ -146,7 +148,8 @@ inline fun <T : SerializableNetworkError> JsonElement.handleException(
         httpErrorCode = errorResponse.httpCode,
         errorCode = errorResponse.code,
         errorMessage = errorResponse.errorMessage,
-        throwable = Throwable()
+        throwable = Throwable(),
+        headers = mapOf()
     )
 
     throw error

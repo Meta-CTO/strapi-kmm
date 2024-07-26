@@ -30,7 +30,8 @@ actual object ErrorMapper {
         errorCode: Int?,
         errorMessage: String?,
         errorBody: String?,
-        throwable: Throwable
+        throwable: Throwable,
+        headers: Map<String, List<String>>?
     ): AppException {
         val code =
             if (httpErrorCode == NetworkMapperConstants.UNAUTHORIZED) httpErrorCode else errorCode
@@ -38,7 +39,8 @@ actual object ErrorMapper {
             errorBody = errorBody,
             errorCode = code ?: -1,
             errorMessage = errorMessage ?: "The application has encountered an unknown error",
-            throwable = throwable
+            throwable = throwable,
+            headers = headers
         )
     }
 
