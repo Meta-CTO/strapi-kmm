@@ -8,8 +8,8 @@ import kotlin.js.JsExport
 
 
 @JsExport
-class ResponseWithHeaders<T>(
-    val response: T,
+class HttpResponse<T>(
+    val data: T,
     val headers: Map<String, List<String>>
 )
 

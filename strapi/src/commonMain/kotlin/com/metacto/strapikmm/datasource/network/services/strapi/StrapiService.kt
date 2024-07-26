@@ -18,7 +18,7 @@ import com.metacto.strapikmm.errorhandling.AppException
 import com.metacto.strapikmm.errorhandling.ErrorMapper
 import com.metacto.strapikmm.errorhandling.NetworkMapperConstants
 import com.metacto.strapikmm.errorhandling.errortype.isNetworkException
-import com.metacto.strapikmm.model.ResponseWithHeaders
+import com.metacto.strapikmm.model.HttpResponse
 import com.metacto.strapikmm.util.nullIfEmpty
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -56,9 +56,9 @@ class StrapiService(
     }
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T> getWithHeaders(
+    suspend inline fun <reified T> getHttpResponse(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
-    ): ResponseWithHeaders<T> = executeRequestWithNetworkHandling {
+    ): HttpResponse<T> = executeRequestWithNetworkHandling {
         val builder = StrapiRequestBuilder()
         builder.requestBuilder()
 
@@ -67,7 +67,7 @@ class StrapiService(
 
         val body = response.body<JsonElement>()
         val flattedResponse = JsonFlatter.flat<T>(body).convert<T>()
-        return@executeRequestWithNetworkHandling ResponseWithHeaders(
+        return@executeRequestWithNetworkHandling HttpResponse(
             flattedResponse,
             response.headers.toMap()
         )
@@ -91,26 +91,26 @@ class StrapiService(
     }
 
     @Throws(Throwable::class)
-    inline fun <reified T> getFlowWithHeaders(
+    inline fun <reified T> getFlowHttpResponse(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
-    ): Flow<ResponseWithHeaders<T>> {
+    ): Flow<HttpResponse<T>> {
         val builder = StrapiRequestBuilder()
         builder.requestBuilder()
 
         // throw exception if the model is PagingResponse or DataWrapper
         return if (T::class == PagingResponse::class) {
-            getPagedWithHeaders<T>(requestBuilder)
+            getPagedHttpResponse<T>(requestBuilder)
         } else if (T::class == DataWrapper::class) {
-            getOneWithHeaders<T>(requestBuilder)
+            getOneHttpResponse<T>(requestBuilder)
         } else {
-            getDefaultWithHeaders<T>(requestBuilder)
+            getDefaultHttpResponse<T>(requestBuilder)
         }
     }
 
     @Throws(Throwable::class)
-    inline fun <reified T> getDefaultWithHeaders(
+    inline fun <reified T> getDefaultHttpResponse(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {}
-    ): Flow<ResponseWithHeaders<T>> = flow {
+    ): Flow<HttpResponse<T>> = flow {
         // build the builder and the request to extract the path and the url
         val builder = StrapiRequestBuilder()
         builder.requestBuilder()
@@ -137,7 +137,7 @@ class StrapiService(
             if (localData?.content.isNullOrEmpty().not()) {
                 val json = JsonWithIgnoredUnknownKeys.parseToJsonElement(localData?.content!!)
                 val response = JsonFlatter.flat<T>(json).convert<T>()
-                emit(ResponseWithHeaders(response, emptyMap()))
+                emit(HttpResponse(response, emptyMap()))
             }
         }
 
@@ -162,7 +162,7 @@ class StrapiService(
             )
         }
 
-        emit(ResponseWithHeaders(data, response.headers.toMap()))
+        emit(HttpResponse(data, response.headers.toMap()))
     }
 
     @Throws(Throwable::class)
@@ -362,9 +362,9 @@ class StrapiService(
     }
 
     @Throws(Throwable::class)
-    inline fun <reified T> getPagedWithHeaders(
+    inline fun <reified T> getPagedHttpResponse(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {}
-    ): Flow<ResponseWithHeaders<T>> = flow {
+    ): Flow<HttpResponse<T>> = flow {
 
         // build the builder and the request to extract the path and the url
         val builder = StrapiRequestBuilder()
@@ -415,7 +415,7 @@ class StrapiService(
                         )
                     )
                 ) as T
-                emit(ResponseWithHeaders(data, emptyMap()))
+                emit(HttpResponse(data, emptyMap()))
             }
         }
 
@@ -498,7 +498,7 @@ class StrapiService(
         }
 
         emit(
-            ResponseWithHeaders(
+            HttpResponse(
                 data,
                 response.headers.toMap()
             )
@@ -578,7 +578,7 @@ class StrapiService(
         }
 
     @Throws(Throwable::class)
-    inline fun <reified T> getOneWithHeaders(crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {}): Flow<ResponseWithHeaders<T>> =
+    inline fun <reified T> getOneHttpResponse(crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {}): Flow<HttpResponse<T>> =
         flow {
 
             // build the builder and the request to extract the path and the url
@@ -618,7 +618,7 @@ class StrapiService(
                     val cachedData = Json.decodeFromString(modelSerializer, localData?.content!!)
                     val data = DataWrapper(cachedData) as T
                     emit(
-                        ResponseWithHeaders(
+                        HttpResponse(
                             data,
                             emptyMap()
                         )
@@ -652,7 +652,7 @@ class StrapiService(
             )
 
             emit(
-                ResponseWithHeaders(
+                HttpResponse(
                     data,
                     response.headers.toMap()
                 )
@@ -675,18 +675,18 @@ class StrapiService(
     }
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T> postWithHeaders(
+    suspend inline fun <reified T> postHttpResponse(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
-    ): ResponseWithHeaders<T> = executeRequestWithNetworkHandling {
+    ): HttpResponse<T> = executeRequestWithNetworkHandling {
         val builder = StrapiRequestBuilder()
         builder.requestBuilder()
         val httpResponse = httpClient.post(buildRequest(builder, HttpMethod.Post.value))
         return@executeRequestWithNetworkHandling if (T::class.simpleName == Unit::class.simpleName) {
-            ResponseWithHeaders(Unit as T, httpResponse.headers.toMap())
+            HttpResponse(Unit as T, httpResponse.headers.toMap())
         } else {
             val json = httpResponse.body<JsonElement>()
             val response = JsonFlatter.flat<T>(json).convert<T>()
-            ResponseWithHeaders(response, httpResponse.headers.toMap())
+            HttpResponse(response, httpResponse.headers.toMap())
         }
     }
 
@@ -707,9 +707,9 @@ class StrapiService(
     }
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T> patchWithHeaders(
+    suspend inline fun <reified T> patchHttpResponse(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
-    ): ResponseWithHeaders<T> = executeRequestWithNetworkHandling {
+    ): HttpResponse<T> = executeRequestWithNetworkHandling {
         val builder = StrapiRequestBuilder()
         builder.requestBuilder()
 
@@ -718,10 +718,10 @@ class StrapiService(
         val json =  httpResponse.body<JsonElement>()
 
         return@executeRequestWithNetworkHandling if (T::class.simpleName == Unit::class.simpleName) {
-            ResponseWithHeaders(Unit as T, httpResponse.headers.toMap())
+            HttpResponse(Unit as T, httpResponse.headers.toMap())
         } else {
             val response = handleUpdateItem<T>(json, request, builder)
-            ResponseWithHeaders(response, httpResponse.headers.toMap())
+            HttpResponse(response, httpResponse.headers.toMap())
         }
     }
 
@@ -743,9 +743,9 @@ class StrapiService(
     }
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T> putWithHeaders(
+    suspend inline fun <reified T> putHttpResponse(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
-    ): ResponseWithHeaders<T> = executeRequestWithNetworkHandling {
+    ): HttpResponse<T> = executeRequestWithNetworkHandling {
         val builder = StrapiRequestBuilder()
         builder.requestBuilder()
         val request = buildRequest(builder, HttpMethod.Put.value)
@@ -755,10 +755,10 @@ class StrapiService(
         val json = httpResponse.body<JsonElement>()
 
         return@executeRequestWithNetworkHandling if (T::class.simpleName == Unit::class.simpleName) {
-            ResponseWithHeaders(Unit as T, httpResponse.headers.toMap())
+            HttpResponse(Unit as T, httpResponse.headers.toMap())
         } else {
             val response = handleUpdateItem<T>(json, request, builder)
-            ResponseWithHeaders(response, httpResponse.headers.toMap())
+            HttpResponse(response, httpResponse.headers.toMap())
         }
     }
 
@@ -848,9 +848,9 @@ class StrapiService(
     }
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T> deleteWithHeaders(
+    suspend inline fun <reified T> deleteHttpResponse(
         crossinline requestBuilder: StrapiRequestBuilder.() -> Unit = {},
-    ): ResponseWithHeaders<T> = executeRequestWithNetworkHandling {
+    ): HttpResponse<T> = executeRequestWithNetworkHandling {
         val builder = StrapiRequestBuilder()
         builder.requestBuilder()
         val request = buildRequest(builder, HttpMethod.Delete.value)
@@ -865,10 +865,10 @@ class StrapiService(
         val json = httpResponse.body<JsonElement>()
 
         val response = if (T::class.simpleName == Unit::class.simpleName) {
-            ResponseWithHeaders(Unit as T, httpResponse.headers.toMap())
+            HttpResponse(Unit as T, httpResponse.headers.toMap())
         } else {
             val response = JsonFlatter.flat<T>(json).convert<T>()
-            ResponseWithHeaders(response, httpResponse.headers.toMap())
+            HttpResponse(response, httpResponse.headers.toMap())
         }
         val elementId = apiPath.split("/").lastOrNull()
         deleteCachedItem(
