@@ -1,10 +1,14 @@
+@file:OptIn(InternalSerializationApi::class)
+
 package com.metacto.strapikmm.datasource.network.services.strapi
 
 import com.metacto.strapikmm.datasource.network.NetworkLogConfiguration
 import com.metacto.strapikmm.datasource.network.NetworkLogLevel
 import com.metacto.strapikmm.errorhandling.ErrorMapper
+import com.metacto.strapikmm.errorhandling.SerializableNetworkError
 import com.metacto.strapikmm.util.Logger
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -12,9 +16,75 @@ import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.descriptors.elementNames
 import kotlinx.serialization.json.*
 import kotlinx.serialization.serializer
+import kotlin.reflect.KClass
 import kotlin.reflect.typeOf
 
 object JsonFlatter {
+
+    @OptIn(ExperimentalSerializationApi::class)
+    inline fun <T : SerializableNetworkError> flat(
+        jsonElement: JsonElement,
+        kClass: KClass<T>
+    ): JsonElement {
+        if (NetworkLogConfiguration.logLevel == NetworkLogLevel.ALL) {
+            Logger("").log(jsonElement.toString())
+        }
+
+        val descriptor = kClass.serializer().descriptor
+
+        val elementNames = descriptor.elementNames
+
+        return when (jsonElement) {
+            is JsonObject -> {
+                val map = mutableMapOf<String, JsonElement>()
+                elementNames.forEachIndexed { index, elementName ->
+                    val childDescriptor = descriptor.getElementDescriptor(index)
+                    val jsonNames = mutableListOf<String>()
+                    val annotations = descriptor.getElementAnnotations(index)
+                        .filter { it is JsonNames || it is SerialName }
+
+                    annotations.forEach { annotation ->
+                        if (annotation is SerialName) {
+                            jsonNames.add(annotation.value)
+                        } else if (annotation is JsonNames) {
+                            jsonNames.addAll(
+                                annotation.names.sortedBy { it.split(".").size }
+                            )
+                        }
+                    }
+
+                    if (jsonNames.isEmpty()) {
+                        jsonNames.add(elementName)
+                    }
+
+                    // Default value if the item not presented in the json
+                    map[elementName] = JsonNull
+
+                    jsonNames.forEach { element ->
+                        val value = parse(element, jsonElement, childDescriptor)
+                        if (value != DummyObject && value != null) {
+                            map[elementName] = value
+                        }
+                    }
+                }
+
+                JsonObject(map)
+            }
+
+            is JsonArray -> {
+                val jsonElements = jsonElement.mapIndexed { index, element ->
+                    val childDescriptor = descriptor.getElementDescriptor(index)
+                    parse(element, childDescriptor)
+                }
+
+                JsonArray(jsonElements)
+            }
+
+            else -> {
+                throw IllegalStateException("Malformed JSON passed to parser, expected object or array but got $jsonElement")
+            }
+        }
+    }
 
     @OptIn(ExperimentalSerializationApi::class)
     inline fun <reified T> flat(jsonElement: JsonElement): JsonElement {
@@ -61,6 +131,7 @@ object JsonFlatter {
 
                 JsonObject(map)
             }
+
             is JsonArray -> {
                 val jsonElements = jsonElement.mapIndexed { index, element ->
                     val childDescriptor = descriptor.getElementDescriptor(index)
@@ -69,6 +140,7 @@ object JsonFlatter {
 
                 JsonArray(jsonElements)
             }
+
             else -> {
                 throw ErrorMapper.mapToAppException(
                     "Malformed JSON passed to parser, expected object or array but got $jsonElement",
@@ -80,7 +152,7 @@ object JsonFlatter {
 
     @ExperimentalSerializationApi
     fun parse(json: JsonObject, descriptor: SerialDescriptor): JsonObject {
-        if(json.isEmpty()) {
+        if (json.isEmpty()) {
             return json
         }
 
@@ -171,12 +243,15 @@ object JsonFlatter {
                 val jsonObjectValue = jsonElement.jsonObject
                 parse(jsonObjectValue, descriptor)
             }
+
             is JsonArray -> {
                 parse(jsonElement, descriptor)
             }
+
             is JsonPrimitive -> {
                 jsonElement
             }
+
             else -> {
                 jsonElement ?: JsonNull
             }
@@ -188,7 +263,7 @@ object JsonFlatter {
         jsonArray: JsonArray,
         descriptor: SerialDescriptor
     ): JsonElement {
-        if(jsonArray.isEmpty()) return jsonArray
+        if (jsonArray.isEmpty()) return jsonArray
         if (descriptor.kind == StructureKind.LIST) {
             // The descriptor represents a List of data classes
             // Implement parsing logic for List of data classes

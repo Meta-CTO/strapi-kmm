@@ -1,19 +1,27 @@
 package com.metacto.strapikmm.datasource.network
 
 import com.metacto.strapikmm.constants.SharedConstants
+import com.metacto.strapikmm.errorhandling.SerializableNetworkError
 import com.metacto.strapikmm.sharedpreference.KmmPreference
 import com.metacto.strapikmm.sharedpreference.TokenHandler
-import io.ktor.client.*
-import io.ktor.client.engine.js.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.statement.*
-import io.ktor.serialization.kotlinx.json.*
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.js.Js
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.plugins.HttpResponseValidator
+import io.ktor.client.plugins.RedirectResponseException
+import io.ktor.client.plugins.ResponseException
+import io.ktor.client.plugins.ServerResponseException
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
+import io.ktor.serialization.kotlinx.json.json
+import kotlin.reflect.KClass
 
 actual class KtorClientFactory actual constructor(
     networkLogLevel: NetworkLogLevel,
     shouldShowActualErrorMessages: Boolean,
-    private val preference: KmmPreference
+    val preference: KmmPreference
 ) {
 
     init {
@@ -21,14 +29,15 @@ actual class KtorClientFactory actual constructor(
         NetworkLogConfiguration.shouldShowActualErrorMessages = shouldShowActualErrorMessages
     }
 
-    actual fun build(): HttpClient {
+    actual fun <T : SerializableNetworkError> build(
+        errorClass: KClass<T>
+    ): HttpClient {
 
         return HttpClient(Js) {
             expectSuccess = true
             install(ContentNegotiation) {
                 json()
             }
-
             install(DefaultRequest) {
                 val sharedToken = preference.getSecureString(SharedConstants.ACCESS_TOKEN)
                 val token = TokenHandler.token
@@ -76,7 +85,7 @@ actual class KtorClientFactory actual constructor(
 
                 handleResponseExceptionWithRequest { cause, _ ->
                     // TODO: Handle full token
-                    cause.handleNetworkException()
+                    cause.handleNetworkException<T>(errorClass)
                 }
             }
         }

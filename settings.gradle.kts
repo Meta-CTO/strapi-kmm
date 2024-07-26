@@ -22,4 +22,4 @@ pluginManagement {
 rootProject.name = "StrapiKMM"
 include(":strapi")
 include(":app")
-include(":ksp")
+include(":androidapp")

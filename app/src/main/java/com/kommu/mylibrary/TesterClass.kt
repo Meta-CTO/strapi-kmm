@@ -1,9 +1,13 @@
 package com.kommu.mylibrary
 
+import com.metacto.strapikmm.datasource.network.handleException
+import com.metacto.strapikmm.errorhandling.SerializableNetworkError
 import com.metacto.strapikmm.util.DESEncryption
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 
 class TesterClass {
     companion object {
@@ -26,8 +30,38 @@ class TesterClass {
             // Decrypting the encrypted string
             val decrypted = des.decrypt(encrypted)
             println("Decrypted: $decrypted")
+
+            val map = mutableMapOf(
+                "Message" to JsonPrimitive("An error has occurred."),
+                "ExceptionMessage" to JsonPrimitive("No username found for token"),
+                "ExceptionType" to JsonPrimitive("GlobalComponents.Data.Exceptions.NotFoundException"),
+                "StackTrace" to JsonPrimitive(null)
+            )
+            val element = JsonObject(map)
+            val data = element.handleException<AppError>(
+                AppError::class
+            )
+
+            println("Data: $data")
         }
     }
+}
+
+@Serializable
+data class AppError(
+    @SerialName("ExceptionMessage")
+    val exceptionMessage: String? = null,
+    @SerialName("ExceptionType")
+    val exceptionType: String? = null,
+    @SerialName("Message")
+    val message: String? = null
+) : SerializableNetworkError {
+    override val code: Int
+        get() = -43
+    override val errorMessage: String
+        get() = exceptionMessage ?: message ?: "Unknown error"
+    override val httpCode: Int
+        get() = 400
 }
 
 @Serializable
