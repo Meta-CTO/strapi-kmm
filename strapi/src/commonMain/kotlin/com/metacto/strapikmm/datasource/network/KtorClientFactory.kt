@@ -5,7 +5,8 @@ package com.metacto.strapikmm.datasource.network
 import com.metacto.strapikmm.constants.SharedConstants
 import com.metacto.strapikmm.datasource.network.services.strapi.JsonFlatter
 import com.metacto.strapikmm.datasource.network.services.strapi.JsonWithIgnoredUnknownKeys
-import com.metacto.strapikmm.errorhandling.NetworkErrorMapper
+import com.metacto.strapikmm.errorhandling.NetworkError
+import com.metacto.strapikmm.errorhandling.ErrorMapper
 import com.metacto.strapikmm.errorhandling.SerializableNetworkError
 import com.metacto.strapikmm.sharedpreference.KmmPreference
 import com.metacto.strapikmm.util.Logger
@@ -18,9 +19,10 @@ import io.ktor.client.plugins.ResponseException
 import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.statement.bodyAsText
-import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.serializer
 import kotlin.reflect.KClass
 
@@ -50,7 +52,9 @@ fun HttpRequestBuilder.printCURLDescription(
     components.add("-X $method")
 
     val token = kmmPreference.getSecureString(SharedConstants.ACCESS_TOKEN)
-    if (token.isNullOrEmpty().not() && (headers[KmmBaseService.IS_AUTHENTICATED] ?: true.toString()).toBooleanStrict()) {
+    if (token.isNullOrEmpty().not() && (headers[KmmBaseService.IS_AUTHENTICATED]
+            ?: true.toString()).toBooleanStrict()
+    ) {
         components.add("-H \"Authorization: Bearer ${token!!.replace("\"", "\\\"")}\"")
     }
 
@@ -75,7 +79,8 @@ fun HttpRequestBuilder.printCURLDescription(
 fun DefaultRequest.DefaultRequestBuilder.handleAuthenticationHeader(preference: KmmPreference) {
     val token = preference.getSecureString(SharedConstants.ACCESS_TOKEN)
     if (token.isNullOrEmpty()
-            .not() && (headers[KmmBaseService.IS_AUTHENTICATED] ?: true.toString()).toBooleanStrict()
+            .not() && (headers[KmmBaseService.IS_AUTHENTICATED]
+            ?: true.toString()).toBooleanStrict()
     ) {
         headers.append(
             SharedConstants.AUTHORIZATION_HEADER,
@@ -85,27 +90,6 @@ fun DefaultRequest.DefaultRequestBuilder.handleAuthenticationHeader(preference: 
 
     headers.remove(KmmBaseService.IS_AUTHENTICATED)
 }
-
- inline fun <T : SerializableNetworkError> JsonElement.handleException(
-    errorClass: KClass<T>
-) {
-    val errorData =
-        JsonFlatter.flat<T>(JsonWithIgnoredUnknownKeys.decodeFromJsonElement(this), errorClass)
-    val errorResponse =
-        JsonWithIgnoredUnknownKeys.decodeFromJsonElement(errorClass.serializer(), errorData)
-
-    val error = NetworkErrorMapper().mapServerError(
-        httpErrorCode = errorResponse.httpCode,
-        errorCode = errorResponse.code,
-        errorMessage = errorResponse.errorMessage,
-        throwable = Throwable()
-    )
-
-    Logger("").log("Error: $error")
-
-    throw error
-}
-
 
 suspend fun <T : SerializableNetworkError> Throwable.handleNetworkException(
     errorClass: KClass<T>
@@ -133,24 +117,39 @@ suspend fun <T : SerializableNetworkError> Throwable.handleNetworkException(
     } else {
         val bytes = response.body<JsonElement>()
         val errorData =
-            JsonFlatter.flat<T>(
-                JsonWithIgnoredUnknownKeys.decodeFromJsonElement(bytes),
-                errorClass
-            )
+            JsonFlatter.flat<NetworkError>(JsonWithIgnoredUnknownKeys.decodeFromJsonElement(bytes))
         val errorResponse =
-            JsonWithIgnoredUnknownKeys.decodeFromJsonElement(errorClass.serializer(), errorData)
+            JsonWithIgnoredUnknownKeys.decodeFromJsonElement<NetworkError>(errorData)
 
-        val error = NetworkErrorMapper().mapServerError(
-            httpErrorCode = response.status.value,
-            errorCode = errorResponse.code,
-            errorMessage = errorResponse.errorMessage,
+        val error = ErrorMapper.mapServerError(
+            httpErrorCode = errorResponse.httpStatusCode,
+            errorCode = errorResponse.errorCode,
+            errorMessage = errorResponse.message,
+            errorBody = JsonWithIgnoredUnknownKeys.encodeToString(errorResponse),
             throwable = this
         )
 
-        Logger("").log("Error: $error")
-
         throw error
     }
+}
+
+
+inline fun <T : SerializableNetworkError> JsonElement.handleException(
+    errorClass: KClass<T>
+) {
+    val errorData =
+        JsonFlatter.flat<T>(JsonWithIgnoredUnknownKeys.decodeFromJsonElement(this), errorClass)
+    val errorResponse =
+        JsonWithIgnoredUnknownKeys.decodeFromJsonElement(errorClass.serializer(), errorData)
+
+    val error = ErrorMapper.mapServerError(
+        httpErrorCode = errorResponse.httpCode,
+        errorCode = errorResponse.code,
+        errorMessage = errorResponse.errorMessage,
+        throwable = Throwable()
+    )
+
+    throw error
 }
 
 
@@ -160,28 +159,28 @@ suspend fun Throwable.handleError() {
             val bodyString = response.bodyAsText()
             Logger("").log("ServerResponseException Error: $bodyString")
             val httpErrorCode = response.status.value
-            throw NetworkErrorMapper().mapToAppException(this, bodyString, httpErrorCode)
+            throw ErrorMapper.mapToAppException(this, bodyString, httpErrorCode)
         }
 
         is ClientRequestException -> {
             val bodyString = response.bodyAsText()
             Logger("").log("ClientRequestException Error: $bodyString")
             val httpErrorCode = response.status.value
-            throw NetworkErrorMapper().mapToAppException(this, bodyString, httpErrorCode)
+            throw ErrorMapper.mapToAppException(this, bodyString, httpErrorCode)
         }
 
         is RedirectResponseException -> {
             val bodyString = response.bodyAsText()
             Logger("").log("RedirectResponseException Error: $bodyString")
             val httpErrorCode = response.status.value
-            throw NetworkErrorMapper().mapToAppException(this, bodyString, httpErrorCode)
+            throw ErrorMapper.mapToAppException(this, bodyString, httpErrorCode)
         }
 
         else -> {
             val className = this::class.simpleName
             val error = this.message ?: this.toString()
             Logger("").log("$className Error: $error")
-            throw NetworkErrorMapper().mapToAppException(this, error, -1)
+            throw ErrorMapper.mapToAppException(this, error, -1)
         }
     }
 }

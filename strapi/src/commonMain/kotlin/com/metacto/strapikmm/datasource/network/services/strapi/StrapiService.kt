@@ -15,8 +15,8 @@ import com.metacto.strapikmm.annotations.getModelVersion
 import com.metacto.strapikmm.database.DatabaseDriverFactory
 import com.metacto.strapikmm.datasource.network.NetworkLogConfiguration
 import com.metacto.strapikmm.errorhandling.AppException
-import com.metacto.strapikmm.errorhandling.NetworkErrorMapper
-import com.metacto.strapikmm.errorhandling.createErrorJsonResponse
+import com.metacto.strapikmm.errorhandling.ErrorMapper
+import com.metacto.strapikmm.errorhandling.NetworkMapperConstants
 import com.metacto.strapikmm.errorhandling.errortype.isNetworkException
 import com.metacto.strapikmm.model.ResponseWithHeaders
 import com.metacto.strapikmm.util.nullIfEmpty
@@ -231,7 +231,10 @@ class StrapiService(
         builder.requestBuilder()
 
         val modelSerializer = builder.modelSerializer
-            ?: throw Throwable("You must provide the responseType in the requestBuilder")
+            ?: throw ErrorMapper.mapToAppException(
+                "You must provide the responseType in the requestBuilder",
+                -1
+            )
 
         val modelVersion = modelSerializer.getModelVersion()
 
@@ -511,7 +514,10 @@ class StrapiService(
             builder.requestBuilder()
 
             val modelSerializer = builder.modelSerializer
-                ?: throw Throwable("You must provide the responseType in the requestBuilder")
+                ?: throw ErrorMapper.mapToAppException(
+                    "You must provide the responseType in the requestBuilder",
+                    -1
+                )
             val modelVersion = modelSerializer.getModelVersion()
 
             val requestClassName = builder.requestClassName ?: ""
@@ -918,9 +924,12 @@ inline fun <reified T> JsonElement.convert(): T {
         return JsonWithIgnoredUnknownKeys.decodeFromString(this.toString())
     } catch (throwable: Throwable) {
         if (throwable is kotlinx.serialization.SerializationException && NetworkLogConfiguration.logLevel == NetworkLogLevel.NONE) {
-            throw Throwable("Something went wrong, please try again later")
+            throw ErrorMapper.mapToAppException(
+                errorCode = NetworkMapperConstants.UNEXPECTED,
+                errorMessage = NetworkMapperConstants.SOMETHING_WRONG_MESSAGE
+            )
         } else {
-            throw throwable
+            throw ErrorMapper.mapThrowable(throwable)
         }
     }
 }
@@ -930,21 +939,21 @@ suspend fun <T> executeRequestWithNetworkHandling(block: suspend () -> T): T {
         return block()
     } catch (throwable: Throwable) {
         when {
-            throwable.isNetworkException() -> throw AppException(
-                errorCode = NetworkErrorMapper.NO_INTERNET_CONNECTION,
-                errorMessage = createErrorJsonResponse(
-                    NetworkErrorMapper.NO_INTERNET_CONNECTION_MESSAGE,
-                    NetworkErrorMapper.NO_INTERNET_CONNECTION
-                )
+
+            throwable.isNetworkException() -> throw ErrorMapper.mapToAppException(
+                errorCode = NetworkMapperConstants.NO_INTERNET_CONNECTION,
+                errorMessage = NetworkMapperConstants.NO_INTERNET_CONNECTION_MESSAGE
             )
 
-            NetworkLogConfiguration.shouldShowActualErrorMessages -> throw throwable
-            else -> throw AppException(
-                errorCode = NetworkErrorMapper.SOMETHING_WRONG,
-                errorMessage = createErrorJsonResponse(
-                    NetworkErrorMapper.SOMETHING_WRONG_MESSAGE,
-                    NetworkErrorMapper.SOMETHING_WRONG
-                )
+            throwable is AppException && NetworkLogConfiguration.shouldShowActualErrorMessages -> throw throwable
+
+            NetworkLogConfiguration.shouldShowActualErrorMessages -> throw ErrorMapper.mapThrowable(
+                throwable
+            )
+
+            else -> throw ErrorMapper.mapToAppException(
+                errorCode = NetworkMapperConstants.SOMETHING_WRONG,
+                errorMessage = NetworkMapperConstants.SOMETHING_WRONG_MESSAGE
             )
         }
     }
