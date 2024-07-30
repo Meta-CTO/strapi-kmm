@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import com.alexstyl.contactstore.ContactColumn
 import com.alexstyl.contactstore.ContactStore
+import com.metacto.strapikmm.errorhandling.executeCatching
 import com.metacto.strapikmm.util.exceptionIfActive
 import com.metacto.strapikmm.util.resumeIfActive
 import kotlinx.coroutines.CancellableContinuation
@@ -19,7 +20,7 @@ actual class ContactsDataCollector {
     }
 
     @Throws(Throwable::class)
-    actual fun setOptions(options: ContactsDataCollectorOptions?) {
+    actual fun setOptions(options: ContactsDataCollectorOptions?) = executeCatching {
         // Validate options, must not be null
         requireNotNull(options) {
             "options cannot be null"
@@ -36,42 +37,45 @@ actual class ContactsDataCollector {
     }
 
     @Throws(Throwable::class)
-    actual suspend fun requestAccess(): Boolean = suspendCancellableCoroutine { cont ->
-        // Check if contacts permission is granted
-        if (isContactsPermissionGranted()) {
-            // Granted, resume the continuation if possible
-            cont.resumeIfActive(true)
-        } else {
-            // Not granted, launch contacts permission requester from the user
-            requestAccessCont = cont
-            options.launcher.launch(CONTACTS_PERMISSION)
+    actual suspend fun requestAccess(): Boolean = executeCatching{
+        suspendCancellableCoroutine { cont ->
+            // Check if contacts permission is granted
+            if (isContactsPermissionGranted()) {
+                // Granted, resume the continuation if possible
+                cont.resumeIfActive(true)
+            } else {
+                // Not granted, launch contacts permission requester from the user
+                requestAccessCont = cont
+                options.launcher.launch(CONTACTS_PERMISSION)
+            }
         }
     }
 
     @Throws(Throwable::class)
-    actual suspend fun loadContacts() = suspendCancellableCoroutine { cont ->
-        // Validate contacts permission
-        if (isContactsPermissionGranted().not()) {
-            // Contacts permission must bet granted first
-            cont.exceptionIfActive(
-                Throwable("Contacts permission is not granted, use requestAccess() fun to be granted.")
+    actual suspend fun loadContacts() = executeCatching {
+        suspendCancellableCoroutine { cont ->
+            // Validate contacts permission
+            if (isContactsPermissionGranted().not()) {
+                // Contacts permission must bet granted first
+                cont.exceptionIfActive(
+                    Throwable("Contacts permission is not granted, use requestAccess() fun to be granted.")
+                )
+                return@suspendCancellableCoroutine
+            }
+
+            // Contacts permission is granted,
+            // Load contacts
+            val contacts = contactsStore.fetchContacts(
+                columnsToFetch = CONTACT_COLUMNS
+            ).blockingGet()
+
+            // Map them to kmm list and resume the continuation
+            val kmmContacts = contacts.toKmmContactsList(
+                context = options.context
             )
-            return@suspendCancellableCoroutine
+            cont.resumeIfActive(kmmContacts)
         }
-
-        // Contacts permission is granted,
-        // Load contacts
-        val contacts = contactsStore.fetchContacts(
-            columnsToFetch = CONTACT_COLUMNS
-        ).blockingGet()
-
-        // Map them to kmm list and resume the continuation
-        val kmmContacts = contacts.toKmmContactsList(
-            context = options.context
-        )
-        cont.resumeIfActive(kmmContacts)
     }
-
 
     private fun isContactsPermissionGranted(): Boolean {
         // Check contacts permission

@@ -1,6 +1,7 @@
 package com.metacto.strapikmm.repos
 
 import com.metacto.strapikmm.datasource.network.services.strapi.StrapiService
+import com.metacto.strapikmm.errorhandling.executeCatching
 import com.metacto.strapikmm.model.PagingResponse
 import com.metacto.strapikmm.model.file.File
 import com.metacto.strapikmm.model.file.UploadFileRequest
@@ -10,7 +11,7 @@ class UploaderRepository(
     private val uploaderService: StrapiService
 ) {
     @Throws(Throwable::class)
-    suspend fun uploadFiles(filesToUpload: List<UploadFileRequest>) =
+    suspend fun uploadFiles(filesToUpload: List<UploadFileRequest>) = executeCatching {
         uploaderService.post<PagingResponse<File>> {
             endpoint("/custom-uploader")
             body(UploadFiles(filesToUpload))
@@ -18,4 +19,5 @@ class UploaderRepository(
                 populate("*")
             }
         }.data.orEmpty()
+        }
 }

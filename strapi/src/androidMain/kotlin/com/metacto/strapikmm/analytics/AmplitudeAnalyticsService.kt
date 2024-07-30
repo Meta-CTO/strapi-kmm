@@ -3,6 +3,7 @@ package com.metacto.strapikmm.analytics
 import android.content.Context
 import com.amplitude.analytics.connector.util.toJSONObject
 import com.amplitude.api.Amplitude
+import com.metacto.strapikmm.errorhandling.ErrorMapper
 
 actual class AmplitudeAnalyticsService actual constructor(
     private val context: Any?,
@@ -13,7 +14,10 @@ actual class AmplitudeAnalyticsService actual constructor(
 
     init {
         if (context == null || context !is Context) {
-            throw IllegalArgumentException("Context must be an Android Context")
+            throw ErrorMapper.mapToAppException(
+                "Context must be an Android Context",
+                -1
+            )
         }
 
         initialize()

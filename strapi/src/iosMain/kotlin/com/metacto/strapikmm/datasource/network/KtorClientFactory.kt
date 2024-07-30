@@ -1,7 +1,7 @@
 package com.metacto.strapikmm.datasource.network
 
-import com.metacto.strapikmm.errorhandling.SerializableNetworkError
 import com.metacto.strapikmm.sharedpreference.KmmPreference
+import com.metacto.strapikmm.errorhandling.SerializableNetworkError
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.darwin.Darwin
 import io.ktor.client.plugins.ClientRequestException

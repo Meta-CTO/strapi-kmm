@@ -4,6 +4,7 @@ package com.metacto.strapikmm.datasource.network.services.strapi
 
 import com.metacto.strapikmm.datasource.network.NetworkLogConfiguration
 import com.metacto.strapikmm.datasource.network.NetworkLogLevel
+import com.metacto.strapikmm.errorhandling.ErrorMapper
 import com.metacto.strapikmm.errorhandling.SerializableNetworkError
 import com.metacto.strapikmm.util.Logger
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -141,7 +142,10 @@ object JsonFlatter {
             }
 
             else -> {
-                throw IllegalStateException("Malformed JSON passed to parser, expected object or array but got $jsonElement")
+                throw ErrorMapper.mapToAppException(
+                    "Malformed JSON passed to parser, expected object or array but got $jsonElement",
+                    -1
+                )
             }
         }
     }
@@ -276,7 +280,10 @@ object JsonFlatter {
             // Implement parsing logic for Pure JsonArray
             return jsonArray
         } else {
-            throw IllegalArgumentException("Unsupported SerialDescriptor kind: ${descriptor.kind}")
+            throw ErrorMapper.mapToAppException(
+                "Unsupported SerialDescriptor kind: ${descriptor.kind}",
+                -1
+            )
         }
     }
 }

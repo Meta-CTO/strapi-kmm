@@ -3,6 +3,7 @@ package com.metacto.strapikmm.repos
 import com.metacto.strapikmm.constants.SharedConstants
 import com.metacto.strapikmm.datasource.network.StrapiQueryBuilder
 import com.metacto.strapikmm.datasource.network.services.strapi.StrapiService
+import com.metacto.strapikmm.errorhandling.executeCatching
 import com.metacto.strapikmm.model.DataWrapper
 import com.metacto.strapikmm.sharedpreference.KmmPreference
 import com.metacto.strapikmm.util.DatetimeUtil
@@ -21,7 +22,7 @@ class AppConfigurationRepository(
     suspend inline fun <reified T> getAppConfiguration(
         noinline appConfigurationQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
         currentAppConfigurationVersion: Int
-    ): T {
+    ): T = executeCatching {
         val cachedAppConfiguration = sharedPreference.getString(SharedConstants.CACHED_APP_CONFIG)
         val cachedAppConfigurationDate =
             sharedPreference.getString(SharedConstants.CACHED_APP_CONFIG_DATE)
@@ -71,7 +72,7 @@ class AppConfigurationRepository(
             strapiQueryBuilder(appConfigurationQueryBuilder)
         }.data
 
-    inline fun <reified T> getCachedAppConfiguration(): T? {
+    inline fun <reified T> getCachedAppConfiguration(): T? = executeCatching {
         val cachedData = sharedPreference.getString(SharedConstants.CACHED_APP_CONFIG)
         return if (cachedData.isNullOrEmpty()) {
             null
