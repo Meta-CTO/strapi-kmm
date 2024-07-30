@@ -19,7 +19,8 @@ actual class BackgroundDownloader(
     private val showNotifications: Boolean = true,
     private val canPauseDownloads: Boolean = true,
     private val canCancelDownloads: Boolean = true,
-    actual val downloadStatusListener: DownloadStatusListener
+    actual val downloadStatusListener: DownloadStatusListener,
+    private val applicationId: String
 ) {
     private val logger = Logger(LOG_TAG)
     private lateinit var fetch: Fetch
@@ -66,7 +67,7 @@ actual class BackgroundDownloader(
         val configs = FetchConfiguration
             .Builder(context.applicationContext)
             .setDownloadConcurrentLimit(maximumNumberOfConcurrentDownloads)
-            .setNamespace(BuildConfig.APPLICATION_ID)
+            .setNamespace(applicationId)
             .applyIf(showNotifications) {
                 setNotificationManager(notificationManager)
             }
