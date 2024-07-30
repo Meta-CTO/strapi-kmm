@@ -536,7 +536,7 @@ suspend fun <T> executeRequestWithNetworkHandling(block: suspend () -> T): T {
                 errorMessage = NetworkMapperConstants.NO_INTERNET_CONNECTION_MESSAGE
             )
 
-            throwable is AppException && NetworkLogConfiguration.shouldShowActualErrorMessages -> throw throwable
+            throwable is AppException -> throw throwable
 
             NetworkLogConfiguration.shouldShowActualErrorMessages -> throw ErrorMapper.mapThrowable(
                 throwable
