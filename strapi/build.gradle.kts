@@ -146,7 +146,7 @@ kotlin {
         }
         val androidMain by getting {
             val contactsVersion = "1.4.0"
-            val fetchVersion = "3.1.6"
+            val fetchVersion = "3.2.0-beta07"
             val awsS3Version = "2.73.0"
 
             dependencies {
@@ -164,7 +164,7 @@ kotlin {
                 implementation("com.alexstyl:contactstore:$contactsVersion")
                 implementation("com.alexstyl:contactstore-coroutines:$contactsVersion")
 
-                implementation("androidx.tonyodev.fetch2:xfetch2:$fetchVersion")
+                implementation("com.github.abbas7777:fetch2-android14:$fetchVersion")
                 api("com.amazonaws:aws-android-sdk-s3:$awsS3Version")
             }
         }
