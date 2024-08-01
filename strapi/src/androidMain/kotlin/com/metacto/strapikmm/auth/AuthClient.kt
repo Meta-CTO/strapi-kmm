@@ -90,4 +90,8 @@ actual class AuthClient : AuthProvider {
     actual fun setAuthOptions(options: AuthOptions) {
         this.options = options
     }
+
+    actual fun signOut() {
+        gClient.signOut()
+    }
 }

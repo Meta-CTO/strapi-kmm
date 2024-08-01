@@ -36,6 +36,8 @@ interface Authenticator {
     suspend fun verifyPhoneVerification(code: String): String
     @Throws(Throwable::class)
     suspend fun linkPhoneNumber(code: String)
+    @Throws(Throwable::class)
+    suspend fun signOut()
 }
 
 class FirebaseAuthenticator(
@@ -183,5 +185,11 @@ class FirebaseAuthenticator(
             "Unable to getIdToken",
             -1
         )
+    }
+
+    @Throws(Throwable::class)
+    override suspend fun signOut() {
+        authClient.signOut()
+        Firebase.auth.signOut()
     }
 }
