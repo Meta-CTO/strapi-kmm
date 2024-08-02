@@ -92,6 +92,8 @@ actual class AuthClient : AuthProvider {
     }
 
     actual fun signOut() {
-        gClient.signOut()
+        if(::gClient.isInitialized) {
+            gClient.signOut()
+        }
     }
 }
