@@ -154,6 +154,7 @@ class AuthRepository(
 
     suspend fun signOut() {
         logoutUseCase.logout()
+        authenticator.signOut()
     }
 
     fun saveUserToken(token: String) {

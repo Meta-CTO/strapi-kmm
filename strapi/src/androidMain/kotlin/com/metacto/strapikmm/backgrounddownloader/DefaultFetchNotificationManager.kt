@@ -9,6 +9,7 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import com.metacto.strapiKMM.R
 import com.metacto.strapikmm.util.applyIf
 import com.tonyodev.fetch2.ACTION_TYPE_CANCEL
 import com.tonyodev.fetch2.ACTION_TYPE_CANCEL_ALL
@@ -34,7 +35,6 @@ import com.tonyodev.fetch2.EXTRA_NOTIFICATION_GROUP_ID
 import com.tonyodev.fetch2.EXTRA_NOTIFICATION_ID
 import com.tonyodev.fetch2.Fetch
 import com.tonyodev.fetch2.FetchNotificationManager
-import com.tonyodev.fetch2.R
 import com.tonyodev.fetch2.Status
 import com.tonyodev.fetch2.util.onDownloadNotificationActionTriggered
 

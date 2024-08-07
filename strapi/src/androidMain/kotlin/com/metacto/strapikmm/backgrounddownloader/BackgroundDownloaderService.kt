@@ -7,7 +7,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import com.tonyodev.fetch2.R
+import com.metacto.strapiKMM.R
 
 class BackgroundDownloaderService : Service() {
     private lateinit var notificationManager: NotificationManager
