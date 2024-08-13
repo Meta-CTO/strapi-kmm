@@ -1,5 +1,8 @@
 package com.kommu.mylibrary
 
+import com.metacto.strapikmm.appconfigversion.AppConfigurationVersion
+import com.metacto.strapikmm.appconfigversion.AppVersion
+import com.metacto.strapikmm.appconfigversion.UpdateType
 import com.metacto.strapikmm.datasource.network.handleException
 import com.metacto.strapikmm.errorhandling.SerializableNetworkError
 import com.metacto.strapikmm.util.DESEncryption
@@ -45,6 +48,25 @@ class TesterClass {
             println("Data: $data")
         }
     }
+}
+
+fun checkUpdateVersionType(
+    currentPublicVersion: String,
+    currentAppVersion: String
+): UpdateType {
+    val currentParts = currentAppVersion.split(".").map { it.toInt() }
+    val requiredParts = currentPublicVersion.split(".").map { it.toInt() }
+
+    for (i in 0 until maxOf(currentParts.size, requiredParts.size)) {
+        val currentPart = currentParts.getOrNull(i) ?: 0
+        val requiredPart = requiredParts.getOrNull(i) ?: 0
+
+        if (currentPart < requiredPart) {
+            // Current version is less than the required version then return the update type or none if not specified
+            return UpdateType.OPTIONAL
+        }
+    }
+    return UpdateType.NONE // Versions are equal, suggest no update
 }
 
 @Serializable
@@ -201,8 +223,10 @@ data class AppConfiguration(
     @SerialName("data.attributes.activityPercentiles")
     val activityPercentiles: List<ActivityPercentile>? = null,
     @SerialName("data.attributes.journeyAssets")
-    val journeyAssets: List<JourneyAssets>? = null
-)
+    val journeyAssets: List<JourneyAssets>? = null,
+    @SerialName("appp")
+    val app: List<AppVersion>? = null
+): AppConfigurationVersion(app.orEmpty())
 
 @Serializable
 data class JourneyAssets(

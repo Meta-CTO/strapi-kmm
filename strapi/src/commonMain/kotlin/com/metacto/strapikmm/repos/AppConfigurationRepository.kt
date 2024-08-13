@@ -1,5 +1,8 @@
 package com.metacto.strapikmm.repos
 
+import com.metacto.strapikmm.appconfigversion.AppConfigurationVersion
+import com.metacto.strapikmm.appconfigversion.AppVersion
+import com.metacto.strapikmm.appconfigversion.UpdateType
 import com.metacto.strapikmm.constants.SharedConstants
 import com.metacto.strapikmm.datasource.network.StrapiQueryBuilder
 import com.metacto.strapikmm.datasource.network.services.strapi.StrapiService
@@ -13,13 +16,14 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class AppConfigurationRepository(
+    val applicationContext: Any? = null,
     val appConfigurationService: StrapiService,
     val sharedPreference: KmmPreference,
-    val appConfigurationExpirationInMinutes: Long,
+    val appConfigurationExpirationInMinutes: Long
 ) {
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T> getAppConfiguration(
+    suspend inline fun <reified T: AppConfigurationVersion> getAppConfiguration(
         noinline appConfigurationQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
         currentAppConfigurationVersion: Int
     ): T = executeCatching {
@@ -66,7 +70,7 @@ class AppConfigurationRepository(
     }
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T> loadAppConfiguration(noinline appConfigurationQueryBuilder: StrapiQueryBuilder.() -> Unit) =
+    suspend inline fun <reified T: AppConfigurationVersion> loadAppConfiguration(noinline appConfigurationQueryBuilder: StrapiQueryBuilder.() -> Unit) =
         appConfigurationService.get<DataWrapper<T>> {
             endpoint("/app-configuration")
             strapiQueryBuilder(appConfigurationQueryBuilder)
@@ -80,4 +84,38 @@ class AppConfigurationRepository(
             Json.decodeFromString(cachedData)
         }
     }
+
+    @Throws(Throwable::class)
+    suspend inline fun <reified T: AppConfigurationVersion> checkAppUpdates(
+        noinline appConfigurationQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
+        currentAppConfigurationVersion: Int
+    ): UpdateType {
+        val appConfiguration = getAppConfiguration<T>(
+            appConfigurationQueryBuilder,
+            currentAppConfigurationVersion
+        )
+
+        return appConfiguration.applicationVersions.checkRequiredUpdate(applicationContext)
+    }
+}
+
+expect fun List<AppVersion>.checkRequiredUpdate(applicationContext: Any?): UpdateType
+
+fun checkUpdateVersionType(
+    currentPublicVersion: AppVersion,
+    currentAppVersion: String
+): UpdateType {
+    val currentParts = currentAppVersion.split(".").map { it.toInt() }
+    val requiredParts = currentPublicVersion.version.orEmpty().split(".").map { it.toInt() }
+
+    for (i in 0 until maxOf(currentParts.size, requiredParts.size)) {
+        val currentPart = currentParts.getOrNull(i) ?: 0
+        val requiredPart = requiredParts.getOrNull(i) ?: 0
+
+        if (currentPart < requiredPart) {
+            // Current version is less than the required version then return the update type or none if not specified
+            return currentPublicVersion.updateType ?: UpdateType.NONE
+        }
+    }
+    return UpdateType.NONE // Versions are equal, suggest no update
 }
