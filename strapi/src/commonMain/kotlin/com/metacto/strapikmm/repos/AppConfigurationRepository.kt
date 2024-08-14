@@ -1,7 +1,7 @@
 package com.metacto.strapikmm.repos
 
 import com.metacto.strapikmm.appconfigversion.AppConfigurationVersion
-import com.metacto.strapikmm.appconfigversion.AppVersion
+import com.metacto.strapikmm.appconfigversion.AppVersionValidator
 import com.metacto.strapikmm.appconfigversion.UpdateType
 import com.metacto.strapikmm.constants.SharedConstants
 import com.metacto.strapikmm.datasource.network.StrapiQueryBuilder
@@ -23,7 +23,7 @@ class AppConfigurationRepository(
 ) {
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T: AppConfigurationVersion> getAppConfiguration(
+    suspend inline fun <reified T : AppConfigurationVersion> getAppConfiguration(
         noinline appConfigurationQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
         currentAppConfigurationVersion: Int
     ): T = executeCatching {
@@ -50,7 +50,8 @@ class AppConfigurationRepository(
         }
 
         if (cachedAppConfiguration != null && cachedAppConfigurationDate != null) {
-            val minutesSinceCacheDate = LocalDateTime.parse(cachedAppConfigurationDate).minutesFromNow()
+            val minutesSinceCacheDate =
+                LocalDateTime.parse(cachedAppConfigurationDate).minutesFromNow()
 
             if (
                 cachedAppConfiguration.isNotEmpty() &&
@@ -70,7 +71,7 @@ class AppConfigurationRepository(
     }
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T: AppConfigurationVersion> loadAppConfiguration(noinline appConfigurationQueryBuilder: StrapiQueryBuilder.() -> Unit) =
+    suspend inline fun <reified T : AppConfigurationVersion> loadAppConfiguration(noinline appConfigurationQueryBuilder: StrapiQueryBuilder.() -> Unit) =
         appConfigurationService.get<DataWrapper<T>> {
             endpoint("/app-configuration")
             strapiQueryBuilder(appConfigurationQueryBuilder)
@@ -86,7 +87,7 @@ class AppConfigurationRepository(
     }
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T: AppConfigurationVersion> checkAppUpdates(
+    suspend inline fun <reified T : AppConfigurationVersion> checkAppUpdates(
         noinline appConfigurationQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
         currentAppConfigurationVersion: Int
     ): UpdateType {
@@ -95,27 +96,10 @@ class AppConfigurationRepository(
             currentAppConfigurationVersion
         )
 
-        return appConfiguration.applicationVersions.checkRequiredUpdate(applicationContext)
+        return AppVersionValidator.checkRequiredUpdate(
+            appConfiguration.applicationVersions,
+            applicationContext
+        )
     }
 }
 
-expect fun List<AppVersion>.checkRequiredUpdate(applicationContext: Any?): UpdateType
-
-fun checkUpdateVersionType(
-    currentPublicVersion: AppVersion,
-    currentAppVersion: String
-): UpdateType {
-    val currentParts = currentAppVersion.split(".").map { it.toInt() }
-    val requiredParts = currentPublicVersion.version.orEmpty().split(".").map { it.toInt() }
-
-    for (i in 0 until maxOf(currentParts.size, requiredParts.size)) {
-        val currentPart = currentParts.getOrNull(i) ?: 0
-        val requiredPart = requiredParts.getOrNull(i) ?: 0
-
-        if (currentPart < requiredPart) {
-            // Current version is less than the required version then return the update type or none if not specified
-            return currentPublicVersion.updateType ?: UpdateType.NONE
-        }
-    }
-    return UpdateType.NONE // Versions are equal, suggest no update
-}
