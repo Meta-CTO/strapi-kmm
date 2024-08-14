@@ -1,5 +1,8 @@
 package com.metacto.strapikmm.repos
 
+import com.metacto.strapikmm.appconfigversion.AppConfigurationVersion
+import com.metacto.strapikmm.appconfigversion.AppVersionValidator
+import com.metacto.strapikmm.appconfigversion.UpdateType
 import com.metacto.strapikmm.constants.SharedConstants
 import com.metacto.strapikmm.datasource.network.StrapiQueryBuilder
 import com.metacto.strapikmm.datasource.network.services.strapi.StrapiService
@@ -13,13 +16,14 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class AppConfigurationRepository(
+    val applicationContext: Any? = null,
     val appConfigurationService: StrapiService,
     val sharedPreference: KmmPreference,
-    val appConfigurationExpirationInMinutes: Long,
+    val appConfigurationExpirationInMinutes: Long
 ) {
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T> getAppConfiguration(
+    suspend inline fun <reified T : AppConfigurationVersion> getAppConfiguration(
         noinline appConfigurationQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
         currentAppConfigurationVersion: Int
     ): T = executeCatching {
@@ -46,7 +50,8 @@ class AppConfigurationRepository(
         }
 
         if (cachedAppConfiguration != null && cachedAppConfigurationDate != null) {
-            val minutesSinceCacheDate = LocalDateTime.parse(cachedAppConfigurationDate).minutesFromNow()
+            val minutesSinceCacheDate =
+                LocalDateTime.parse(cachedAppConfigurationDate).minutesFromNow()
 
             if (
                 cachedAppConfiguration.isNotEmpty() &&
@@ -66,7 +71,7 @@ class AppConfigurationRepository(
     }
 
     @Throws(Throwable::class)
-    suspend inline fun <reified T> loadAppConfiguration(noinline appConfigurationQueryBuilder: StrapiQueryBuilder.() -> Unit) =
+    suspend inline fun <reified T : AppConfigurationVersion> loadAppConfiguration(noinline appConfigurationQueryBuilder: StrapiQueryBuilder.() -> Unit) =
         appConfigurationService.get<DataWrapper<T>> {
             endpoint("/app-configuration")
             strapiQueryBuilder(appConfigurationQueryBuilder)
@@ -80,4 +85,21 @@ class AppConfigurationRepository(
             Json.decodeFromString(cachedData)
         }
     }
+
+    @Throws(Throwable::class)
+    suspend inline fun <reified T : AppConfigurationVersion> checkAppUpdates(
+        noinline appConfigurationQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
+        currentAppConfigurationVersion: Int
+    ): UpdateType {
+        val appConfiguration = getAppConfiguration<T>(
+            appConfigurationQueryBuilder,
+            currentAppConfigurationVersion
+        )
+
+        return AppVersionValidator.checkRequiredUpdate(
+            appConfiguration.applicationVersions,
+            applicationContext
+        )
+    }
 }
+
