@@ -5,6 +5,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
 
+
 actual object AppVersionValidator {
     actual fun checkRequiredUpdate(
         appVersions: List<AppVersion>,
@@ -13,14 +14,9 @@ actual object AppVersionValidator {
         require(applicationContext is Context) {
             "applicationContext must be an Android Context and not null"
         }
-        val currentPublicVersion =
-            appVersions.firstOrNull { appVersion -> appVersion.client == AppClient.ANDROID }
-                ?: return AppUpdateResult(
-                    updateType = UpdateType.NONE,
-                    message = "No version found for Android"
-                )
+
         val currentAppVersion = applicationContext.getCurrentVersion()
-        return currentPublicVersion.checkUpdateVersionType(currentAppVersion)
+        return appVersions.checkUpdateForPlatform(currentAppVersion, AppClient.ANDROID)
     }
 }
 
