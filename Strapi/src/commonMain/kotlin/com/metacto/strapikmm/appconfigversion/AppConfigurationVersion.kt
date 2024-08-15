@@ -31,10 +31,20 @@ enum class UpdateType(val type: String) {
 
 @Serializable
 data class AppVersion(
+    @JsonNames("attributes.message", "message")
+    val message: String? = null,
     @JsonNames("attributes.version", "version")
     val version: String? = null,
     @JsonNames("attributes.client", "client")
     val client: AppClient? = null,
     @JsonNames("attributes.updateType", "updateType")
     val updateType: UpdateType? = null,
+)
+
+@Serializable
+data class AppUpdateResult(
+    @SerialName("updateType")
+    val updateType: UpdateType,
+    @SerialName("message")
+    val message: String
 )

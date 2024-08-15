@@ -4,7 +4,7 @@ actual object AppVersionValidator {
     actual fun checkRequiredUpdate(
         appVersions: List<AppVersion>,
         applicationContext: Any?
-    ): UpdateType {
+    ): AppUpdateResult {
         TODO("Not yet implemented")
     }
 }

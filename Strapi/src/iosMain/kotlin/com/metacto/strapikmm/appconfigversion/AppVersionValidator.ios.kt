@@ -5,10 +5,13 @@ actual object AppVersionValidator {
     actual fun checkRequiredUpdate(
         appVersions: List<AppVersion>,
         applicationContext: Any?
-    ): UpdateType {
+    ): AppUpdateResult {
         val currentPublicVersion =
             appVersions.firstOrNull { appVersion ->  appVersion.client == AppClient.IOS }
-                ?: return UpdateType.NONE
+                ?: return AppUpdateResult(
+                    updateType = UpdateType.NONE,
+                    message = "No version found for iOS"
+                )
 
         val currentAppVersion =
             NSBundle.mainBundle.infoDictionary?.get("CFBundleShortVersionString") as? String  ?: "0.0.0"

@@ -1,6 +1,7 @@
 package com.metacto.strapikmm.repos
 
 import com.metacto.strapikmm.appconfigversion.AppConfigurationVersion
+import com.metacto.strapikmm.appconfigversion.AppUpdateResult
 import com.metacto.strapikmm.appconfigversion.AppVersionValidator
 import com.metacto.strapikmm.appconfigversion.UpdateType
 import com.metacto.strapikmm.constants.SharedConstants
@@ -90,7 +91,7 @@ class AppConfigurationRepository(
     suspend inline fun <reified T : AppConfigurationVersion> checkAppUpdates(
         noinline appConfigurationQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
         currentAppConfigurationVersion: Int
-    ): UpdateType {
+    ): AppUpdateResult {
         val appConfiguration = getAppConfiguration<T>(
             appConfigurationQueryBuilder,
             currentAppConfigurationVersion
