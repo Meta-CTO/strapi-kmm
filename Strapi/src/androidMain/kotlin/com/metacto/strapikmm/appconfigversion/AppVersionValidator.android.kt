@@ -9,13 +9,16 @@ actual object AppVersionValidator {
     actual fun checkRequiredUpdate(
         appVersions: List<AppVersion>,
         applicationContext: Any?
-    ): UpdateType {
+    ): AppUpdateResult {
         require(applicationContext is Context) {
             "applicationContext must be an Android Context and not null"
         }
         val currentPublicVersion =
             appVersions.firstOrNull { appVersion -> appVersion.client == AppClient.ANDROID }
-                ?: return UpdateType.NONE
+                ?: return AppUpdateResult(
+                    updateType = UpdateType.NONE,
+                    message = "No version found for Android"
+                )
         val currentAppVersion = applicationContext.getCurrentVersion()
         return currentPublicVersion.checkUpdateVersionType(currentAppVersion)
     }
