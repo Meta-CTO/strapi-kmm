@@ -14,7 +14,6 @@ actual class KtorClientFactory actual constructor(
     networkLogLevel: NetworkLogLevel,
     shouldShowActualErrorMessages: Boolean,
     val preference: KmmPreference,
-
 ) {
 
     init {
