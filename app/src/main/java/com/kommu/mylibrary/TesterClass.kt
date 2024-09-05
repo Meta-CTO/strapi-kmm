@@ -1,14 +1,6 @@
 package com.kommu.mylibrary
 
-import com.metacto.strapikmm.appconfigversion.AppConfigurationVersion
-import com.metacto.strapikmm.appconfigversion.AppVersion
-import com.metacto.strapikmm.appconfigversion.UpdateType
-import com.metacto.strapikmm.datasource.network.handleException
-import com.metacto.strapikmm.errorhandling.SerializableNetworkError
 import com.metacto.strapikmm.util.DESEncryption
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 

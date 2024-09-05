@@ -125,7 +125,7 @@ suspend fun <T : SerializableNetworkError> Throwable.handleNetworkException(
             JsonWithIgnoredUnknownKeys.decodeFromJsonElement(errorClass.serializer(), errorData)
 
         val error = ErrorMapper.mapServerError(
-            httpErrorCode = errorResponse.httpCode,
+            httpErrorCode = response.status.value,
             errorCode = errorResponse.code,
             errorMessage = errorResponse.errorMessage,
             errorBody = JsonWithIgnoredUnknownKeys.encodeToString(errorClass.serializer(), errorResponse),
@@ -136,27 +136,6 @@ suspend fun <T : SerializableNetworkError> Throwable.handleNetworkException(
         throw error
     }
 }
-
-
-inline fun <T : SerializableNetworkError> JsonElement.handleException(
-    errorClass: KClass<T>
-) {
-    val errorData =
-        JsonFlatter.flat<T>(JsonWithIgnoredUnknownKeys.decodeFromJsonElement(this), errorClass)
-    val errorResponse =
-        JsonWithIgnoredUnknownKeys.decodeFromJsonElement(errorClass.serializer(), errorData)
-
-    val error = ErrorMapper.mapServerError(
-        httpErrorCode = errorResponse.httpCode,
-        errorCode = errorResponse.code,
-        errorMessage = errorResponse.errorMessage,
-        throwable = Throwable(),
-        headers = mapOf()
-    )
-
-    throw error
-}
-
 
 suspend fun Throwable.handleError() {
     when (this) {
