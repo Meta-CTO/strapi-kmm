@@ -15,8 +15,8 @@ import dev.gitlive.firebase.auth.AuthCredential
 
 actual class AuthOptions(
     var activity: Activity?,
-    val launcher: ActivityResultLauncher<Intent>,
-    val onCanceled: () -> Unit = {}
+    var launcher: ActivityResultLauncher<Intent>,
+    var onCanceled: () -> Unit = {}
 ) {
     var onResult: (ActivityResult) -> Unit = {}
 }
