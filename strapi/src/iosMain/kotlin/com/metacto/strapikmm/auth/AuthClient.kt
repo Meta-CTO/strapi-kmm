@@ -23,12 +23,12 @@ actual class AuthClient : AuthProvider {
 
     private fun createSignInWithAppleProvider() {
         val provider =  SignInWithAppleProvider(
-            onSuccess = { token, profileMetadata ->
+            onSuccess = { token, authorizationCode, profileMetadata ->
                 val credential = FIROAuthProvider.credentialWithProviderID(
                     providerID = "apple.com",
                     IDToken = token,
                     rawNonce = "",
-                    accessToken = null
+                    accessToken = authorizationCode
                 )
 
                 onResult.invoke(AuthCredential(credential), profileMetadata)
