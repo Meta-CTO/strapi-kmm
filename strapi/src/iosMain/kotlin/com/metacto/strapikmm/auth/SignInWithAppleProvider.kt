@@ -10,7 +10,7 @@ import platform.darwin.NSObject
 
 @OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 class SignInWithAppleProvider(
-    val onSuccess: (String, ProfileMetadata) -> Unit,
+    val onSuccess: (String, String, ProfileMetadata) -> Unit,
     val onFailure: (Throwable) -> Unit
 ) : NSObject(),
     ASAuthorizationControllerDelegateProtocol,
@@ -34,6 +34,9 @@ class SignInWithAppleProvider(
         val idToken = credential?.identityToken?.let {
             return@let NSString.create(it, NSUTF8StringEncoding) as String?
         }
+        val authorizationCode = credential?.authorizationCode?.let {
+            return@let NSString.create(it, NSUTF8StringEncoding) as String?
+        }
 
         val profile = ProfileMetadata(
             firstName = credential?.fullName?.givenName,
@@ -43,8 +46,18 @@ class SignInWithAppleProvider(
             pictureUrl = null
         )
 
+        if (authorizationCode == null) {
+            onFailure(
+                ErrorMapper.mapToAppException(
+                    "authorizationCode cannot be null",
+                    -1
+                )
+            )
+            return
+        }
+
         idToken?.let {
-            onSuccess(idToken, profile)
+            onSuccess(idToken, authorizationCode, profile)
         } ?: onFailure(
             ErrorMapper.mapToAppException(
                 "idToken cannot be null",
