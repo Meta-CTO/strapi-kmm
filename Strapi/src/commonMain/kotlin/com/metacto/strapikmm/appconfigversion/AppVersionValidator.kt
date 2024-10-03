@@ -28,6 +28,11 @@ fun AppVersion.checkUpdateVersionType(currentAppVersion: String): UpdateType {
             // Return the update type or none if not specified
             return this.updateType ?: UpdateType.NONE
         }
+
+        // If the current part is greater than the required part, then no update is required
+        if (currentPart > requiredPart) {
+            return UpdateType.NONE
+        }
     }
     // Return none if not specified
     return UpdateType.NONE
