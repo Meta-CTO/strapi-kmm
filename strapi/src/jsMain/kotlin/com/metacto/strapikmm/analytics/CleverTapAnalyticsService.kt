@@ -3,22 +3,22 @@ package com.metacto.strapikmm.analytics
 actual class CleverTapAnalyticsService actual constructor(
     context: Any?
 ) : AnalyticsService {
-    override val platform: AnalyticsPlatform
+    actual override val platform: AnalyticsPlatform
         get() = AnalyticsPlatform.CLEVERTAP
 
-    override fun initialize() {
+    actual override fun initialize() {
         // no-op
     }
 
-    override fun identifyUser(userId: String, email: String?, phone: String?, extraProperties: Map<String, Any>) {
+    actual override fun identifyUser(userId: String, email: String?, phone: String?, extraProperties: Map<String, Any>) {
         // no-op
     }
 
-    override fun logout() {
+    actual override fun logout() {
         // no-op
     }
 
-    override fun track(event: String, properties: Map<String, Any>) {
+    actual override fun track(event: String, properties: Map<String, Any>) {
         // no-op
     }
 }
