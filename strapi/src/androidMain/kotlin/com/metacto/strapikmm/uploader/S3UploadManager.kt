@@ -42,7 +42,7 @@ actual class S3UploadManager actual constructor(
     private val accessKey: String,
     private val secretKey: String,
     private val awsS3BaseUrl: String,
-    override val uploaderRepository: UploaderRepository,
+    actual override val uploaderRepository: UploaderRepository,
     private val context: Any?
 ) : UploadManager {
     private val fileUtils by lazy { FileUtilsImpl(context as Context) }

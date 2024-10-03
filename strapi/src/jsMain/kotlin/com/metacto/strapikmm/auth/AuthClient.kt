@@ -12,7 +12,7 @@ actual class AuthClient : AuthProvider {
 
     actual fun init() {}
 
-    override fun signInWithApple(
+    actual override fun signInWithApple(
         onSuccess: (AuthCredential, ProfileMetadata) -> Unit, onFail: (Throwable) -> Unit
     ) {
         GlobalScope.launch {
@@ -35,7 +35,7 @@ actual class AuthClient : AuthProvider {
         }
     }
 
-    override fun signInWithGoogle(
+    actual override fun signInWithGoogle(
         onSuccess: (AuthCredential, ProfileMetadata) -> Unit, onFail: (Throwable) -> Unit
     ) {
         GlobalScope.launch {

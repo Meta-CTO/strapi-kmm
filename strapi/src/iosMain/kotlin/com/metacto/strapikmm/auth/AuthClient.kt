@@ -72,7 +72,7 @@ actual class AuthClient : AuthProvider {
         signInWithGoogleProvider = provider
     }
 
-    override fun signInWithGoogle(
+    actual override fun signInWithGoogle(
         onSuccess: (AuthCredential, ProfileMetadata) -> Unit,
         onFail: (Throwable) -> Unit
     ) {
@@ -82,7 +82,7 @@ actual class AuthClient : AuthProvider {
         signInWithGoogleProvider?.start()
     }
 
-    override fun signInWithApple(
+    actual override fun signInWithApple(
         onSuccess: (AuthCredential, ProfileMetadata) -> Unit,
         onFail: (Throwable) -> Unit
     ) {

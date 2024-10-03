@@ -7,18 +7,18 @@ actual class AmplitudeAnalyticsService actual constructor(
     private val context: Any?,
     private val apiKey: String
 ) : AnalyticsService {
-    override val platform: AnalyticsPlatform
+    actual override val platform: AnalyticsPlatform
         get() = AnalyticsPlatform.AMPLITUDE
 
     init {
         initialize()
     }
 
-    override fun initialize() {
+    actual override fun initialize() {
         Amplitude.instance().initializeApiKey(apiKey)
     }
 
-    override fun identifyUser(
+    actual override fun identifyUser(
         userId: String,
         email: String?,
         phone: String?,
@@ -35,7 +35,7 @@ actual class AmplitudeAnalyticsService actual constructor(
         }
     }
 
-    override fun logout() {
+    actual override fun logout() {
         Amplitude.instance().apply {
             uploadEvents()
             clearUserProperties()
@@ -43,7 +43,7 @@ actual class AmplitudeAnalyticsService actual constructor(
         }
     }
 
-    override fun track(event: String, properties: Map<String, Any>) {
+    actual override fun track(event: String, properties: Map<String, Any>) {
         // To avoid casting issues, we copy the properties to a mutable map
         val eventProperties = mutableMapOf<Any?, Any>()
         eventProperties.putAll(properties)

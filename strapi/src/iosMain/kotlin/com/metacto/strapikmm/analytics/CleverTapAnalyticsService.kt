@@ -6,18 +6,18 @@ import cocoapods.CleverTap_iOS_SDK.CleverTap
 actual class CleverTapAnalyticsService actual constructor(
     private val context: Any?
 ) : AnalyticsService {
-    override val platform: AnalyticsPlatform
+    actual override val platform: AnalyticsPlatform
         get() = AnalyticsPlatform.CLEVERTAP
 
     init {
         initialize()
     }
 
-    override fun initialize() {
+    actual override fun initialize() {
         CleverTap.autoIntegrate()
     }
 
-    override fun identifyUser(
+    actual override fun identifyUser(
         userId: String,
         email: String?,
         phone: String?,
@@ -35,14 +35,14 @@ actual class CleverTapAnalyticsService actual constructor(
         }
     }
 
-    override fun logout() {
+    actual override fun logout() {
         CleverTap.sharedInstance()?.apply {
             onUserLogin(mapOf<Any?, Any>(), "")
             profilePush(mapOf<Any?, Any>())
         }
     }
 
-    override fun track(event: String, properties: Map<String, Any>) {
+    actual override fun track(event: String, properties: Map<String, Any>) {
         // To avoid casting issues, we convert to type Any? and Any
         val eventProperties = mutableMapOf<Any?, Any>()
         eventProperties.putAll(properties)

@@ -9,4 +9,6 @@ expect class S3UploadManager constructor(
     awsS3BaseUrl: String,
     uploaderRepository: UploaderRepository,
     context: Any?
-) : UploadManager
+) : UploadManager {
+    override val uploaderRepository: UploaderRepository
+}

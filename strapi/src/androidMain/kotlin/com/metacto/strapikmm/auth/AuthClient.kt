@@ -71,14 +71,14 @@ actual class AuthClient : AuthProvider {
         }
     }
 
-    override fun signInWithApple(
+    actual override fun signInWithApple(
         onSuccess: (AuthCredential, ProfileMetadata) -> Unit,
         onFail: (Throwable) -> Unit
     ) {
         // NOT Needed
     }
 
-    override fun signInWithGoogle(
+    actual override fun signInWithGoogle(
         onSuccess: (AuthCredential, ProfileMetadata) -> Unit,
         onFail: (Throwable) -> Unit
     ) {

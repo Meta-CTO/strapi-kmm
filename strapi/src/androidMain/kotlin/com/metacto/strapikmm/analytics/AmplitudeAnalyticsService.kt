@@ -9,7 +9,7 @@ actual class AmplitudeAnalyticsService actual constructor(
     private val context: Any?,
     private val apiKey: String
 ) : AnalyticsService {
-    override val platform: AnalyticsPlatform
+    actual override val platform: AnalyticsPlatform
         get() = AnalyticsPlatform.AMPLITUDE
 
     init {
@@ -23,7 +23,7 @@ actual class AmplitudeAnalyticsService actual constructor(
         initialize()
     }
 
-    override fun initialize() {
+    actual override fun initialize() {
         Amplitude.getInstance().initialize(context as Context, apiKey)
 
         if (context.applicationContext as? android.app.Application != null) {
@@ -32,7 +32,7 @@ actual class AmplitudeAnalyticsService actual constructor(
         }
     }
 
-    override fun identifyUser(userId: String, email: String?, phone: String?, extraProperties: Map<String, Any>) {
+    actual override fun identifyUser(userId: String, email: String?, phone: String?, extraProperties: Map<String, Any>) {
         val userProperties = HashMap<String, Any>()
         userProperties["user_id"] = userId
         email?.let { userProperties["email"] = it }
@@ -46,7 +46,7 @@ actual class AmplitudeAnalyticsService actual constructor(
         }
     }
 
-    override fun logout() {
+    actual override fun logout() {
         Amplitude.getInstance().apply {
             uploadEvents()
             clearUserProperties()
@@ -54,7 +54,7 @@ actual class AmplitudeAnalyticsService actual constructor(
         }
     }
 
-    override fun track(event: String, properties: Map<String, Any>) {
+    actual override fun track(event: String, properties: Map<String, Any>) {
         Amplitude.getInstance().logEvent(event, properties.toJSONObject())
     }
 }
