@@ -1,5 +1,3 @@
 object Kotlin {
-    const val version = "1.9.23"
-    const val kotlinxCoroutinesVersion = "1.7.1-native-mt"
-    const val kotlinxCoroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${kotlinxCoroutinesVersion}"
+    const val version = "2.0.20"
 }

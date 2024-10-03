@@ -101,7 +101,7 @@ SPEC CHECKSUMS:
   GTMSessionFetcher: e8647203b65cee28c5f73d0f473d096653945e72
   PromisesObjC: c50d2056b5253dadbd6c2bea79b0674bd5a52fa4
   SDWebImage: 182830bcddc30cde95fbc60dfe4badc3553d94ba
-  strapi: 63448ddb9fc586a52a2ecf9470a9b69eb102b4a2
+  strapi: 9732dcf8d6f5df547fb31c20b4acba94c8c6ab50
 
 PODFILE CHECKSUM: 8fdbab4a3f34faf6824d9bda0b6882b6b75583dd
 

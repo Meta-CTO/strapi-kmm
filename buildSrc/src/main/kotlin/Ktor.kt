@@ -1,5 +1,5 @@
 object Ktor {
-    private const val ktorVersion = "2.3.12"
+    private const val ktorVersion = "3.0.0-rc-1"
     private const val logBackVersion = "1.2.10"
     const val core = "io.ktor:ktor-client-core:${ktorVersion}"
     const val clientSerialization = "io.ktor:ktor-client-serialization:${ktorVersion}"

@@ -3,6 +3,7 @@ import co.touchlab.skie.configuration.FunctionInterop
 import co.touchlab.skie.configuration.SealedInterop
 import co.touchlab.skie.configuration.SuspendInterop
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.konan.properties.Properties
@@ -153,9 +154,9 @@ kotlin {
                 implementation("androidx.security:security-crypto:1.0.0")
                 api(Ktor.android)
                 api(ProjectDependencies.SqlDelight.ANDROID_DRIVER)
-                implementation("androidx.activity:activity-ktx:1.7.2")
-                implementation("com.google.android.gms:play-services-auth:20.7.0")
-                implementation(platform("com.google.firebase:firebase-bom:32.1.1"))
+                implementation("androidx.activity:activity-ktx:1.9.2")
+                implementation("com.google.android.gms:play-services-auth:21.2.0")
+                implementation(project.dependencies.platform("com.google.firebase:firebase-bom:33.4.0"))
                 implementation("com.google.firebase:firebase-dynamic-links-ktx")
                 api("com.amplitude:android-sdk:2.39.8")
                 api("com.clevertap.android:clevertap-android-sdk:6.0.0")
@@ -198,8 +199,8 @@ kotlin {
     }
 
     tasks.withType<KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = "17"
+        compilerOptions {
+            jvmTarget.value(JvmTarget.JVM_17)
         }
     }
 

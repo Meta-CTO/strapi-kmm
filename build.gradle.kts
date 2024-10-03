@@ -18,7 +18,7 @@ buildscript {
         maven(url = "https://jitpack.io")
     }
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.23")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.20")
         classpath("com.android.tools.build:gradle:8.0.2")
         classpath(ProjectDependencies.SqlDelight.PLUGIN)
     }
