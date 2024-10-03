@@ -7,7 +7,7 @@ import com.metacto.strapikmm.errorhandling.ErrorMapper
 actual class CleverTapAnalyticsService actual constructor(
     private val context: Any?
 ) : AnalyticsService {
-    override val platform: AnalyticsPlatform
+    actual override val platform: AnalyticsPlatform
         get() = AnalyticsPlatform.CLEVERTAP
 
     init {
@@ -21,11 +21,11 @@ actual class CleverTapAnalyticsService actual constructor(
         initialize()
     }
 
-    override fun initialize() {
+    actual override fun initialize() {
 
     }
 
-    override fun identifyUser(
+    actual override fun identifyUser(
         userId: String,
         email: String?,
         phone: String?,
@@ -43,14 +43,14 @@ actual class CleverTapAnalyticsService actual constructor(
         }
     }
 
-    override fun logout() {
+    actual override fun logout() {
         CleverTapAPI.getDefaultInstance(context as Context)?.apply {
             onUserLogin(hashMapOf(), null)
             pushProfile(hashMapOf())
         }
     }
 
-    override fun track(event: String, properties: Map<String, Any>) {
+    actual override fun track(event: String, properties: Map<String, Any>) {
         CleverTapAPI.getDefaultInstance(context as Context)?.apply {
             pushEvent(event, properties)
         }
