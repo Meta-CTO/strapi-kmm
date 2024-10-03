@@ -72,7 +72,7 @@ actual class S3UploadManager actual constructor(
      * @throws IllegalArgumentException if the file or URI is not provided.
      * @throws Throwable if an error occurs during the upload process.
      */
-    override suspend fun performUpload(file: UploadableFile): UploadFileRequest {
+    actual override suspend fun performUpload(file: UploadableFile): UploadFileRequest {
         val currentFile =
             file.file ?: file.uri?.let { fileUtils.createCopyAndReturnRealFile(file.uri) }
             ?: throw ErrorMapper.mapToAppException(

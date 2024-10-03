@@ -1,5 +1,6 @@
 package com.metacto.strapikmm.uploader
 
+import com.metacto.strapikmm.model.file.UploadFileRequest
 import com.metacto.strapikmm.repos.UploaderRepository
 
 expect class S3UploadManager constructor(
@@ -11,4 +12,6 @@ expect class S3UploadManager constructor(
     context: Any?
 ) : UploadManager {
     override val uploaderRepository: UploaderRepository
+
+    override suspend fun performUpload(file: UploadableFile): UploadFileRequest
 }

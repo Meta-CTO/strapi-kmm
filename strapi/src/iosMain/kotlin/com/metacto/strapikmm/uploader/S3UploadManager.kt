@@ -20,7 +20,7 @@ actual class S3UploadManager actual constructor(
          // TODO: Handle the configuration
      }
 
-     override suspend fun performUpload(file: UploadableFile): UploadFileRequest {
+     actual override suspend fun performUpload(file: UploadableFile): UploadFileRequest {
          // TODO: Implement the upload and verify that following code works for iOS
  //        val expression = AWSS3TransferUtilityUploadExpression()
  //        expression.setValue("public-read",  "x-amz-acl")
