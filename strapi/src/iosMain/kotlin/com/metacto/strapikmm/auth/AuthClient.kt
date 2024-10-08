@@ -99,4 +99,3 @@ actual class AuthClient : AuthProvider {
     actual fun signOut() {
     }
 }
-
