@@ -1,3 +1,3 @@
 object Kotlin {
-    const val version = "2.0.20"
+    const val version = "2.0.21"
 }

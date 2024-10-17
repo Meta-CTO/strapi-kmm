@@ -248,8 +248,8 @@ publishing {
             maven("https://maven.pkg.github.com/Meta-CTO/strapi-kmm") {
                 name = "Github"
                 credentials {
-                    username = gradleLocalProperties(rootDir).getProperty("PUBLISH_REPO_USER") as String
-                    password = gradleLocalProperties(rootDir).getProperty("PUBLISH_REPO_TOKEN") as String
+                    username = gradleLocalProperties(rootDir, providers).getProperty("PUBLISH_REPO_USER") as String
+                    password = gradleLocalProperties(rootDir, providers).getProperty("PUBLISH_REPO_TOKEN") as String
                 }
             }
         }
