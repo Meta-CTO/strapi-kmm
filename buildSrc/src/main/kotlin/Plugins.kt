@@ -8,7 +8,7 @@ object Plugins {
     const val SKIE = "co.touchlab.skie"
 
     object Version {
-        const val SWIFT_KLIB = "0.4.0"
+        const val SWIFT_KLIB = "0.6.4"
         const val SKIE = "0.9.3"
     }
 }
