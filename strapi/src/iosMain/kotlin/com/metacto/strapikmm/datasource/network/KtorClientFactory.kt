@@ -7,6 +7,7 @@ import io.ktor.client.engine.darwin.Darwin
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpResponseValidator
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.RedirectResponseException
 import io.ktor.client.plugins.ResponseException
 import io.ktor.client.plugins.ServerResponseException
@@ -39,6 +40,12 @@ actual class KtorClientFactory actual constructor(
 
             install(DefaultRequest) {
                 handleAuthenticationHeader(preference)
+            }
+
+            install(HttpTimeout) {
+                requestTimeoutMillis = 180_000 // 180 seconds
+                connectTimeoutMillis = 180_000 // 180 seconds
+                socketTimeoutMillis = 180_000  // 180 seconds
             }
 
             HttpResponseValidator {

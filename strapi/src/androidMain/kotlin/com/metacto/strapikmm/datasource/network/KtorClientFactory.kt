@@ -34,6 +34,12 @@ actual class KtorClientFactory actual constructor(
                 handleAuthenticationHeader(preference)
             }
 
+            install(HttpTimeout) {
+                requestTimeoutMillis = 180_000 // 180 seconds
+                connectTimeoutMillis = 180_000 // 180 seconds
+                socketTimeoutMillis = 180_000  // 180 seconds
+            }
+
             HttpResponseValidator {
 
                 validateResponse { response: HttpResponse ->
