@@ -41,9 +41,9 @@ actual class KtorClientFactory actual constructor(
             }
 
             install(HttpTimeout) {
-                requestTimeoutMillis = 180_000 // 180 seconds
-                connectTimeoutMillis = 180_000 // 180 seconds
-                socketTimeoutMillis = 180_000  // 180 seconds
+                requestTimeoutMillis = 1800_000 // 1800 seconds
+                connectTimeoutMillis = 1800_000 // 1800 seconds
+                socketTimeoutMillis = 1800_000  // 1800 seconds
             }
 
             install(DefaultRequest) {
