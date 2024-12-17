@@ -25,6 +25,7 @@ class AppConfigurationRepository(
 
     @Throws(Throwable::class)
     suspend inline fun <reified T : AppConfigurationVersion> getAppConfiguration(
+        forceGet: Boolean = false,
         noinline appConfigurationQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
         currentAppConfigurationVersion: Int
     ): T = executeCatching {
@@ -50,7 +51,9 @@ class AppConfigurationRepository(
             newAppConfiguration
         }
 
-        if (cachedAppConfiguration != null && cachedAppConfigurationDate != null) {
+        if (forceGet) {
+            return loadAppConfiguration()
+        } else if (cachedAppConfiguration != null && cachedAppConfigurationDate != null) {
             val minutesSinceCacheDate =
                 LocalDateTime.parse(cachedAppConfigurationDate).minutesFromNow()
 
@@ -62,7 +65,7 @@ class AppConfigurationRepository(
             ) {
                 return try {
                     Json.decodeFromString(cachedAppConfiguration)
-                } catch (exception: Exception) {
+                } catch (throwable: Throwable) {
                     loadAppConfiguration()
                 }
             }
@@ -89,10 +92,12 @@ class AppConfigurationRepository(
 
     @Throws(Throwable::class)
     suspend inline fun <reified T : AppConfigurationVersion> checkAppUpdates(
+        forceGet: Boolean = false,
         noinline appConfigurationQueryBuilder: StrapiQueryBuilder.() -> Unit = {},
         currentAppConfigurationVersion: Int
     ): AppUpdateResult {
         val appConfiguration = getAppConfiguration<T>(
+            forceGet,
             appConfigurationQueryBuilder,
             currentAppConfigurationVersion
         )
