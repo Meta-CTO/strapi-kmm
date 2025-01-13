@@ -72,7 +72,7 @@ kotlin {
         }
     }
 
-    android {
+    androidTarget {
         publishLibraryVariants("debug", "release")
     }
 

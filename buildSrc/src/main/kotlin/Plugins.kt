@@ -9,6 +9,6 @@ object Plugins {
 
     object Version {
         const val SWIFT_KLIB = "0.6.4"
-        const val SKIE = "0.9.3"
+        const val SKIE = "0.10.0"
     }
 }
