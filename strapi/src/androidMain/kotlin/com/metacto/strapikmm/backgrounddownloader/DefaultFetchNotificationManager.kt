@@ -7,8 +7,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
-import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.metacto.strapiKMM.R
 import com.metacto.strapikmm.util.applyIf
 import com.tonyodev.fetch2.ACTION_TYPE_CANCEL
@@ -74,7 +74,12 @@ internal abstract class DefaultFetchNotificationManager(
     }
 
     override fun registerBroadcastReceiver() {
-        context.registerReceiver(broadcastReceiver, IntentFilter(notificationManagerAction))
+        ContextCompat.registerReceiver(
+            context,
+            broadcastReceiver,
+            IntentFilter(notificationManagerAction),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
     }
 
     override fun unregisterBroadcastReceiver() {
@@ -85,20 +90,18 @@ internal abstract class DefaultFetchNotificationManager(
         context: Context,
         notificationManager: NotificationManager
     ) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channelId = context.getString(R.string.fetch_notification_default_channel_id)
-            var channel: NotificationChannel? =
-                notificationManager.getNotificationChannel(channelId)
-            if (channel == null) {
-                val channelName =
-                    context.getString(R.string.fetch_notification_default_channel_name)
-                channel = NotificationChannel(
-                    channelId,
-                    channelName,
-                    NotificationManager.IMPORTANCE_DEFAULT
-                )
-                notificationManager.createNotificationChannel(channel)
-            }
+        val channelId = context.getString(R.string.fetch_notification_default_channel_id)
+        var channel: NotificationChannel? =
+            notificationManager.getNotificationChannel(channelId)
+        if (channel == null) {
+            val channelName =
+                context.getString(R.string.fetch_notification_default_channel_name)
+            channel = NotificationChannel(
+                channelId,
+                channelName,
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            notificationManager.createNotificationChannel(channel)
         }
     }
 
@@ -227,7 +230,7 @@ internal abstract class DefaultFetchNotificationManager(
                 context,
                 downloadNotification.notificationId + action,
                 intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         }
     }
@@ -255,7 +258,7 @@ internal abstract class DefaultFetchNotificationManager(
                 context,
                 groupId + action,
                 intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         }
     }

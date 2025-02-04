@@ -139,7 +139,7 @@ kotlin {
                 api(Ktor.logback)
                 api(Ktor.logging)
                 api(ProjectDependencies.MULTIPLATFORM_SETTINGS)
-                api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+                api("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
                 api("dev.gitlive:firebase-auth:1.12.0-metacto-13")
 
                 api("dev.gitlive:firebase-config:1.10.4")
@@ -147,7 +147,7 @@ kotlin {
         }
         val androidMain by getting {
             val contactsVersion = "1.4.0"
-            val fetchVersion = "3.2.0-beta07"
+            val fetchVersion = "3.4.1"
             val awsS3Version = "2.73.0"
 
             dependencies {
@@ -155,7 +155,7 @@ kotlin {
                 api(Ktor.android)
                 api(ProjectDependencies.SqlDelight.ANDROID_DRIVER)
                 implementation("androidx.activity:activity-ktx:1.9.2")
-                implementation("com.google.android.gms:play-services-auth:21.2.0")
+                implementation("com.google.android.gms:play-services-auth:21.3.0")
                 implementation(project.dependencies.platform("com.google.firebase:firebase-bom:33.4.0"))
                 implementation("com.google.firebase:firebase-dynamic-links-ktx")
                 api("com.amplitude:android-sdk:2.39.8")
@@ -165,7 +165,7 @@ kotlin {
                 implementation("com.alexstyl:contactstore:$contactsVersion")
                 implementation("com.alexstyl:contactstore-coroutines:$contactsVersion")
 
-                implementation("com.github.abbas7777:fetch2-android14:$fetchVersion")
+                api("com.github.tonyofrancis.Fetch:fetch2:$fetchVersion")
                 api("com.amazonaws:aws-android-sdk-s3:$awsS3Version")
             }
         }

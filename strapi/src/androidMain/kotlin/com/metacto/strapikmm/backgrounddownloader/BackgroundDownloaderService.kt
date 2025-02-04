@@ -41,19 +41,17 @@ class BackgroundDownloaderService : Service() {
         val channelName = getString(R.string.fetch_notification_default_channel_name)
 
         // Check android version
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Get the notification channel if possible
-            var channel = notificationManager.getNotificationChannel(channelId)
+        // Get the notification channel if possible
+        var channel = notificationManager.getNotificationChannel(channelId)
 
-            // Check if does not exist to create it
-            if (channel == null) {
-                channel = NotificationChannel(
-                    channelId,
-                    channelName,
-                    NotificationManager.IMPORTANCE_HIGH
-                )
-                notificationManager.createNotificationChannel(channel)
-            }
+        // Check if does not exist to create it
+        if (channel == null) {
+            channel = NotificationChannel(
+                channelId,
+                channelName,
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            notificationManager.createNotificationChannel(channel)
         }
 
         // Return the channel id
