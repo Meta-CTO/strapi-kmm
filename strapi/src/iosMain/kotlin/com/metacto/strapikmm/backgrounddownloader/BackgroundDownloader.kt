@@ -57,12 +57,13 @@ actual class BackgroundDownloader(
 
     private inner class BackgroundDownloaderDelegate : NSObject(),
         SHBackgroundDownloaderDelegateProtocol {
-        override fun downloaderDidDownloadAssetWithIdentifier(id: String, url: NSURL?) {
+        override fun downloaderDidDownloadAssetWithIdentifier(id: String,  url: NSURL?, downloadURL: NSURL?) {
             logger.log("Did download asset with identifier: $id url: $url")
             downloadStatusListener.onDownloadDone(
                 DownloadInfo(
                     id = id,
-                    url = url,
+                    cacheURL = url,
+                    downloadURL = downloadURL,
                     progress = 1.0,
                     isDownloadComplete = true
                 )
@@ -72,13 +73,15 @@ actual class BackgroundDownloader(
         override fun downloaderDidFailToDownloadAssetWithIdentifier(
             id: String,
             url: NSURL?,
+            downloadURL: NSURL?,
             error: NSError
         ) {
             logger.log("Did fail to download asset with identifier: $id url: $url error: $error")
             downloadStatusListener.onDownloadError(
                 downloadInfo = DownloadInfo(
                     id = id,
-                    url = url,
+                    cacheURL = url,
+                    downloadURL = downloadURL,
                     progress = 0.0,
                     isDownloadComplete = false
                 ),
@@ -91,36 +94,39 @@ actual class BackgroundDownloader(
             downloadStatusListener.onResumeUnfinishedDownloadsError(error)
         }
 
-        override fun downloaderDidResumeUnfinishedDownloadWithIdentifier(id: String, url: NSURL?) {
+        override fun downloaderDidResumeUnfinishedDownloadWithIdentifier(id: String, url: NSURL?, downloadURL: NSURL?) {
             logger.log("Did resume unfinished download with identifier: $id url: $url")
             downloadStatusListener.onUnfinishedDownloadStart(
                 DownloadInfo(
                     id = id,
-                    url = url,
+                    cacheURL = url,
+                    downloadURL = downloadURL,
                     progress = 0.0,
                     isDownloadComplete = false
                 )
             )
         }
 
-        override fun downloaderDidStartDownloadingAsset(id: String, url: NSURL?) {
+        override fun downloaderDidStartDownloadingAsset(id: String, url: NSURL?, downloadURL: NSURL?) {
             logger.log("Did start downloading asset with identifier: $id url: $url")
             downloadStatusListener.onDownloadStart(
                 DownloadInfo(
                     id = id,
-                    url = url,
+                    cacheURL = url,
+                    downloadURL = downloadURL,
                     progress = 0.0,
                     isDownloadComplete = false
                 )
             )
         }
 
-        override fun downloaderDidUpdateProgress(id: String, url: NSURL?, progress: Double) {
+        override fun downloaderDidUpdateProgress(id: String, url: NSURL?, downloadURL: NSURL?, progress: Double) {
             logger.log("Did update progress identifier: $id url: $url progress: $progress")
             downloadStatusListener.onDownloadProgress(
                 DownloadInfo(
                     id = id,
-                    url = url,
+                    cacheURL = url,
+                    downloadURL = downloadURL,
                     progress = progress,
                     isDownloadComplete = false
                 )
