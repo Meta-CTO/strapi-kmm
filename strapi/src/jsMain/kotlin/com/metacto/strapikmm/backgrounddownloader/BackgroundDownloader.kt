@@ -17,4 +17,8 @@ actual class BackgroundDownloader(
     actual fun resumeUnfinishedDownloads() {
         TODO("Not yet implemented")
     }
+
+    actual suspend fun getDownloadState(url: String): DownloadState {
+        TODO("Not yet implemented")
+    }
 }

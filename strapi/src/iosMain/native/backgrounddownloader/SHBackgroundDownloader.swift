@@ -54,7 +54,8 @@ public typealias DownloadIdentifier = String
         let config = URLSessionConfiguration.background(withIdentifier: "com.shmediacache.downloadqueue")
         return URLSession(configuration: config, delegate: self, delegateQueue: nil)
     }()
-    
+
+
     @objc(downloadURL:error:) public func download(url: URL) throws -> DownloadIdentifier {
         if !Self.allowsCellularDownloads && PathMonitor.shared.isExpensive {
             throw DownloaderError.cellularDownloadNotAllowed
@@ -69,6 +70,24 @@ public typealias DownloadIdentifier = String
         }
 
         return download(assets: urls)
+    }
+
+    @objc(checkDownloadStatusWithURL:error:)
+    public func checkDownloadStatus(url: URL) throws -> DownloadedObject {
+        let asset: Asset = url
+        let cachedAssets: [DownloadedAsset]
+
+        guard let downloadedAsset = try cacheManager.getCachedDownloadedAssets().first(where: { $0.identifier == asset.identifier }) else {
+            throw DownloaderError.notDownloaded
+        }
+
+        return DownloadedObject(
+            url: downloadedAsset.url,
+            fileExtension: downloadedAsset.fileExtension,
+            identifier: downloadedAsset.identifier,
+            downloadStartTime: downloadedAsset.downloadStartTime,
+            downloadEndTime: downloadedAsset.downloadEndTime
+        )
     }
 
     @objc public func resumeUnfinishedDownloads() {
@@ -157,11 +176,14 @@ public typealias DownloadIdentifier = String
 
     private enum DownloaderError: LocalizedError {
         case cellularDownloadNotAllowed
+        case notDownloaded
 
         var errorDescription: String? {
             switch self {
             case .cellularDownloadNotAllowed:
                 return "Cellular download not allowed"
+            case .notDownloaded:
+                return "Asset not downloaded"
             }
         }
     }

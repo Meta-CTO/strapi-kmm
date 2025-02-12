@@ -12,4 +12,7 @@ expect class BackgroundDownloader {
     suspend fun download(urls: List<String>): List<String>
 
     fun resumeUnfinishedDownloads()
+
+    @Throws(Throwable::class)
+    suspend fun getDownloadState(url: String): DownloadState
 }
