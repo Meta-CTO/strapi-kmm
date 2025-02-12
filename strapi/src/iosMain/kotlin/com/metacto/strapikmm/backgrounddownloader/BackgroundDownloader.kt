@@ -69,9 +69,9 @@ actual class BackgroundDownloader(
                 return@executeCatching DownloadState.NotDownloaded(url)
             }
 
-            val downloadEndTime = downloadedObject.downloadEndTime
-            return@executeCatching if (downloadEndTime != null) {
-                DownloadState.Completed(url, downloadedObject.url.absoluteString)
+            val downloadEndTime = downloadedObject.downloadEndTime()
+            return@executeCatching if (downloadEndTime != null && downloadedObject.url() != null) {
+                DownloadState.Completed(url, downloadedObject.url()?.absoluteString.orEmpty())
             } else {
                 DownloadState.Downloading(url)
             }

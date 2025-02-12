@@ -88,11 +88,11 @@ public typealias DownloadIdentifier = String
         }
 
         return DownloadedObject(
-            url: downloadedAsset.url,
+            url: downloadedAsset.url as NSURL?,
             fileExtension: downloadedAsset.fileExtension,
             identifier: downloadedAsset.identifier,
-            downloadStartTime: downloadedAsset.downloadStartTime,
-            downloadEndTime: downloadedAsset.downloadEndTime
+            downloadStartTime: NSNumber(value: downloadedAsset.downloadStartTime),
+            downloadEndTime: downloadedAsset.downloadEndTime != nil ? NSNumber(value: downloadedAsset.downloadEndTime!) : nil
         )
     }
 

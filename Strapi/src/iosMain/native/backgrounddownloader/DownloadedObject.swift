@@ -1,18 +1,18 @@
 import Foundation
 
 @objc public class DownloadedObject: NSObject {
-    public let url: URL?
-    public let fileExtension: String
-    public let identifier: String
-    public let downloadStartTime: Int
-    public let downloadEndTime: Int?
+    @objc public let url: NSURL?
+    @objc public let fileExtension: String
+    @objc public let identifier: String
+    @objc public let downloadStartTime: NSNumber
+    @objc public let downloadEndTime: NSNumber?
 
-    init(
-        url: URL?,
+    @objc public init(
+        url: NSURL?,
         fileExtension: String,
         identifier: String,
-        downloadStartTime: Int,
-        downloadEndTime: Int?
+        downloadStartTime: NSNumber,
+        downloadEndTime: NSNumber?
     ) {
         self.url = url
         self.fileExtension = fileExtension
