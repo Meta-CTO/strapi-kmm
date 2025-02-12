@@ -136,6 +136,26 @@ actual class BackgroundDownloader(
         }
     }
 
+    @Throws(Throwable::class)
+    actual suspend fun getDownloadState(url: String): DownloadState {
+        return suspendCancellableCoroutine { cont ->
+            fetch.getDownloads { downloads ->
+                val download = downloads.firstOrNull { it.url == url }
+                if (download == null) {
+                    cont.resumeIfActive(DownloadState.NotDownloaded(url))
+                    return@getDownloads
+                } else {
+                    val progress = download.progress
+                    if (progress == 100) {
+                        cont.resumeIfActive(DownloadState.Completed(url, download.file))
+                    } else {
+                        cont.resumeIfActive(DownloadState.Downloading(url))
+                    }
+                }
+            }
+        }
+    }
+
     private fun getDownloadFileFullPath(url: String): String {
         val fileName = Uri.parse(url).lastPathSegment
         return "$downloadsFolder/$fileName"
