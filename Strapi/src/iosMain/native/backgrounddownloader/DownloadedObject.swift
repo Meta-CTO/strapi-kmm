@@ -1,11 +1,11 @@
 import Foundation
 
 @objc public class DownloadedObject: NSObject {
-    let url: URL?
-    let fileExtension: String
-    let identifier: String
-    let downloadStartTime: Int
-    let downloadEndTime: Int?
+    public let url: URL?
+    public let fileExtension: String
+    public let identifier: String
+    public let downloadStartTime: Int
+    public let downloadEndTime: Int?
 
     init(
         url: URL?,
