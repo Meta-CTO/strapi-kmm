@@ -59,8 +59,7 @@ actual class BackgroundDownloader(
     actual suspend fun getDownloadState(url: String): DownloadState = executeCatching {
         return memScoped {
             val errorPtr: ObjCObjectVar<NSError?> = alloc()
-            val downloadedObject = SHBackgroundDownloader.shared()
-                .checkDownloadStatusWithURL(NSURL(string = url), errorPtr.ptr)
+            val downloadedObject = SHBackgroundDownloader.shared().checkDownloadStatusWithURL(NSURL(string = url), errorPtr.ptr)
 
             errorPtr.value?.let {
                 return@executeCatching DownloadState.NotDownloaded(url)
