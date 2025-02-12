@@ -75,9 +75,15 @@ public typealias DownloadIdentifier = String
     @objc(checkDownloadStatusWithURL:error:)
     public func checkDownloadStatus(url: URL) throws -> DownloadedObject {
         let asset: Asset = url
-        let cachedAssets: [DownloadedAsset]
 
-        guard let downloadedAsset = try cacheManager.getCachedDownloadedAssets().first(where: { $0.identifier == asset.identifier }) else {
+        let cachedAssets: [DownloadedAsset]
+        do {
+            cachedAssets = try cacheManager.getCachedDownloadedAssets()
+        } catch {
+            throw DownloaderError.notDownloaded // Convert any error to notDownloaded
+        }
+
+        guard let downloadedAsset = cachedAssets.first(where: { $0.identifier == asset.identifier }) else {
             throw DownloaderError.notDownloaded
         }
 
