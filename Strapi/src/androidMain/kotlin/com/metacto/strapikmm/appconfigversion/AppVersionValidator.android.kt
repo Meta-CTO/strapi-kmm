@@ -21,7 +21,7 @@ actual object AppVersionValidator {
 }
 
 private fun Context.getCurrentVersion(): String {
-    return packageManager.getPackageInfoCompat(packageName, 0).versionName ?: packageManager.getPackageInfoCompat(packageName, 0).versionCode.toString()
+    return packageManager.getPackageInfoCompat(packageName, 0).versionName ?: "0.0.0"
 }
 
 private fun PackageManager.getPackageInfoCompat(packageName: String, flags: Int = 0): PackageInfo =
