@@ -940,10 +940,7 @@ suspend fun <T> executeRequestWithNetworkHandling(block: suspend () -> T): T {
     } catch (throwable: Throwable) {
         when {
 
-            throwable.isNetworkException() -> throw ErrorMapper.mapToAppException(
-                errorCode = NetworkMapperConstants.NO_INTERNET_CONNECTION,
-                errorMessage = NetworkMapperConstants.NO_INTERNET_CONNECTION_MESSAGE
-            )
+            throwable.isNetworkException() -> throw ErrorMapper.getNetworkConnectionException()
 
             throwable is AppException -> throw throwable
 

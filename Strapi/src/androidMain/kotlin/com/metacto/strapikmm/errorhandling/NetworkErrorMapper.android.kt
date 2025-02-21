@@ -53,4 +53,11 @@ actual object ErrorMapper {
             errorMessage = errorMessage
         )
     }
+
+    actual fun getNetworkConnectionException(): AppException {
+        return AppException(
+            errorCode = NetworkMapperConstants.NO_INTERNET_CONNECTION,
+            errorMessage = NetworkMapperConstants.NO_INTERNET_CONNECTION_MESSAGE
+        )
+    }
 }

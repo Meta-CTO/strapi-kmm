@@ -101,4 +101,14 @@ actual object ErrorMapper {
             userInfo = userInfo
         )
     }
+
+    actual fun getNetworkConnectionException(): AppException {
+        val error = createNsError(
+            httpErrorCode = NetworkMapperConstants.NO_INTERNET_CONNECTION,
+            errorCode = NetworkMapperConstants.NO_INTERNET_CONNECTION,
+            errorMessage = NetworkMapperConstants.NO_INTERNET_CONNECTION_MESSAGE,
+            errorBody = null
+        )
+        return AppException(error = error)
+    }
 }

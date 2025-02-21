@@ -33,6 +33,8 @@ expect object ErrorMapper {
         throwable: Throwable,
         headers: Map<String, List<String>>? = null
     ): AppException
+
+    fun getNetworkConnectionException(): AppException
 }
 
 inline fun <reified T> executeCatching(block: () -> T): T {

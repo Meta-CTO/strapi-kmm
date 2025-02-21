@@ -5,9 +5,9 @@ package com.metacto.strapikmm.datasource.network
 import com.metacto.strapikmm.constants.SharedConstants
 import com.metacto.strapikmm.datasource.network.services.strapi.JsonFlatter
 import com.metacto.strapikmm.datasource.network.services.strapi.JsonWithIgnoredUnknownKeys
-import com.metacto.strapikmm.errorhandling.NetworkError
 import com.metacto.strapikmm.errorhandling.ErrorMapper
 import com.metacto.strapikmm.errorhandling.SerializableNetworkError
+import com.metacto.strapikmm.errorhandling.errortype.isNetworkException
 import com.metacto.strapikmm.sharedpreference.KmmPreference
 import com.metacto.strapikmm.util.Logger
 import io.ktor.client.HttpClient
@@ -95,6 +95,11 @@ fun DefaultRequest.DefaultRequestBuilder.handleAuthenticationHeader(preference: 
 suspend fun <T : SerializableNetworkError> Throwable.handleNetworkException(
     errorClass: KClass<T>
 ) {
+
+    if(this.isNetworkException()) {
+        throw ErrorMapper.getNetworkConnectionException()
+    }
+
     val isResponseException = this is ResponseException
     val isClientRequestException = this is ClientRequestException
     val isServerResponseException = this is ServerResponseException
