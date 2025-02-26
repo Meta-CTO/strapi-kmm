@@ -87,8 +87,10 @@ public typealias DownloadIdentifier = String
             throw DownloaderError.notDownloaded
         }
 
+        let cacheURL = try cacheManager.makeCacheURL(for: downloadedAsset.identifier)
+
         return DownloadedObject(
-            url: downloadedAsset.url as NSURL?,
+            url: cacheURL as NSURL?,
             fileExtension: downloadedAsset.fileExtension,
             identifier: downloadedAsset.identifier,
             downloadStartTime: NSNumber(value: downloadedAsset.downloadStartTime),
