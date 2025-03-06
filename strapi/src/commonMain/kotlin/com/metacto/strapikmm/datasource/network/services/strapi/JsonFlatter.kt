@@ -11,6 +11,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.descriptors.PolymorphicKind
+import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.descriptors.elementNames
@@ -54,7 +55,11 @@ object JsonFlatter {
                     }
 
                     if (jsonNames.isEmpty()) {
-                        jsonNames.add(elementName)
+                        if(jsonElement.keys.contains(elementName)) {
+                            jsonNames.add(elementName)
+                        } else {
+                            jsonNames.add(jsonElement.keys.firstOrNull() ?: elementName)
+                        }
                     }
 
                     // Default value if the item not presented in the json
@@ -115,7 +120,11 @@ object JsonFlatter {
                     }
 
                     if (jsonNames.isEmpty()) {
-                        jsonNames.add(elementName)
+                        if(jsonElement.keys.contains(elementName)) {
+                            jsonNames.add(elementName)
+                        } else {
+                            jsonNames.add(jsonElement.keys.firstOrNull() ?: elementName)
+                        }
                     }
 
                     // Default value if the item not presented in the json
@@ -179,7 +188,11 @@ object JsonFlatter {
             }
 
             if (jsonNames.isEmpty()) {
-                jsonNames.add(elementName)
+                if(json.keys.contains(elementName)) {
+                    jsonNames.add(elementName)
+                } else {
+                    jsonNames.add(json.keys.firstOrNull() ?: elementName)
+                }
             }
 
             // Default value if the item not presented in the json
@@ -264,6 +277,9 @@ object JsonFlatter {
         descriptor: SerialDescriptor
     ): JsonElement {
         if (jsonArray.isEmpty()) return jsonArray
+        if (descriptor.kind == PrimitiveKind.STRING) {
+            return jsonArray
+        }
         if (descriptor.kind == StructureKind.LIST) {
             // The descriptor represents a List of data classes
             // Implement parsing logic for List of data classes

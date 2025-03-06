@@ -697,11 +697,12 @@ class StrapiService(
         val builder = StrapiRequestBuilder()
         builder.requestBuilder()
         val request = buildRequest(builder, HttpMethod.Patch.value)
-        val json = httpClient.patch(request).body<JsonElement>()
+        val response = httpClient.patch(request)
 
         return@executeRequestWithNetworkHandling if (T::class.simpleName == Unit::class.simpleName) {
             Unit as T
         } else {
+            val json = response.body<JsonElement>()
             handleUpdateItem(json, request, builder)
         }
     }
@@ -715,11 +716,11 @@ class StrapiService(
 
         val request = buildRequest(builder, HttpMethod.Patch.value)
         val httpResponse = httpClient.patch(request)
-        val json =  httpResponse.body<JsonElement>()
 
         return@executeRequestWithNetworkHandling if (T::class.simpleName == Unit::class.simpleName) {
             HttpResponse(Unit as T, httpResponse.headers.toMap())
         } else {
+            val json =  httpResponse.body<JsonElement>()
             val response = handleUpdateItem<T>(json, request, builder)
             HttpResponse(response, httpResponse.headers.toMap())
         }
@@ -732,12 +733,13 @@ class StrapiService(
         val builder = StrapiRequestBuilder()
         builder.requestBuilder()
         val request = buildRequest(builder, HttpMethod.Put.value)
-        val json =
-            httpClient.put(request).body<JsonElement>()
+        val httpResponse =
+            httpClient.put(request)
 
         return@executeRequestWithNetworkHandling if (T::class.simpleName == Unit::class.simpleName) {
             Unit as T
         } else {
+            val json =  httpResponse.body<JsonElement>()
             handleUpdateItem(json, request, builder)
         }
     }
@@ -752,11 +754,10 @@ class StrapiService(
         val httpResponse =
             httpClient.put(request)
 
-        val json = httpResponse.body<JsonElement>()
-
         return@executeRequestWithNetworkHandling if (T::class.simpleName == Unit::class.simpleName) {
             HttpResponse(Unit as T, httpResponse.headers.toMap())
         } else {
+            val json =  httpResponse.body<JsonElement>()
             val response = handleUpdateItem<T>(json, request, builder)
             HttpResponse(response, httpResponse.headers.toMap())
         }
@@ -828,12 +829,13 @@ class StrapiService(
         val requestClassName = builder.requestClassName
 
 
-        val json =
-            httpClient.delete(request).body<JsonElement>()
+        val httpResponse =
+            httpClient.delete(request)
 
         val response = if (T::class.simpleName == Unit::class.simpleName) {
             Unit as T
         } else {
+            val json =  httpResponse.body<JsonElement>()
             JsonFlatter.flat<T>(json).convert()
         }
 
