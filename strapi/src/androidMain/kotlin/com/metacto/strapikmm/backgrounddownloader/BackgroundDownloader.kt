@@ -147,13 +147,20 @@ actual class BackgroundDownloader(
                 } else {
                     val progress = download.progress
                     if (progress == 100) {
-                        cont.resumeIfActive(DownloadState.Completed(url, download.file))
+                        cont.resumeIfActive(DownloadState.Completed(download.id.toString(), url, download.file))
                     } else {
                         cont.resumeIfActive(DownloadState.Downloading(url))
                     }
                 }
             }
         }
+    }
+
+    @Throws(Throwable::class)
+    actual suspend fun deleteCachedFile(identifier: String): Boolean {
+        val intIdentifier = identifier.toIntOrNull() ?: return false
+        fetch.delete(intIdentifier)
+        return true
     }
 
     private fun getDownloadFileFullPath(url: String): String {

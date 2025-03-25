@@ -55,10 +55,12 @@ object JsonFlatter {
                     }
 
                     if (jsonNames.isEmpty()) {
-                        if(jsonElement.keys.contains(elementName)) {
+                        if (jsonElement.keys.contains(elementName)) {
                             jsonNames.add(elementName)
-                        } else {
+                        } else if (jsonElement.keys.size == 1){
                             jsonNames.add(jsonElement.keys.firstOrNull() ?: elementName)
+                        } else {
+                            jsonNames.add(elementName)
                         }
                     }
 
@@ -120,10 +122,12 @@ object JsonFlatter {
                     }
 
                     if (jsonNames.isEmpty()) {
-                        if(jsonElement.keys.contains(elementName)) {
+                        if (jsonElement.keys.contains(elementName)) {
                             jsonNames.add(elementName)
-                        } else {
+                        } else if (jsonElement.keys.size == 1){
                             jsonNames.add(jsonElement.keys.firstOrNull() ?: elementName)
+                        } else {
+                            jsonNames.add(elementName)
                         }
                     }
 
@@ -188,10 +192,12 @@ object JsonFlatter {
             }
 
             if (jsonNames.isEmpty()) {
-                if(json.keys.contains(elementName)) {
+                if (json.keys.contains(elementName)) {
                     jsonNames.add(elementName)
-                } else {
+                } else if (json.keys.size == 1){
                     jsonNames.add(json.keys.firstOrNull() ?: elementName)
+                } else {
+                    jsonNames.add(elementName)
                 }
             }
 

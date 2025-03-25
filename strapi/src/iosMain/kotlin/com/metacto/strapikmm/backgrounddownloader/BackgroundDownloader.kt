@@ -33,6 +33,20 @@ actual class BackgroundDownloader(
     }
 
     @Throws(Throwable::class)
+    actual suspend fun deleteCachedFile(identifier: String): Boolean = executeCatching {
+        return memScoped {
+            val errorPtr: ObjCObjectVar<NSError?> = alloc()
+            val status =
+                SHBackgroundDownloader.shared().purgeCachedAsset(identifier = identifier, errorPtr.ptr)
+            errorPtr.value?.let {
+                throw ErrorMapper.mapThrowable(it)
+            }
+
+            status ?: false
+        }
+    }
+
+    @Throws(Throwable::class)
     actual suspend fun download(url: String): String = executeCatching {
         return memScoped {
             val errorPtr: ObjCObjectVar<NSError?> = alloc()
@@ -71,7 +85,7 @@ actual class BackgroundDownloader(
 
             val downloadEndTime = downloadedObject.downloadEndTime()
             return@executeCatching if (downloadEndTime != null && downloadedObject.url() != null) {
-                DownloadState.Completed(url, downloadedObject.url()?.absoluteString.orEmpty())
+                DownloadState.Completed(downloadedObject.identifier(), url, downloadedObject.url()?.absoluteString.orEmpty())
             } else {
                 DownloadState.Downloading(url)
             }

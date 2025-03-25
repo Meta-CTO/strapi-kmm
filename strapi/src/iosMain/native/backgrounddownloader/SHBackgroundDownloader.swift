@@ -107,6 +107,15 @@ public typealias DownloadIdentifier = String
         }
     }
 
+    @objc public func purgeCachedAsset(identifier: String) -> Bool {
+        do {
+            try cacheManager.purgeCache(identifier: identifier)
+            return true
+        } catch {
+            return false
+        }
+    }
+
     private func download(asset: Asset) -> String {
         if let path = cacheManager.pathForCachedAsset(for: asset, purgeInvalidFiles: false) {
             let downloadURL = try? cacheManager.getCachedDownloadedAssets().first { $0.identifier == asset.identifier }?.url

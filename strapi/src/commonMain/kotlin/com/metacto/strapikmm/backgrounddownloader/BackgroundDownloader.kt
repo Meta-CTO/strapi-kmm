@@ -15,4 +15,7 @@ expect class BackgroundDownloader {
 
     @Throws(Throwable::class)
     suspend fun getDownloadState(url: String): DownloadState
+
+    @Throws(Throwable::class)
+    suspend fun deleteCachedFile(identifier: String): Boolean
 }

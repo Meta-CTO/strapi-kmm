@@ -21,4 +21,8 @@ actual class BackgroundDownloader(
     actual suspend fun getDownloadState(url: String): DownloadState {
         TODO("Not yet implemented")
     }
+
+    actual suspend fun deleteCachedFile(identifier: String): Boolean {
+        TODO("Not yet implemented")
+    }
 }
