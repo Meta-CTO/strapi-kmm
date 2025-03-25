@@ -37,7 +37,7 @@ actual class BackgroundDownloader(
         return memScoped {
             val errorPtr: ObjCObjectVar<NSError?> = alloc()
             val status =
-                SHBackgroundDownloader.shared().purgeCachedAsset(identifier = identifier, errorPtr.ptr)
+                SHBackgroundDownloader.shared().purgeCachedAssetWithIdentifier(identifier = identifier, errorPtr.ptr)
             errorPtr.value?.let {
                 throw ErrorMapper.mapThrowable(it)
             }

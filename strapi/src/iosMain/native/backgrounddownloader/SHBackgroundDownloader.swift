@@ -107,7 +107,8 @@ public typealias DownloadIdentifier = String
         }
     }
 
-    @objc public func purgeCachedAsset(identifier: String) -> Bool {
+    @objc(purgeCachedAssetWithIdentifier:)
+    public func purgeCachedAsset(identifier: String) -> Bool {
         do {
             try cacheManager.purgeCache(identifier: identifier)
             return true
