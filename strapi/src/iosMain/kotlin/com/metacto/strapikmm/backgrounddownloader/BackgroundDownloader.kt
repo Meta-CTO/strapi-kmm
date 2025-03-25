@@ -34,16 +34,9 @@ actual class BackgroundDownloader(
 
     @Throws(Throwable::class)
     actual suspend fun deleteCachedFile(identifier: String): Boolean = executeCatching {
-        return memScoped {
-            val errorPtr: ObjCObjectVar<NSError?> = alloc()
-            val status =
-                SHBackgroundDownloader.shared().purgeCachedAssetWithIdentifier(identifier = identifier, errorPtr.ptr)
-            errorPtr.value?.let {
-                throw ErrorMapper.mapThrowable(it)
-            }
-
-            status ?: false
-        }
+        val status =
+            SHBackgroundDownloader.shared().purgeCachedAssetWithIdentifier(identifier = identifier)
+        return@executeCatching status ?: false
     }
 
     @Throws(Throwable::class)
