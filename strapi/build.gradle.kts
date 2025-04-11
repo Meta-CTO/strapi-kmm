@@ -159,7 +159,7 @@ kotlin {
                 implementation(project.dependencies.platform("com.google.firebase:firebase-bom:33.4.0"))
                 implementation("com.google.firebase:firebase-dynamic-links-ktx")
                 api("com.amplitude:android-sdk:2.39.8")
-                api("com.clevertap.android:clevertap-android-sdk:7.2.2")
+                api("com.clevertap.android:clevertap-android-sdk:7.3.1")
                 api("com.android.installreferrer:installreferrer:2.2")
 
                 implementation("com.alexstyl:contactstore:$contactsVersion")
