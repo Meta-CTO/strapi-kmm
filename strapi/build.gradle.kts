@@ -60,13 +60,16 @@ kotlin {
 
         pod("FirebaseAuth") {
             linkOnly = true
-            version = "10.12.0"
+            version = "11.7.0"
         }
         pod("GoogleSignIn") {
             linkOnly = true
             version = "8.0.0"
         }
-        pod("FirebaseDynamicLinks")
+        pod("FirebaseDynamicLinks") {
+            linkOnly = true
+            version = "11.7.0"
+        }
         pod("Amplitude")
         pod("CleverTap-iOS-SDK") {
             moduleName = "CleverTapSDK"
