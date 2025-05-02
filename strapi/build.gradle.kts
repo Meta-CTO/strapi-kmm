@@ -58,8 +58,14 @@ kotlin {
         ios.deploymentTarget = "14.1"
         podfile = project.file("../iosApp/Podfile")
 
-        pod("FirebaseAuth", linkOnly = true)
-        pod("GoogleSignIn")
+        pod("FirebaseAuth") {
+            linkOnly = true
+            version = "10.12.0"
+        }
+        pod("GoogleSignIn") {
+            linkOnly = true
+            version = "8.0.0"
+        }
         pod("FirebaseDynamicLinks")
         pod("Amplitude")
         pod("CleverTap-iOS-SDK") {
