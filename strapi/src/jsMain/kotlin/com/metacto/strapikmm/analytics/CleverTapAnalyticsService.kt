@@ -1,7 +1,8 @@
 package com.metacto.strapikmm.analytics
 
 actual class CleverTapAnalyticsService actual constructor(
-    context: Any?
+    context: Any?,
+    enableIOSAutoIntegrate: Boolean
 ) : AnalyticsService {
     actual override val platform: AnalyticsPlatform
         get() = AnalyticsPlatform.CLEVERTAP

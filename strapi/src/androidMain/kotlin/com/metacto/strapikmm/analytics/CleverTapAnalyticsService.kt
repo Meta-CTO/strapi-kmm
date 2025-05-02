@@ -5,7 +5,8 @@ import com.clevertap.android.sdk.CleverTapAPI
 import com.metacto.strapikmm.errorhandling.ErrorMapper
 
 actual class CleverTapAnalyticsService actual constructor(
-    private val context: Any?
+    private val context: Any?,
+    private val enableIOSAutoIntegrate: Boolean
 ) : AnalyticsService {
     actual override val platform: AnalyticsPlatform
         get() = AnalyticsPlatform.CLEVERTAP

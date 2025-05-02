@@ -33,7 +33,11 @@ object JsonFlatter {
 
         val descriptor = kClass.serializer().descriptor
 
-        val elementNames = descriptor.elementNames
+        val elementNames = if (descriptor.kind == StructureKind.MAP && jsonElement is JsonObject) {
+            jsonElement.keys
+        } else {
+            descriptor.elementNames
+        }
 
         return when (jsonElement) {
             is JsonObject -> {
@@ -100,7 +104,11 @@ object JsonFlatter {
         }
 
         val descriptor = serializer(typeOf<T>()).descriptor
-        val elementNames = descriptor.elementNames
+        val elementNames = if (descriptor.kind == StructureKind.MAP && jsonElement is JsonObject) {
+            jsonElement.keys
+        } else {
+            descriptor.elementNames
+        }
 
         return when (jsonElement) {
             is JsonObject -> {
@@ -174,7 +182,12 @@ object JsonFlatter {
         }
 
         val map = mutableMapOf<String, JsonElement>()
-        val elementNames = descriptor.elementNames
+        val elementNames = if (descriptor.kind == StructureKind.MAP) {
+            json.keys
+        } else {
+            descriptor.elementNames
+        }
+
         elementNames.forEachIndexed { index, elementName ->
             val childDescriptor = descriptor.getElementDescriptor(index)
             val jsonNames = mutableListOf<String>()

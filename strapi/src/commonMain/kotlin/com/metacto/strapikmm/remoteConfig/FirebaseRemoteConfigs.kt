@@ -10,6 +10,7 @@ import dev.gitlive.firebase.remoteconfig.FirebaseRemoteConfig
 import dev.gitlive.firebase.remoteconfig.get
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
+
 class FirebaseRemoteConfigs(
     private val kmmPreference: KmmPreference,
     private val firebaseConfigs: FirebaseRemoteConfig

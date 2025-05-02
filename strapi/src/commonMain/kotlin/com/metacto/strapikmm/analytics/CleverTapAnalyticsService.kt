@@ -1,6 +1,9 @@
 package com.metacto.strapikmm.analytics
 
-expect class CleverTapAnalyticsService(context: Any?) : AnalyticsService {
+expect class CleverTapAnalyticsService(
+    context: Any?,
+    enableIOSAutoIntegrate: Boolean
+) : AnalyticsService {
     override val platform: AnalyticsPlatform
 
     override fun initialize()

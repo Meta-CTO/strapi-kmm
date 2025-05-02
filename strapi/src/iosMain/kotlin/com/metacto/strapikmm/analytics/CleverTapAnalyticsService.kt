@@ -4,7 +4,8 @@ import cocoapods.CleverTap_iOS_SDK.CleverTap
 
 @OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 actual class CleverTapAnalyticsService actual constructor(
-    private val context: Any?
+    private val context: Any?,
+    private val enableIOSAutoIntegrate: Boolean
 ) : AnalyticsService {
     actual override val platform: AnalyticsPlatform
         get() = AnalyticsPlatform.CLEVERTAP
@@ -14,7 +15,9 @@ actual class CleverTapAnalyticsService actual constructor(
     }
 
     actual override fun initialize() {
-        CleverTap.autoIntegrate()
+        if (enableIOSAutoIntegrate) {
+            CleverTap.autoIntegrate()
+        }
     }
 
     actual override fun identifyUser(
