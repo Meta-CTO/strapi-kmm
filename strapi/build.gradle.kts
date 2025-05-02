@@ -64,7 +64,7 @@ kotlin {
         }
         pod("GoogleSignIn") {
             linkOnly = true
-            version = "8.0.0"
+//            version = "8.0.0"
         }
         pod("FirebaseDynamicLinks") {
             linkOnly = true
