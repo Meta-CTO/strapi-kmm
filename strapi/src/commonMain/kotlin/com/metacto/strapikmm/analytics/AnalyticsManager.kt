@@ -69,8 +69,8 @@ class AnalyticsManager private constructor(
             this.amplitudeService?.initialize()
         }
 
-        fun setCleverTapAnalyticsService() = apply {
-            this.cleverTapAnalyticsService = CleverTapAnalyticsService(context)
+        fun setCleverTapAnalyticsService(enableIOSAutoIntegrate: Boolean) = apply {
+            this.cleverTapAnalyticsService = CleverTapAnalyticsService(context, enableIOSAutoIntegrate)
             this.cleverTapAnalyticsService?.initialize()
         }
 
