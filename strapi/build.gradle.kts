@@ -63,11 +63,11 @@ kotlin {
             version = "11.7.0"
         }
         pod("GoogleSignIn") {
-            linkOnly = true
-//            version = "8.0.0"
+//            linkOnly = true
+            version = "8.0.0"
         }
         pod("FirebaseDynamicLinks") {
-            linkOnly = true
+//            linkOnly = true
             version = "11.7.0"
         }
         pod("Amplitude")
