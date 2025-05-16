@@ -2,5 +2,6 @@ package com.metacto.strapikmm.analytics
 
 enum class AnalyticsPlatform {
     AMPLITUDE,
-    CLEVERTAP
+    CLEVERTAP,
+    APPSFLYER,
 }

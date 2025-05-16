@@ -71,6 +71,11 @@ kotlin {
             version = "11.7.0"
         }
         pod("Amplitude")
+        pod("AppsFlyerFramework") {
+            version = "~> 6.17.0"
+            moduleName  = "AppsFlyerLib"
+            extraOpts += listOf("-compiler-option", "-fmodules")
+        }
         pod("CleverTap-iOS-SDK") {
             moduleName = "CleverTapSDK"
         }
@@ -171,6 +176,7 @@ kotlin {
                 api("com.clevertap.android:clevertap-android-sdk:7.3.1")
                 api("com.android.installreferrer:installreferrer:2.2")
 
+                api("com.appsflyer:af-android-sdk:6.14.0")
                 implementation("com.alexstyl:contactstore:$contactsVersion")
                 implementation("com.alexstyl:contactstore-coroutines:$contactsVersion")
 
