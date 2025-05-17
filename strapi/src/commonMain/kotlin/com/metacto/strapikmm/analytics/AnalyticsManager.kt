@@ -14,7 +14,8 @@ class AnalyticsManager private constructor(
         phone: String?,
         extraProperties: Map<String, Any>
     ) {
-        val enableAnalyticsTracking = sharedPreference.getBool(SharedConstants.ENABLE_ANALYTICS_TRACKING, true)
+        val enableAnalyticsTracking =
+            sharedPreference.getBool(SharedConstants.ENABLE_ANALYTICS_TRACKING, true)
         if (!enableAnalyticsTracking) return
         services.forEach {
             it.identifyUser(id, email, phone, extraProperties)
@@ -45,7 +46,8 @@ class AnalyticsManager private constructor(
     }
 
     fun trackEvent(event: TrackingEvent) {
-        val enableAnalyticsTracking = sharedPreference.getBool(SharedConstants.ENABLE_ANALYTICS_TRACKING, true)
+        val enableAnalyticsTracking =
+            sharedPreference.getBool(SharedConstants.ENABLE_ANALYTICS_TRACKING, true)
         if (!enableAnalyticsTracking) return
 
         val eventProperties = event.properties.toMutableMap()
@@ -63,14 +65,26 @@ class AnalyticsManager private constructor(
     class Builder(private val context: Any?, private val sharedPreference: KmmPreference) {
         private var amplitudeService: AnalyticsService? = null
         private var cleverTapAnalyticsService: AnalyticsService? = null
+        private var appsFlyerAnalyticsService: AnalyticsService? = null
 
         fun setAmplitudeService(amplitudeKey: String) = apply {
             this.amplitudeService = AmplitudeAnalyticsService(context, amplitudeKey)
             this.amplitudeService?.initialize()
         }
 
+        fun setAppsFlyerAnalyticsService(
+            devApiKey: String,
+            appleAppId: String?,
+            initializeByDefault: Boolean
+        ) = apply {
+            this.appsFlyerAnalyticsService =
+                AppsFlyerAnalyticsService(context, devApiKey, appleAppId, initializeByDefault)
+            this.appsFlyerAnalyticsService?.initialize()
+        }
+
         fun setCleverTapAnalyticsService(enableIOSAutoIntegrate: Boolean) = apply {
-            this.cleverTapAnalyticsService = CleverTapAnalyticsService(context, enableIOSAutoIntegrate)
+            this.cleverTapAnalyticsService =
+                CleverTapAnalyticsService(context, enableIOSAutoIntegrate)
             this.cleverTapAnalyticsService?.initialize()
         }
 
@@ -78,6 +92,10 @@ class AnalyticsManager private constructor(
             val analyticsManager = AnalyticsManager(sharedPreference = sharedPreference)
 
             amplitudeService?.let {
+                analyticsManager.registerService(it)
+            }
+
+            appsFlyerAnalyticsService?.let {
                 analyticsManager.registerService(it)
             }
 
