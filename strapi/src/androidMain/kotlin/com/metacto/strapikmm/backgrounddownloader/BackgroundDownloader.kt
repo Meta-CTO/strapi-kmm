@@ -10,6 +10,7 @@ import com.metacto.strapikmm.util.Logger
 import com.metacto.strapikmm.util.applyIf
 import com.tonyodev.fetch2.*
 import kotlinx.coroutines.suspendCancellableCoroutine
+import androidx.core.net.toUri
 
 actual class BackgroundDownloader(
     private val context: Context,
@@ -164,7 +165,7 @@ actual class BackgroundDownloader(
     }
 
     private fun getDownloadFileFullPath(url: String): String {
-        val fileName = Uri.parse(url).lastPathSegment
+        val fileName = url.toUri().pathSegments.joinToString("_")
         return "$downloadsFolder/$fileName"
     }
 
