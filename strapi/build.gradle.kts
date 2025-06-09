@@ -78,6 +78,7 @@ kotlin {
         }
         pod("CleverTap-iOS-SDK") {
             moduleName = "CleverTapSDK"
+            extraOpts += listOf("-compiler-option", "-fmodules")
         }
 
         framework {
