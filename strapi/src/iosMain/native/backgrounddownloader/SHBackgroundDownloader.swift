@@ -233,11 +233,27 @@ extension SHBackgroundDownloader: URLSessionDownloadDelegate {
         if (200...299).contains(response.statusCode) {
             do {
                 let cacheURL = try cacheManager.makeCacheURL(for: assetIdentifier)
+
+                // If the file is already there we treat it as a success.
+                if FileManager.default.fileExists(atPath: cacheURL.path) {
+                    cacheManager.assetDidDownloadSuccessfully(identifier: assetIdentifier)
+                    delegate?.downloaderDidDownloadAssetWithIdentifierAndURL(
+                        id: assetIdentifier,
+                        url: cacheURL,
+                        downloadURL: downloadURL
+                    )
+                    processQueue()
+                    return
+                }
+
+                // No file yet → copy the newly-downloaded one
                 try FileManager.default.copyItem(at: location, to: cacheURL)
-
-                delegate?.downloaderDidDownloadAssetWithIdentifierAndURL(id: assetIdentifier, url: cacheURL, downloadURL: downloadURL)
-
                 cacheManager.assetDidDownloadSuccessfully(identifier: assetIdentifier)
+                delegate?.downloaderDidDownloadAssetWithIdentifierAndURL(
+                    id: assetIdentifier,
+                    url: cacheURL,
+                    downloadURL: downloadURL
+                )
             } catch {
                 delegate?.downloaderDidFailToDownloadAssetWithIdentifierAndError(
                     id: assetIdentifier, url: response.url, downloadURL: downloadURL, error: error

@@ -133,10 +133,10 @@ public final class SHCacheManager {
             do {
                 let cacheFileURL = try self.makeCacheURL(for: "caches.txt")
                 let data = try JSONEncoder().encode(updatedDownloadedAssets)
-                
+
                 try data.write(to: cacheFileURL)
             } catch {
-                
+
             }
         }
     }
