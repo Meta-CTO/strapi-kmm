@@ -66,6 +66,7 @@ class AnalyticsManager private constructor(
         private var amplitudeService: AnalyticsService? = null
         private var cleverTapAnalyticsService: AnalyticsService? = null
         private var appsFlyerAnalyticsService: AnalyticsService? = null
+        private val analyticsServices: MutableList<AnalyticsService> = mutableListOf()
 
         fun setAmplitudeService(amplitudeKey: String) = apply {
             this.amplitudeService = AmplitudeAnalyticsService(context, amplitudeKey)
@@ -88,6 +89,10 @@ class AnalyticsManager private constructor(
             this.cleverTapAnalyticsService?.initialize()
         }
 
+        fun addService(analyticsService: AnalyticsService) {
+            analyticsServices.add(analyticsService)
+        }
+
         fun build(): AnalyticsManager {
             val analyticsManager = AnalyticsManager(sharedPreference = sharedPreference)
 
@@ -101,6 +106,10 @@ class AnalyticsManager private constructor(
 
             cleverTapAnalyticsService?.let {
                 analyticsManager.registerService(it)
+            }
+
+            analyticsServices.forEach { service ->
+                analyticsManager.registerService(service)
             }
 
             return analyticsManager

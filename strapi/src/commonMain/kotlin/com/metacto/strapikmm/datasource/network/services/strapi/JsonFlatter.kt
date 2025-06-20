@@ -272,6 +272,10 @@ object JsonFlatter {
     ): JsonElement {
         return when (jsonElement) {
             is JsonObject -> {
+                if (descriptor.kind == StructureKind.LIST) {
+                    return DummyObject
+                }
+
                 val jsonObjectValue = jsonElement.jsonObject
                 parse(jsonObjectValue, descriptor)
             }
@@ -315,10 +319,7 @@ object JsonFlatter {
             // Implement parsing logic for Pure JsonArray
             return jsonArray
         } else {
-            throw ErrorMapper.mapToAppException(
-                "Unsupported SerialDescriptor kind: ${descriptor.kind}",
-                -1
-            )
+            return DummyObject
         }
     }
 }
