@@ -4,4 +4,5 @@ enum class AnalyticsPlatform {
     AMPLITUDE,
     CLEVERTAP,
     APPSFLYER,
+    CUSTOM
 }
