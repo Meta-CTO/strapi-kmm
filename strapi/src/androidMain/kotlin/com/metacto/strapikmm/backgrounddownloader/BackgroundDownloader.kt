@@ -26,11 +26,24 @@ actual class BackgroundDownloader(
     private val logger = Logger(LOG_TAG)
     private lateinit var fetch: Fetch
 
+    private var _maximumNumberOfConcurrentDownloads = maximumNumberOfConcurrentDownloads
+    private var _allowsCellularDownloads = allowsCellularDownloads
+
     init {
         validateNotificationsPermission()
         validateWritePermission()
         initFetch()
     }
+
+    actual fun updateMaximumConcurrentDownloads(newLimit: Int) {
+        _maximumNumberOfConcurrentDownloads = newLimit
+        fetch.setDownloadConcurrentLimit(newLimit)
+    }
+
+    actual fun updateCellularDownloadsAllowed(allowed: Boolean) {
+        _allowsCellularDownloads = allowed
+    }
+
 
     private fun validateNotificationsPermission() {
         if (showNotifications.not()) return
@@ -67,7 +80,7 @@ actual class BackgroundDownloader(
         // Create fetch configs
         val configs = FetchConfiguration
             .Builder(context.applicationContext)
-            .setDownloadConcurrentLimit(maximumNumberOfConcurrentDownloads)
+            .setDownloadConcurrentLimit(_maximumNumberOfConcurrentDownloads)
             .setNamespace(applicationId)
             .applyIf(showNotifications) {
                 setNotificationManager(notificationManager)
@@ -101,7 +114,7 @@ actual class BackgroundDownloader(
             // Create and config the request
             val request = Request(url, filePath).apply {
                 networkType =
-                    if (allowsCellularDownloads) NetworkType.ALL else NetworkType.WIFI_ONLY
+                    if (_allowsCellularDownloads) NetworkType.ALL else NetworkType.WIFI_ONLY
                 autoRetryMaxAttempts = DEFAULT_MAX_RETRY_COUNT
             }
 

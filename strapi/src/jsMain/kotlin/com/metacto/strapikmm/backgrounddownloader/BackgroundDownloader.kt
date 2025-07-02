@@ -25,4 +25,12 @@ actual class BackgroundDownloader(
     actual suspend fun deleteCachedFile(identifier: String): Boolean {
         TODO("Not yet implemented")
     }
+
+    actual fun updateMaximumConcurrentDownloads(newLimit: Int) {
+        TODO("Not yet implemented")
+    }
+
+    actual fun updateCellularDownloadsAllowed(allowed: Boolean) {
+        TODO("Not yet implemented")
+    }
 }

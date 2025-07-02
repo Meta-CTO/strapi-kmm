@@ -18,4 +18,7 @@ expect class BackgroundDownloader {
 
     @Throws(Throwable::class)
     suspend fun deleteCachedFile(identifier: String): Boolean
+
+    fun updateMaximumConcurrentDownloads(newLimit: Int)
+    fun updateCellularDownloadsAllowed(allowed: Boolean)
 }

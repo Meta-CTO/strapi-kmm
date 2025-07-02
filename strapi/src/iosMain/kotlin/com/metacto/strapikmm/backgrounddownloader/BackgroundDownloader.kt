@@ -21,13 +21,14 @@ actual class BackgroundDownloader(
     private val delegate = BackgroundDownloaderDelegate()
     private val logger = Logger("BackgroundDownloader")
 
+    // Make these mutable
+    private var _maximumNumberOfConcurrentDownloads = maximumNumberOfConcurrentDownloads
+    private var _allowsCellularDownloads = allowsCellularDownloads
+
     init {
         PathMonitor.shared().startMonitoring()
 
-        SHBackgroundDownloader.configureMaximumNumberConcurrentDownloads(
-            maximumNumberOfConcurrentDownloads.convert(),
-            allowsCellularDownloads
-        )
+        configureDownloader()
 
         SHBackgroundDownloader.shared().setDelegate(delegate)
     }
@@ -179,5 +180,22 @@ actual class BackgroundDownloader(
                 )
             )
         }
+    }
+
+    private fun configureDownloader() {
+        SHBackgroundDownloader.configureMaximumNumberConcurrentDownloads(
+            _maximumNumberOfConcurrentDownloads.convert(),
+            _allowsCellularDownloads
+        )
+    }
+
+    actual fun updateMaximumConcurrentDownloads(newLimit: Int) {
+        _maximumNumberOfConcurrentDownloads = newLimit
+        configureDownloader()
+    }
+
+    actual fun updateCellularDownloadsAllowed(allowed: Boolean) {
+        _allowsCellularDownloads = allowed
+        configureDownloader()
     }
 }
