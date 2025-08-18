@@ -125,11 +125,12 @@ class StrapiService(
         val apiPath = request.url.encodedPath
         val fetchStrategy = builder.requestFetchStrategy
         val requestClassName = builder.requestClassName ?: T::class.simpleName ?: ""
+        val shouldCache = builder.shouldCache
 
         val modelVersion = serializer<T>().getModelVersion()
 
         // get data from cache if available
-        if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE) {
+        if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE && shouldCache) {
             val localData = if (requestClassName.isNotEmpty()) {
                 localDataRepository.getContentDataByModelVersionAndModelTypeAndApiUrl(
                     modelVersion,
@@ -156,7 +157,7 @@ class StrapiService(
 
         val data = JsonFlatter.flat<T>(json).convert<T>()
         // save data to cache
-        if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE) {
+        if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE && shouldCache) {
             // Then cache
 
             localDataRepository.insertOrUpdateContentData(
@@ -183,11 +184,12 @@ class StrapiService(
         val apiPath = request.url.encodedPath
         val fetchStrategy = builder.requestFetchStrategy
         val requestClassName = builder.requestClassName ?: T::class.simpleName ?: ""
+        val shouldCache = builder.shouldCache
 
         val modelVersion = serializer<T>().getModelVersion()
 
         // get data from cache if available
-        if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE) {
+        if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE && shouldCache) {
             val localData = if (requestClassName.isNotEmpty()) {
                 localDataRepository.getContentDataByModelVersionAndModelTypeAndApiUrl(
                     modelVersion,
@@ -211,7 +213,7 @@ class StrapiService(
 
         val response = JsonFlatter.flat<T>(json).convert<T>()
         // save data to cache
-        if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE) {
+        if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE && shouldCache) {
             // Then cache
 
             localDataRepository.insertOrUpdateContentData(
@@ -247,6 +249,7 @@ class StrapiService(
         val page = builder.queryBuilder?.pagingData?.page ?: 1
 
         val fetchStrategy = builder.requestFetchStrategy
+        val shouldCache = builder.shouldCache
 
         val request = buildRequest(builder, HttpMethod.Get.value)
 
@@ -257,7 +260,7 @@ class StrapiService(
         val apiPath = request.url.encodedPath
 
         // get data from cache if available
-        if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE && page == 1) {
+        if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE && shouldCache && page == 1) {
             val localData =
                 localDataRepository.getListDataByModelVersionAndApiUrl(modelVersion, apiUrl)
             val listItems = localData.orEmpty().map { localItem ->
@@ -301,7 +304,7 @@ class StrapiService(
 
         // Then cache the whole list and each item in the list individually
         // if the page is 1 or the paging cache strategy is CACHE_LAST
-        if (page == 1) {
+        if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE && shouldCache && page == 1) {
             // Converting the list to json array to be able to cache it
             val jsonArray = flatResponse.jsonObject["data"]?.jsonArray.orEmpty()
             val elementsIds = jsonArray.mapNotNull { jsonElement ->
@@ -385,6 +388,7 @@ class StrapiService(
         val page = builder.queryBuilder?.pagingData?.page ?: 1
 
         val fetchStrategy = builder.requestFetchStrategy
+        val shouldCache = builder.shouldCache
 
         val request = buildRequest(builder, HttpMethod.Get.value)
 
@@ -395,7 +399,7 @@ class StrapiService(
         val apiPath = request.url.encodedPath
 
         // get data from cache if available
-        if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE && page == 1) {
+        if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE && shouldCache && page == 1) {
             val localData =
                 localDataRepository.getListDataByModelVersionAndApiUrl(modelVersion, apiUrl)
             val listItems = localData.orEmpty().map { localItem ->
@@ -440,7 +444,7 @@ class StrapiService(
 
         // Then cache the whole list and each item in the list individually
         // if the page is 1 or the paging cache strategy is CACHE_LAST
-        if (page == 1) {
+        if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE && shouldCache && page == 1) {
             // Converting the list to json array to be able to cache it
             val jsonArray = flatResponse.jsonObject["data"]?.jsonArray.orEmpty()
             val elementsIds = jsonArray.mapNotNull { jsonElement ->
@@ -529,6 +533,7 @@ class StrapiService(
             val requestClassName = builder.requestClassName ?: ""
 
             val fetchStrategy = builder.requestFetchStrategy
+            val shouldCache = builder.shouldCache
 
             val request = buildRequest(builder, HttpMethod.Get.value)
 
@@ -538,7 +543,7 @@ class StrapiService(
             val entityId = apiPath.split("/").lastOrNull()?.toInt()
 
             // get data from cache if available
-            if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE) {
+            if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE && shouldCache) {
                 val localData = if (entityId != null && requestClassName.isNotEmpty()) {
                     localDataRepository.getContentDataByModelTypeAndModelVersionAndModelId(
                         requestClassName,
@@ -572,13 +577,15 @@ class StrapiService(
             val jsonContent = Json.encodeToString(jsonObject)
 
             // Then Insert
-            localDataRepository.insertOrUpdateContentData(
-                modelVersion = modelVersion,
-                modelType = requestClassName.nullIfEmpty(),
-                jsonContent,
-                apiPath,
-                entityId
-            )
+            if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE && shouldCache) {
+                localDataRepository.insertOrUpdateContentData(
+                    modelVersion = modelVersion,
+                    modelType = requestClassName.nullIfEmpty(),
+                    jsonContent,
+                    apiPath,
+                    entityId
+                )
+            }
 
             emit(response)
         }
@@ -598,6 +605,7 @@ class StrapiService(
             val requestClassName = builder.requestClassName ?: ""
 
             val fetchStrategy = builder.requestFetchStrategy
+            val shouldCache = builder.shouldCache
 
             val request = buildRequest(builder, HttpMethod.Get.value)
 
@@ -607,7 +615,7 @@ class StrapiService(
             val entityId = apiPath.split("/").lastOrNull()?.toInt()
 
             // get data from cache if available
-            if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE) {
+            if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE && shouldCache) {
                 val localData = if (entityId != null && requestClassName.isNotEmpty()) {
                     localDataRepository.getContentDataByModelTypeAndModelVersionAndModelId(
                         requestClassName,
@@ -649,13 +657,15 @@ class StrapiService(
             val jsonContent = Json.encodeToString(jsonObject)
 
             // Then Insert
-            localDataRepository.insertOrUpdateContentData(
-                modelVersion = modelVersion,
-                modelType = requestClassName.nullIfEmpty(),
-                jsonContent,
-                apiPath,
-                entityId
-            )
+            if (fetchStrategy == FetchStrategy.CACHE_THEN_REMOTE && shouldCache) {
+                localDataRepository.insertOrUpdateContentData(
+                    modelVersion = modelVersion,
+                    modelType = requestClassName.nullIfEmpty(),
+                    jsonContent,
+                    apiPath,
+                    entityId
+                )
+            }
 
             emit(
                 HttpResponse(

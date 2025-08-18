@@ -16,6 +16,7 @@ class StrapiRequestBuilder {
     var requestFetchStrategy: FetchStrategy = FetchStrategy.CACHE_THEN_REMOTE
     var requestClassName: String? = null
     var modelSerializer: KSerializer<*>? = null
+    var shouldCache: Boolean = true
 
     fun endpoint(endpoint: String) {
         this.requestEndpoint = endpoint
@@ -27,6 +28,10 @@ class StrapiRequestBuilder {
 
     fun fetchStrategy(strategy: FetchStrategy) {
         this.requestFetchStrategy = strategy
+    }
+
+    fun cacheEnabled(enabled: Boolean) {
+        this.shouldCache = enabled
     }
 
     inline fun <reified T : Any> responseModel() {
