@@ -80,8 +80,11 @@ class StrapiService(
         val builder = StrapiRequestBuilder()
         builder.requestBuilder()
 
+        val page = builder.queryBuilder?.pagingData?.page
+        val pageSize = builder.queryBuilder?.pagingData?.pageSize
+
         // throw exception if the model is PagingResponse or DataWrapper
-        return if (T::class == PagingResponse::class) {
+        return if (T::class == PagingResponse::class || (page != null && pageSize != null)) {
             getPaged(requestBuilder)
         } else if (T::class == DataWrapper::class) {
             getOne(requestBuilder)
@@ -97,8 +100,11 @@ class StrapiService(
         val builder = StrapiRequestBuilder()
         builder.requestBuilder()
 
+        val page = builder.queryBuilder?.pagingData?.page
+        val pageSize = builder.queryBuilder?.pagingData?.pageSize
+
         // throw exception if the model is PagingResponse or DataWrapper
-        return if (T::class == PagingResponse::class) {
+        return if (T::class == PagingResponse::class || (page != null && pageSize != null)) {
             getPagedHttpResponse<T>(requestBuilder)
         } else if (T::class == DataWrapper::class) {
             getOneHttpResponse<T>(requestBuilder)
