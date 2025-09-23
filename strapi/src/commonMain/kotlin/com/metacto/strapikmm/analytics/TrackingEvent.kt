@@ -28,8 +28,13 @@ class TrackingEvent private constructor(builder: Builder) {
             return this
         }
 
+        fun trackOnAppsFlyer(): Builder {
+            platforms.add(AnalyticsPlatform.APPSFLYER)
+            return this
+        }
+
         fun trackOnAllAnalyticsPlatform(): Builder {
-            platforms.addAll(listOf(AnalyticsPlatform.CLEVERTAP, AnalyticsPlatform.AMPLITUDE))
+            platforms.addAll(listOf(AnalyticsPlatform.APPSFLYER, AnalyticsPlatform.CLEVERTAP, AnalyticsPlatform.AMPLITUDE))
             return this
         }
 
