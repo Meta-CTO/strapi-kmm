@@ -66,10 +66,6 @@ kotlin {
 //            linkOnly = true
             version = "8.0.0"
         }
-        pod("FirebaseDynamicLinks") {
-//            linkOnly = true
-            version = "11.7.0"
-        }
         pod("Amplitude")
         pod("AppsFlyerFramework") {
             version = "~> 6.17.0"
@@ -172,7 +168,6 @@ kotlin {
                 implementation("androidx.activity:activity-ktx:1.9.2")
                 implementation("com.google.android.gms:play-services-auth:21.3.0")
                 implementation(project.dependencies.platform("com.google.firebase:firebase-bom:33.4.0"))
-                implementation("com.google.firebase:firebase-dynamic-links-ktx")
                 api("com.amplitude:android-sdk:2.39.8")
                 api("com.clevertap.android:clevertap-android-sdk:7.3.1")
                 api("com.android.installreferrer:installreferrer:2.2")
